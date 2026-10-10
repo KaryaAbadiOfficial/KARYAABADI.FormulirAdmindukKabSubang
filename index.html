@@ -8,113 +8,149 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
         :root {
-            --primary: #004aad; --white: #ffffff; --danger: #dc3545;
-            --warning: #ffc107; --success: #28a745; --gray: #6c757d;
+            --dark-green: #0b3d2e; --gold: #d4af37; --gold-light: #f3e5ab;
+            --red-download: #c0392b; --white: #ffffff;
         }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; background-color: #eef2f7; color: #333; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; background-color: #f4f6f5; color: #333; }
         header {
-            background: linear-gradient(135deg, #004aad 0%, #002a6b 100%);
-            color: white; padding: 20px 50px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background: var(--dark-green); color: var(--gold); padding: 15px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 4px solid var(--gold); box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
-        header h1 { margin: 0; font-size: 28px; text-transform: uppercase; }
-        header p { margin: 5px 0 0; font-size: 14px; opacity: 0.9; }
+        .header-left img, .header-right img { height: 80px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+        .header-left { display: flex; align-items: center; }
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .header-right h2 { margin: 0; font-size: 22px; color: var(--gold); letter-spacing: 1px; text-align: right; }
+        .header-center { flex-grow: 1; text-align: center; }
+        .header-center h1 { margin: 0; font-size: 26px; text-transform: uppercase; color: var(--white); }
+        .header-center p { margin: 5px 0 0; font-size: 13px; color: var(--gold-light); }
 
-        .info-section {
-            background: white; max-width: 1000px; margin: 20px auto; padding: 20px;
-            border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 5px solid var(--primary);
+        .toolbar-container {
+            background: var(--white); padding: 20px; max-width: 1200px; margin: 25px auto;
+            border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-top: 5px solid var(--dark-green);
         }
-        .info-section h2 { margin-top: 0; color: var(--primary); font-size: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        .info-section ol { padding-left: 20px; line-height: 1.6; font-size: 15px; }
-
-        .toolbar { 
-            background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-            margin: 0 auto 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center;
-            max-width: 1000px; position: sticky; top: 0; z-index: 100;
-        }
-        .toolbar button, .toolbar select { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-success { background: var(--success); color: white; }
-        .btn-warning { background: var(--warning); color: black; }
-        .btn-danger { background: var(--danger); color: white; }
-        .btn-secondary { background: var(--gray); color: white; }
-        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        .row-1 { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .form-group { display: flex; align-items: center; gap: 15px; flex: 1; }
+        .form-group label { font-weight: bold; color: var(--dark-green); font-size: 16px; }
+        select { padding: 12px; border: 2px solid var(--dark-green); border-radius: 6px; min-width: 300px; font-size: 15px; cursor: pointer; background: var(--white); }
         
-        /* CSS untuk Textarea yang luas */
-        textarea { 
-            padding: 10px; border: 1px solid #ccc; border-radius: 5px; 
-            width: 220px; min-height: 40px; resize: vertical; font-family: Arial, sans-serif;
+        .history-group { display: flex; gap: 10px; }
+        .btn-icon {
+            background: var(--gold); color: var(--dark-green); border: none; width: 45px; height: 45px;
+            border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;
+            transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        select { padding: 10px; border: 1px solid #ccc; border-radius: 5px; min-width: 250px; }
-        #statusMode { font-weight: bold; color: var(--primary); background: #e9ecef; padding: 10px 15px; border-radius: 5px; }
+        .btn-icon:hover { background: var(--gold-light); transform: scale(1.05); }
+        .btn-icon:disabled { background: #ccc; color: #888; cursor: not-allowed; }
 
-        #pdfWrapper { display: flex; justify-content: center; padding-bottom: 40px; }
+        .row-2 { margin-bottom: 20px; }
+        textarea { width: 100%; min-height: 80px; padding: 12px; border: 2px solid var(--dark-green); border-radius: 6px; font-family: 'Segoe UI', sans-serif; font-size: 15px; resize: vertical; box-sizing: border-box; }
+
+        .row-3 { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .btn-mode {
+            background: var(--white); color: var(--dark-green); border: 2px solid var(--dark-green);
+            padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;
+            display: flex; align-items: center; gap: 5px; transition: 0.2s;
+        }
+        .btn-mode:hover { background: var(--dark-green); color: var(--gold); }
+        .btn-upload { background: var(--gold-light); border-color: var(--gold); cursor: pointer; }
+
+        .row-4 { display: flex; justify-content: center; gap: 15px; align-items: center; margin-bottom: 20px; }
+        .btn-nav { background: var(--dark-green); color: var(--gold); border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 15px; }
+        .page-info { font-weight: bold; color: var(--dark-green); font-size: 16px; min-width: 80px; text-align: center; }
+        
+        .row-5 { display: flex; justify-content: center; margin-top: 25px; }
+        .btn-download {
+            background: var(--red-download); color: var(--white); border: none; padding: 15px 40px;
+            border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; display: flex;
+            align-items: center; gap: 10px; box-shadow: 0 4px 6px rgba(192, 57, 43, 0.4); transition: 0.2s;
+        }
+        .btn-download:hover { background: #e74c3c; transform: translateY(-2px); }
+        .btn-download:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; }
+
+        #pdfWrapper { display: flex; justify-content: center; padding-bottom: 50px; }
         #pdfContainer { position: relative; box-shadow: 0 0 15px rgba(0,0,0,0.2); background: white; }
         #interactionLayer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: crosshair; }
         .annotation-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
         
         .annotation-box { position: absolute; pointer-events: auto; cursor: move; user-select: none; }
-        /* CSS untuk menampilkan Enter (baris baru) di PDF Viewer */
-        .text-annot { 
-            color: black; font-family: Arial, sans-serif; white-space: pre; line-height: 1.15; 
-            transform: translateY(-100%); font-weight: bold; 
-        }
+        .text-annot { color: black; font-family: Arial, sans-serif; white-space: pre; line-height: 1.15; transform: translateY(-100%); font-weight: bold; }
         .circle-annot { border: 1.5px solid black; border-radius: 50%; }
         .check-annot { overflow: visible; }
-        .resize-handle { position: absolute; bottom: -5px; right: -5px; width: 12px; height: 12px; background: var(--primary); border-radius: 50%; cursor: se-resize; pointer-events: auto; }
+        .resize-handle { position: absolute; bottom: -5px; right: -5px; width: 12px; height: 12px; background: var(--gold); border: 1px solid var(--dark-green); border-radius: 50%; cursor: se-resize; pointer-events: auto; }
         
-        .page-nav { display: flex; gap: 10px; align-items: center; margin-left: auto; }
-        footer { background: #002a6b; color: white; text-align: center; padding: 20px; margin-top: 20px; font-size: 14px; }
+        footer { background: var(--dark-green); color: var(--gold); text-align: center; padding: 20px; margin-top: 20px; font-size: 14px; }
+        input[type="file"] { display: none; }
     </style>
 </head>
 <body>
     <header>
-        <h1>KARYA ABADI FORMULIR SUBANG</h1>
-        <p>Sistem Digital Pengisian Formulir Kependudukan - Rapi, Presisi, Tanpa Merusak Format Asli</p>
+        <div class="header-left"><img src="logo-subang.png" alt="Logo Kabupaten Subang"></div>
+        <div class="header-center">
+            <h1>KARYA ABADI FORMULIR SUBANG</h1>
+            <p>Sistem Digital Pengisian Formulir Kependudukan - Rapi, Presisi, Tanpa Merusak Format Asli</p>
+        </div>
+        <div class="header-right">
+            <h2>KARYA ABADI</h2>
+            <img src="logo-karya-abadi.png" alt="Logo Karya Abadi">
+        </div>
     </header>
 
-    <section class="info-section">
-        <h2>Panduan Penggunaan Cepat</h2>
-        <ol>
-            <li>Pilih formulir pada <b>Dropdown</b>. PDF akan <b>LANGSUNG TAMPIL</b> di bawah secara instan.</li>
-            <li>Ketik teks di kolom input (bisa menggunakan tombol <b>Enter</b> untuk baris baru), klik <b>Mode Teks</b>, lalu klik di atas PDF untuk menempelkan teks (Font otomatis tebal).</li>
-            <li>Klik <b>Mode Ceklis (✓)</b> atau <b>Mode Lingkaran</b> untuk memberi tanda pada pilihan ganda.</li>
-            <li>Gunakan <b>Mode Edit/Geser</b> untuk memindahkan/memperbesar objek (tarik titik biru di pojok objek).</li>
-            <li>Gunakan <b>Mode Hapus</b> lalu klik langsung objek yang ingin dihapus.</li>
-            <li>Klik <b>Download PDF</b> jika sudah selesai.</li>
-        </ol>
-    </section>
+    <div class="toolbar-container">
+        <div class="row-1">
+            <div class="form-group">
+                <label>1. Pilih Formulir:</label>
+                <select id="formSelect">
+                    <option value="">-- Pilih Formulir --</option>
+                    <option value="F 1.02 FORMULIR PENDAFTARAN PERISTIWA KEPENDUDUKAN.pdf">F 1.02 Pendaftaran Peristiwa</option>
+                    <option value="F 1.06 SURAT PERNYATAAN PERUBAHAN ELEMEN DATA KEPENDUDUKAN.pdf">F 1.06 Perubahan Elemen Data</option>
+                    <option value="F-1.01 FORMULIR BIODATA WNI.pdf">F-1.01 Biodata WNI</option>
+                    <option value="F-1.03 FORMULIR PENDAFTARAN PERPINDAHAN PENDUDUK.pdf">F-1.03 Perpindahan Penduduk</option>
+                    <option value="F-1.07 SURAT KUASA.pdf">F-1.07 Surat Kuasa</option>
+                    <option value="F-1.21-FORMULIR-PERMOHONAN-KTP-WNI.pdf">F-1.21 Permohonan KTP</option>
+                    <option value="F-2.01 FORMULIR PELAPORAN PENCATATAN SIPIL DI DALAM WILAYAH NKRI.pdf">F-2.01 Pelaporan Capil</option>
+                    <option value="F-2.03 SPTJM KELAHIRAN.pdf">F-2.03 SPTJM Kelahiran</option>
+                    <option value="F-2.04 SPTJM KEBENARAN SUAMI ISTRI.pdf">F-2.04 SPTJM Suami Istri</option>
+                    <option value="SURAT PERNYATAAN DOMISILI SUBANG.pdf">Surat Pernyataan Domisili</option>
+                </select>
+            </div>
+            <div class="history-group">
+                <button class="btn-icon" id="undoBtn" onclick="undo()" title="Undo">↩️</button>
+                <button class="btn-icon" id="redoBtn" onclick="redo()" title="Redo">↪️</button>
+            </div>
+        </div>
 
-    <div class="toolbar">
-        <select id="formSelect">
-            <option value="">-- Pilih Formulir --</option>
-            <option value="F 1.02 FORMULIR PENDAFTARAN PERISTIWA KEPENDUDUKAN.pdf">F 1.02 Pendaftaran Peristiwa</option>
-            <option value="F 1.06 SURAT PERNYATAAN PERUBAHAN ELEMEN DATA KEPENDUDUKAN.pdf">F 1.06 Perubahan Elemen Data</option>
-            <option value="F-1.01 FORMULIR BIODATA WNI.pdf">F-1.01 Biodata WNI</option>
-            <option value="F-1.03 FORMULIR PENDAFTARAN PERPINDAHAN PENDUDUK.pdf">F-1.03 Perpindahan Penduduk</option>
-            <option value="F-1.07 SURAT KUASA.pdf">F-1.07 Surat Kuasa</option>
-            <option value="F-1.21-FORMULIR-PERMOHONAN-KTP-WNI.pdf">F-1.21 Permohonan KTP</option>
-            <option value="F-2.01 FORMULIR PELAPORAN PENCATATAN SIPIL DI DALAM WILAYAH NKRI.pdf">F-2.01 Pelaporan Capil</option>
-            <option value="F-2.03 SPTJM KELAHIRAN.pdf">F-2.03 SPTJM Kelahiran</option>
-            <option value="F-2.04 SPTJM KEBENARAN SUAMI ISTRI.pdf">F-2.04 SPTJM Suami Istri</option>
-            <option value="SURAT PERNYATAAN DOMISILI SUBANG.pdf">Surat Pernyataan Domisili</option>
-        </select>
-        
-        <textarea id="textInput" placeholder="Ketik Teks... (Bisa Enter/Baris)"></textarea>
-        
-        <button class="btn-warning" onclick="setMode('text')">Mode Teks</button>
-        <button class="btn-warning" onclick="setMode('check')">Mode Ceklis (✓)</button>
-        <button class="btn-warning" onclick="setMode('circle')">Mode Lingkaran</button>
-        <button class="btn-secondary" onclick="setMode('edit')">Mode Edit/Geser</button>
-        <button class="btn-danger" onclick="setMode('delete')">Mode Hapus</button>
-        
-        <span id="statusMode">Mode Aktif: -</span>
-        
-        <button class="btn-primary" onclick="downloadPDF()">Download PDF</button>
+        <div class="row-2">
+            <label style="display:block; margin-bottom:5px; font-weight:bold; color:var(--dark-green);">2. Masukkan Teks (Bisa Enter/Baris):</label>
+            <textarea id="textInput" placeholder="Ketik teks di sini... (Bisa menggunakan tombol Enter untuk baris baru)"></textarea>
+        </div>
 
-        <div class="page-nav">
-            <button class="btn-success" onclick="prevPage()">Prev</button>
-            <span id="pageInfo">Hal 0/0</span>
-            <button class="btn-success" onclick="nextPage()">Next</button>
+        <div class="row-3">
+            <button class="btn-mode" onclick="setMode('text')">📝 Mode Teks</button>
+            <button class="btn-mode" onclick="setMode('check')">✓ Ceklis</button>
+            <button class="btn-mode" onclick="setMode('circle')">⭕ Lingkaran</button>
+            <button class="btn-mode" onclick="setMode('edit')">✋ Edit/Geser</button>
+            <button class="btn-mode" onclick="setMode('delete')">🗑️ Hapus</button>
+            <label class="btn-mode btn-upload">✍️ Upload TTD <input type="file" id="signUpload" accept="image/*"></label>
+            <label class="btn-mode btn-upload">🛡️ Upload Materai <input type="file" id="materaiUpload" accept="image/*"></label>
+        </div>
+
+        <div class="row-4">
+            <button class="btn-nav" onclick="prevPage()">◀ PREV</button>
+            <span class="page-info" id="pageInfo">Hal 0 / 0</span>
+            <button class="btn-nav" onclick="nextPage()">NEXT ▶</button>
+        </div>
+
+        <div class="row-5">
+            <button class="btn-download" id="downloadBtn" onclick="downloadPDF()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="12" y1="11" x2="12" y2="17"></line>
+                    <polyline points="9 14 12 17 15 14"></polyline>
+                </svg>
+                DOWNLOAD PDF
+            </button>
         </div>
     </div>
 
@@ -126,60 +162,81 @@
         </div>
     </div>
 
-    <footer>
-        <p>&copy; 2024 KARYA ABADI FORMULIR SUBANG. All Rights Reserved.</p>
-    </footer>
+    <footer><p>&copy; 2024 KARYA ABADI FORMULIR SUBANG. All Rights Reserved.</p></footer>
 
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         
-        let pdfDoc = null;
-        let pdfBytes = null;
-        let currentMode = 'text';
-        let annotations = []; 
-        let scale = 1.5; 
-        let currentPage = 1;
-        let totalPages = 1;
+        let pdfDoc = null, pdfBytes = null, currentMode = 'text', annotations = [], scale = 1.5, currentPage = 1, totalPages = 1;
+        let history = [], historyIndex = -1;
+        let signImgBytes = null, materaiImgBytes = null; // Disimpan terpisah agar tidak rusak oleh JSON.stringify
 
         const formSelect = document.getElementById('formSelect');
         const canvas = document.getElementById('pdfViewer');
         const ctx = canvas.getContext('2d');
         const interactionLayer = document.getElementById('interactionLayer');
         const annotationLayer = document.getElementById('annotationLayer');
-        const statusMode = document.getElementById('statusMode');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        function saveHistory() {
+            history = history.slice(0, historyIndex + 1);
+            // Hapus imgBytes dari anotasi sebelum stringify agar tidak error
+            let cleanAnnotations = annotations.map(a => {
+                let copy = {...a};
+                delete copy.imgBytes;
+                return copy;
+            });
+            history.push(JSON.stringify(cleanAnnotations));
+            historyIndex++;
+            updateHistoryButtons();
+        }
+        function updateHistoryButtons() {
+            document.getElementById('undoBtn').disabled = historyIndex <= 0;
+            document.getElementById('redoBtn').disabled = historyIndex >= history.length - 1;
+        }
+        function undo() {
+            if (historyIndex > 0) { historyIndex--; annotations = JSON.parse(history[historyIndex]); renderAnnotations(); updateHistoryButtons(); }
+        }
+        function redo() {
+            if (historyIndex < history.length - 1) { historyIndex++; annotations = JSON.parse(history[historyIndex]); renderAnnotations(); updateHistoryButtons(); }
+        }
+        saveHistory();
 
         formSelect.addEventListener('change', async (e) => {
             const fileName = e.target.value;
             if (!fileName) return;
-            
             try {
                 const response = await fetch(encodeURIComponent(fileName));
-                if (!response.ok) throw new Error("File PDF tidak ditemukan di server GitHub");
-                pdfBytes = await response.arrayBuffer();
-                pdfDoc = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
-                totalPages = pdfDoc.numPages;
-                currentPage = 1;
-                annotations = []; 
+                if (!response.ok) throw new Error("File PDF tidak ditemukan");
+                const arrayBuffer = await response.arrayBuffer();
+                
+                // FIX BUG: Gandakan buffer agar PDF.js tidak mengosongkan data untuk PDF-Lib
+                pdfBytes = arrayBuffer.slice(0); 
+                const viewerBuffer = arrayBuffer.slice(0); 
+                
+                pdfDoc = await pdfjsLib.getDocument({ data: viewerBuffer }).promise;
+                totalPages = pdfDoc.numPages; currentPage = 1; annotations = [];
+                saveHistory();
                 renderPage(1);
-            } catch (err) {
-                alert("Gagal memuat PDF! Pastikan file PDF asli sudah ter-upload ke repository GitHub yang sama dengan file index.html ini.");
-                console.error(err);
-            }
+            } catch (err) { alert("Gagal memuat PDF! Pastikan file PDF sudah ter-upload ke repository."); console.error(err); }
+        });
+
+        document.getElementById('signUpload').addEventListener('change', async (e) => {
+            if(e.target.files[0]) { signImgBytes = await e.target.files[0].arrayBuffer(); setMode('sign'); alert('Tanda Tangan siap! Klik di PDF.'); }
+        });
+        document.getElementById('materaiUpload').addEventListener('change', async (e) => {
+            if(e.target.files[0]) { materaiImgBytes = await e.target.files[0].arrayBuffer(); setMode('materai'); alert('Materai siap! Klik di PDF.'); }
         });
 
         async function renderPage(num) {
             if (!pdfDoc) return;
             currentPage = num;
-            document.getElementById('pageInfo').innerText = `Hal ${num}/${totalPages}`;
+            document.getElementById('pageInfo').innerText = `Hal ${num} / ${totalPages}`;
             const page = await pdfDoc.getPage(num);
             const viewport = page.getViewport({ scale });
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
-            interactionLayer.style.width = viewport.width + 'px';
-            interactionLayer.style.height = viewport.height + 'px';
-            annotationLayer.style.width = viewport.width + 'px';
-            annotationLayer.style.height = viewport.height + 'px';
-
+            canvas.height = viewport.height; canvas.width = viewport.width;
+            interactionLayer.style.width = viewport.width + 'px'; interactionLayer.style.height = viewport.height + 'px';
+            annotationLayer.style.width = viewport.width + 'px'; annotationLayer.style.height = viewport.height + 'px';
             const renderContext = { canvasContext: ctx, viewport: viewport };
             await page.render(renderContext).promise;
             renderAnnotations();
@@ -187,33 +244,33 @@
 
         function setMode(mode) {
             currentMode = mode;
-            statusMode.innerText = `Mode: ${mode.toUpperCase()}`;
-            if (mode === 'edit' || mode === 'delete') {
-                interactionLayer.style.pointerEvents = 'none';
-            } else {
-                interactionLayer.style.pointerEvents = 'auto';
-            }
+            document.querySelectorAll('.btn-mode').forEach(btn => btn.classList.remove('active'));
+            if (mode === 'edit' || mode === 'delete') { interactionLayer.style.pointerEvents = 'none'; } 
+            else { interactionLayer.style.pointerEvents = 'auto'; }
         }
 
         interactionLayer.addEventListener('click', (e) => {
             if (currentMode === 'edit' || currentMode === 'delete' || !pdfDoc) return;
             const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
+            const x = e.clientX - rect.left, y = e.clientY - rect.top;
             let annot = { page: currentPage, x, y, type: currentMode };
 
             if (currentMode === 'text') {
                 const text = document.getElementById('textInput').value;
-                if (!text.trim()) return alert('Ketik teks di kotak sebelum klik di PDF!');
-                annot.text = text;
-                annot.size = 14; 
+                if (!text.trim()) return alert('Ketik teks dulu!');
+                annot.text = text; annot.size = 14;
             } else if (currentMode === 'check' || currentMode === 'circle') {
-                annot.width = 20;
-                annot.height = 20;
+                annot.width = 20; annot.height = 20;
+            } else if (currentMode === 'sign' || currentMode === 'materai') {
+                // Cek apakah gambar sudah diupload
+                if (currentMode === 'sign' && !signImgBytes) return alert('Upload TTD dulu!');
+                if (currentMode === 'materai' && !materaiImgBytes) return alert('Upload Materai dulu!');
+                annot.width = currentMode === 'sign' ? 100 : 90;
+                annot.height = currentMode === 'sign' ? 50 : 90;
             }
 
             annotations.push(annot);
+            saveHistory();
             renderAnnotations();
         });
 
@@ -223,26 +280,23 @@
                 const globalIndex = annotations.indexOf(a);
                 const div = document.createElement('div');
                 div.className = 'annotation-box';
-                div.style.left = a.x + 'px';
-                div.style.top = a.y + 'px';
+                div.style.left = a.x + 'px'; div.style.top = a.y + 'px';
                 
                 if (a.type === 'text') {
-                    div.classList.add('text-annot');
-                    div.style.fontSize = a.size + 'px';
-                    div.innerText = a.text;
+                    div.classList.add('text-annot'); div.style.fontSize = a.size + 'px'; div.innerText = a.text;
                 } else if (a.type === 'circle') {
-                    div.classList.add('circle-annot');
-                    div.style.width = a.width + 'px';
-                    div.style.height = a.height + 'px';
-                    div.style.transform = 'translate(-50%, -50%)'; 
+                    div.classList.add('circle-annot'); div.style.width = a.width + 'px'; div.style.height = a.height + 'px'; div.style.transform = 'translate(-50%, -50%)'; 
                 } else if (a.type === 'check') {
-                    div.classList.add('check-annot');
-                    div.style.width = a.width + 'px';
-                    div.style.height = a.height + 'px';
-                    div.innerHTML = `<svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
-                        <polyline points="10,60 40,80 90,20" fill="none" stroke="black" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>`;
+                    div.classList.add('check-annot'); div.style.width = a.width + 'px'; div.style.height = a.height + 'px';
+                    div.innerHTML = `<svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none"><polyline points="10,60 40,80 90,20" fill="none" stroke="black" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
                     div.style.transform = 'translate(-10%, -50%)';
+                } else if (a.type === 'sign' || a.type === 'materai') {
+                    const img = document.createElement('img');
+                    const bytes = a.type === 'sign' ? signImgBytes : materaiImgBytes;
+                    if(!bytes) return;
+                    img.src = URL.createObjectURL(new Blob([bytes]));
+                    img.style.width = a.width + 'px'; img.style.height = a.height + 'px'; img.style.opacity = 0.9;
+                    div.appendChild(img); div.style.transform = 'translateY(-100%)';
                 }
 
                 attachInteractions(div, globalIndex);
@@ -255,138 +309,106 @@
                 if (currentMode === 'delete') {
                     e.stopPropagation();
                     annotations.splice(annotIndex, 1);
+                    saveHistory();
                     renderAnnotations();
                 }
             });
 
             element.addEventListener('mousedown', (e) => {
                 if (e.target.classList.contains('resize-handle') || currentMode === 'delete') return;
-                e.stopPropagation();
-                e.preventDefault();
-                
+                e.stopPropagation(); e.preventDefault();
                 if (currentMode === 'edit') {
-                    const startX = e.clientX;
-                    const startY = e.clientY;
-                    const startLeft = parseFloat(element.style.left);
-                    const startTop = parseFloat(element.style.top);
-
-                    const onMouseMove = (moveEvent) => {
-                        let newX = startLeft + (moveEvent.clientX - startX);
-                        let newY = startTop + (moveEvent.clientY - startY);
-                        element.style.left = newX + 'px';
-                        element.style.top = newY + 'px';
-                        annotations[annotIndex].x = newX;
-                        annotations[annotIndex].y = newY;
+                    const startX = e.clientX, startY = e.clientY;
+                    const startLeft = parseFloat(element.style.left), startTop = parseFloat(element.style.top);
+                    const onMove = (moveEvent) => {
+                        let newX = startLeft + (moveEvent.clientX - startX), newY = startTop + (moveEvent.clientY - startY);
+                        element.style.left = newX + 'px'; element.style.top = newY + 'px';
+                        annotations[annotIndex].x = newX; annotations[annotIndex].y = newY;
                     };
-                    const onMouseUp = () => {
-                        document.removeEventListener('mousemove', onMouseMove);
-                        document.removeEventListener('mouseup', onMouseUp);
-                    };
-                    document.addEventListener('mousemove', onMouseMove);
-                    document.addEventListener('mouseup', onMouseUp);
+                    const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); saveHistory(); };
+                    document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onUp);
                 }
             });
 
             const handle = document.createElement('div');
             handle.className = 'resize-handle';
             element.appendChild(handle);
-
             handle.addEventListener('mousedown', (e) => {
-                e.stopPropagation();
-                e.preventDefault();
+                e.stopPropagation(); e.preventDefault();
                 const annot = annotations[annotIndex];
-                const startX = e.clientX;
-                const startY = e.clientY;
-                const startW = element.offsetWidth;
-                const startH = element.offsetHeight;
+                const startX = e.clientX, startY = e.clientY;
+                const startW = element.offsetWidth, startH = element.offsetHeight;
                 const startFontSize = annot.type === 'text' ? annot.size : 0;
-
-                const onMouseMove = (moveEvent) => {
+                const onMove = (moveEvent) => {
                     let maxDelta = Math.max(moveEvent.clientX - startX, moveEvent.clientY - startY);
-                    
-                    if (annot.type === 'text') {
-                        let newSize = Math.max(8, startFontSize + maxDelta);
-                        element.style.fontSize = newSize + 'px';
-                        annot.size = newSize;
-                    } else {
-                        let newW = Math.max(10, startW + maxDelta);
-                        let newH = Math.max(10, startH + maxDelta);
-                        element.style.width = newW + 'px';
-                        element.style.height = newH + 'px';
-                        annot.width = newW;
-                        annot.height = newH;
-                    }
+                    if (annot.type === 'text') { let s = Math.max(8, startFontSize + maxDelta); element.style.fontSize = s + 'px'; annot.size = s; } 
+                    else { let w = Math.max(10, startW + maxDelta), h = Math.max(10, startH + maxDelta); element.style.width = w + 'px'; element.style.height = h + 'px'; annot.width = w; annot.height = h; }
                 };
-                const onMouseUp = () => {
-                    document.removeEventListener('mousemove', onMouseMove);
-                    document.removeEventListener('mouseup', onMouseUp);
-                };
-                document.addEventListener('mousemove', onMouseMove);
-                document.addEventListener('mouseup', onMouseUp);
+                const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); saveHistory(); };
+                document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onUp);
             });
         }
 
         async function downloadPDF() {
             if (!pdfBytes) return alert('Pilih formulir dulu!');
-            const { PDFDocument, rgb } = PDFLib;
-            const pdfDocLib = await PDFDocument.load(pdfBytes);
-            const helveticaBoldFont = await pdfDocLib.embedFont(PDFLib.StandardFonts.HelveticaBold);
+            downloadBtn.disabled = true;
+            downloadBtn.innerText = "Proses..."; // Indikator Loading
 
-            for (let a of annotations) {
-                const page = pdfDocLib.getPage(a.page - 1);
-                const { width: pdfW, height: pdfH } = page.getSize();
-                const canvasW = canvas.width;
-                const canvasH = canvas.height;
+            try {
+                const { PDFDocument, rgb } = PDFLib;
+                // Load pdfBytes yang sudah digandakan di awal
+                const pdfDocLib = await PDFDocument.load(pdfBytes);
+                const helveticaBoldFont = await pdfDocLib.embedFont(PDFLib.StandardFonts.HelveticaBold);
 
-                const pdfX = (a.x / canvasW) * pdfW;
-                const pdfY_base = pdfH - (a.y / canvasH) * pdfH;
+                for (let a of annotations) {
+                    const page = pdfDocLib.getPage(a.page - 1);
+                    const { width: pdfW, height: pdfH } = page.getSize();
+                    const canvasW = canvas.width, canvasH = canvas.height;
+                    const pdfX = (a.x / canvasW) * pdfW, pdfY_base = pdfH - (a.y / canvasH) * pdfH;
 
-                if (a.type === 'text') {
-                    const fs = a.size / scale; 
-                    const lines = a.text.split('\n'); // Pecah teks berdasarkan tombol Enter
-                    const lineHeight = fs * 1.15; // Jarak antar baris
-
-                    lines.forEach((line, index) => {
-                        // Hitung posisi Y untuk setiap baris (berurutan ke bawah)
-                        const y_pdf = pdfY_base - (fs * 0.2) - (index * lineHeight);
-                        page.drawText(line, { 
-                            x: pdfX, 
-                            y: y_pdf, 
-                            size: fs, 
-                            font: helveticaBoldFont, 
-                            color: rgb(0, 0, 0) 
+                    if (a.type === 'text') {
+                        const fs = a.size / scale; 
+                        const lines = a.text.split('\n'), lineHeight = fs * 1.15;
+                        lines.forEach((line, i) => {
+                            const y_pdf = pdfY_base - (fs * 0.2) - (i * lineHeight);
+                            page.drawText(line, { x: pdfX, y: y_pdf, size: fs, font: helveticaBoldFont, color: rgb(0, 0, 0) });
                         });
-                    });
-                } 
-                else if (a.type === 'circle') {
-                    const w = (a.width / canvasW) * pdfW;
-                    const h = (a.height / canvasH) * pdfH;
-                    const cx = pdfX;
-                    const cy = pdfY_base;
-                    page.drawEllipse({ x: cx, y: cy, xScale: w/2, yScale: h/2, borderColor: rgb(0, 0, 0), borderWidth: 1.5 });
-                } 
-                else if (a.type === 'check') {
-                    const w = (a.width / canvasW) * pdfW;
-                    const h = (a.height / canvasH) * pdfH;
-                    const x_pdf = pdfX - (w * 0.1);
-                    const y_pdf = pdfY_base - (h * 0.5);
-
-                    const p1 = { x: x_pdf + w * 0.1, y: y_pdf + h * 0.4 };
-                    const p2 = { x: x_pdf + w * 0.4, y: y_pdf + h * 0.2 };
-                    const p3 = { x: x_pdf + w * 0.9, y: y_pdf + h * 0.8 };
-                    
-                    const thickness = w * 0.12;
-                    page.drawLine({ start: p1, end: p2, thickness: thickness, color: rgb(0, 0, 0) });
-                    page.drawLine({ start: p2, end: p3, thickness: thickness, color: rgb(0, 0, 0) });
+                    } 
+                    else if (a.type === 'circle') {
+                        const w = (a.width / canvasW) * pdfW, h = (a.height / canvasH) * pdfH;
+                        page.drawEllipse({ x: pdfX, y: pdfY_base, xScale: w/2, yScale: h/2, borderColor: rgb(0, 0, 0), borderWidth: 1.5 });
+                    } 
+                    else if (a.type === 'check') {
+                        const w = (a.width / canvasW) * pdfW, h = (a.height / canvasH) * pdfH;
+                        const x_pdf = pdfX - (w * 0.1), y_pdf = pdfY_base - (h * 0.5);
+                        page.drawLine({ start: { x: x_pdf + w * 0.1, y: y_pdf + h * 0.4 }, end: { x: x_pdf + w * 0.4, y: y_pdf + h * 0.2 }, thickness: w * 0.12, color: rgb(0, 0, 0) });
+                        page.drawLine({ start: { x: x_pdf + w * 0.4, y: y_pdf + h * 0.2 }, end: { x: x_pdf + w * 0.9, y: y_pdf + h * 0.8 }, thickness: w * 0.12, color: rgb(0, 0, 0) });
+                    }
+                    else if (a.type === 'sign' || a.type === 'materai') {
+                        const bytes = a.type === 'sign' ? signImgBytes : materaiImgBytes;
+                        if (!bytes) continue;
+                        let img;
+                        try { img = await pdfDocLib.embedPng(bytes); } catch { img = await pdfDocLib.embedJpg(bytes); }
+                        const w = (a.width / canvasW) * pdfW, h = (a.height / canvasH) * pdfH;
+                        page.drawImage(img, { x: pdfX, y: pdfY_base - h, width: w, height: h });
+                    }
                 }
-            }
 
-            const pdfOut = await pdfDocLib.save();
-            const blob = new Blob([pdfOut], { type: 'application/pdf' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = "Karya_Abadi_Formulir_Subang_Terisi.pdf";
-            link.click();
+                const pdfOut = await pdfDocLib.save();
+                const blob = new Blob([pdfOut], { type: 'application/pdf' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = "Karya_Abadi_Formulir_Subang_Terisi.pdf";
+                link.click();
+                
+            } catch (err) {
+                alert("Gagal download PDF. Cek konsol untuk detail error.");
+                console.error("Download Error:", err);
+            } finally {
+                // Kembalikan tombol ke keadaan semula
+                downloadBtn.disabled = false;
+                downloadBtn.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="11" x2="12" y2="17"></line><polyline points="9 14 12 17 15 14"></polyline></svg> DOWNLOAD PDF`;
+            }
         }
 
         function nextPage() { if (currentPage < totalPages) renderPage(currentPage + 1); }
