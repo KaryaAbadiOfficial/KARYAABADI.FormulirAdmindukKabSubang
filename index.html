@@ -78,24 +78,29 @@
         #interactionLayer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; touch-action: pan-y pinch-zoom; }
         .annotation-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
         
-        .annotation-box { position: absolute; pointer-events: auto; touch-action: none; width: max-content; }
-        .text-annot { color: black; font-family: Arial, sans-serif; white-space: pre; line-height: 1.15; font-weight: bold; outline: none; cursor: move; min-width: 20px; padding: 2px; }
+        .annotation-box { position: absolute; pointer-events: auto; touch-action: none; width: max-content; min-width: 20px; }
+        .text-annot { color: black; font-family: Arial, sans-serif; white-space: pre; line-height: 1.15; font-weight: bold; outline: none; cursor: move; padding: 2px; }
         .text-annot:focus { border: 1px dashed var(--dark-green); cursor: text; background: rgba(255,255,255,0.8); }
         .circle-annot { border: 2.5px solid black; border-radius: 50%; cursor: move; }
         .check-annot { overflow: visible; cursor: move; }
-        .resize-handle { position: absolute; bottom: -12px; right: -12px; width: 24px; height: 24px; background: var(--gold); border: 2px solid var(--dark-green); border-radius: 50%; cursor: se-resize; pointer-events: auto; touch-action: none; z-index: 10; }
+        .resize-handle { position: absolute; bottom: -12px; right: -12px; width: 24px; height: 24px; background: var(--gold); border: 2px solid var(--dark-green); border-radius: 50%; cursor: se-resize; pointer-events: auto; touch-action: none; z-index: 10; display: none; }
+        .annotation-box.active .resize-handle, .annotation-box:hover .resize-handle { display: block; }
         
-        /* MENU TITIK 3 (SELALU MUNCUL & DI KANAN) */
+        /* MENU TITIK 3 (MUNCUL SAAT DIPILIHOVER) */
         .menu-trigger {
             position: absolute; top: 50%; right: -35px; transform: translateY(-50%);
             background: #fff; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;
-            width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+            width: 28px; height: 28px; display: none; 
+            align-items: center; justify-content: center;
             font-weight: bold; color: #333; font-size: 18px; line-height: 1; z-index: 1001; box-shadow: 0 2px 4px rgba(0,0,0,0.15);
         }
+        .annotation-box.active .menu-trigger, .annotation-box:hover .menu-trigger { display: flex; }
+        
         .popover-menu {
             position: absolute; top: 50%; right: calc(100% + 10px); transform: translateY(-50%);
             background: #333; color: white; border-radius: 5px; padding: 5px; display: none;
-            flex-direction: column; gap: 2px; z-index: 1002; box-shadow: 0 4px 8px rgba(0,0,0,0.2); width: 150px;
+            flex-direction: column; gap: 2px; z-index: 1002; box-shadow: 0 4px 8px rgba(0,0,0,0.2); 
+            width: 150px; min-width: 150px; max-width: 150px; box-sizing: border-box;
         }
         .popover-menu button {
             background: none; border: none; color: white; text-align: left; padding: 10px; cursor: pointer;
@@ -105,7 +110,8 @@
         .spacing-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-top: 1px solid #555; font-size: 14px; }
         .spacing-controls { display: flex; align-items: center; gap: 10px; }
         .spacing-btn { background: #555; border: none; color: white; width: 30px; height: 30px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center; }
-        .spacing-val { min-width: 30px; text-align: center; font-weight: bold; }
+        /* Lebar angka spasi dikunci agar menu tidak melebar */
+        .spacing-val { width: 40px; text-align: center; font-weight: bold; display: inline-block; }
 
         .float-tools {
             position: fixed; top: 85px; right: 15px; z-index: 9999; background: white; padding: 8px;
@@ -128,13 +134,8 @@
             .header-center h1 { margin: 0; font-size: 24px; text-transform: uppercase; color: var(--white); }
             .header-center p { margin: 5px 0 0; font-size: 12px; color: var(--gold-light); }
             .menu-toggle { display: none; }
-            
-            /* SIDEBAR TINGGI MENGIKUTI PDF */
             .main-layout { align-items: stretch; }
-            .sidebar {
-                position: relative; top: 0; height: auto; transform: translateX(0);
-                width: 340px; overflow-y: visible; min-height: calc(100vh - 110px);
-            }
+            .sidebar { position: relative; top: 0; height: auto; transform: translateX(0); width: 340px; overflow-y: visible; min-height: calc(100vh - 110px); }
             .backdrop { display: none !important; }
             .pdf-area { padding: 40px; }
         }
@@ -195,10 +196,9 @@
                 DOWNLOAD PDF
             </button>
 
-            <!-- PANDUAN TOOL -->
             <h3>5. Panduan Tool</h3>
             <div class="guide-box">
-                <p><b>1. Tambah & Edit Teks:</b> Klik tombol "Tambah Teks", lalu klik ikon <b>⋮</b> di kanan teks dan pilih <b>Edit Teks</b> untuk mengetik.</p>
+                <p><b>1. Tambah & Edit Teks:</b> Klik "Tambah Teks", lalu klik teks tersebut. Klik ikon <b>⋮</b> di kanan teks dan pilih <b>Edit Teks</b>.</p>
                 <p><b>2. Geser & Perbesar:</b> Tahan dan geser objek. Tarik kotak kuning di pojok kanan bawah untuk memperbesar.</p>
                 <p><b>3. Spasi Huruf:</b> Klik ikon <b>⋮</b>, gunakan tombol <b>[+]</b> dan <b>[-]</b> untuk melebarkan huruf agar pas di kolom tabel.</p>
                 <p><b>4. Undo/Redo:</b> Tombol mengambang di kanan atas layar untuk membatalkan/mengulang aksi.</p>
@@ -305,7 +305,7 @@
                 const response = await fetch(encodeURIComponent(fileName));
                 if (!response.ok) throw new Error("File PDF tidak ditemukan");
                 const arrayBuffer = await response.arrayBuffer();
-                pdfBytes = new Uint8Array(arrayBuffer.slice(0)); // Simpan sebagai Uint8Array agar PDF-Lib stabil
+                pdfBytes = new Uint8Array(arrayBuffer.slice(0)); 
                 const viewerBuffer = arrayBuffer.slice(0); 
                 pdfDoc = await pdfjsLib.getDocument({ data: viewerBuffer }).promise;
                 totalPages = pdfDoc.numPages; currentPage = 1; annotations = [];
@@ -352,7 +352,10 @@
             if(window.innerWidth < 768) toggleSidebar();
             setTimeout(() => {
                 let lastDiv = annotationLayer.querySelector('.annotation-box:last-child');
-                if (lastDiv) makeEditable(annotations.length - 1, lastDiv);
+                if (lastDiv) {
+                    lastDiv.classList.add('active');
+                    makeEditable(annotations.length - 1, lastDiv);
+                }
             }, 100);
         }
 
@@ -404,10 +407,28 @@
                     div.appendChild(img); div.style.transform = 'translateY(-100%)';
                     div.appendChild(createMenu(globalIndex, false, div));
                 }
+                
+                // Event agar kelas active hilang jika klik di luar
+                div.addEventListener('mousedown', () => {
+                    document.querySelectorAll('.annotation-box').forEach(b => b.classList.remove('active'));
+                    div.classList.add('active');
+                });
+                div.addEventListener('touchstart', () => {
+                    document.querySelectorAll('.annotation-box').forEach(b => b.classList.remove('active'));
+                    div.classList.add('active');
+                }, { passive: true });
+
                 attachInteractions(div, globalIndex);
                 annotationLayer.appendChild(div);
             });
         }
+        
+        // Global listener untuk menghapus kelas active jika klik di luar annotation
+        document.addEventListener('mousedown', (e) => {
+            if (!e.target.closest('.annotation-box')) {
+                document.querySelectorAll('.annotation-box').forEach(b => b.classList.remove('active'));
+            }
+        });
 
         function createMenu(idx, isText, element) {
             const container = document.createElement('div');
@@ -548,11 +569,15 @@
                     const pdfX = (a.x / canvasW) * pdfW, pdfY_base = pdfH - (a.y / canvasH) * pdfH;
 
                     if (a.type === 'text') {
-                        const textStr = a.text || ' '; // Cegah crash jika teks kosong
-                        const fs = a.size / scale; const lines = textStr.split('\n'), lh = fs * 1.15;
-                        const y_pdf = pdfY_base - (fs * 0.8); 
+                        const textStr = a.text || ' '; 
+                        const fs = a.size / scale; 
+                        const lines = textStr.split('\n'), lh = fs * 1.15;
+                        // Y offset presisi: (line-height - 1)/2 + ascent (0.729)
+                        const y_offset = (fs * 0.075) + (fs * 0.729) + (2 / scale); 
+                        const y_pdf = pdfY_base - y_offset; 
+                        
                         lines.forEach((line, i) => { 
-                            if (line.length === 0) return; // Skip baris kosong agar tidak crash PDF-Lib
+                            if (line.length === 0) return; 
                             if (a.letterSpacing && a.letterSpacing > 0) {
                                 let currentX = pdfX; const spacingPdf = a.letterSpacing / scale;
                                 for (let char of line) {
