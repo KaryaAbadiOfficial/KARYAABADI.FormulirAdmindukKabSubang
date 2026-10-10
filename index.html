@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SISTEM DIGITAL - Pengisian Formulir Kependudukan Kabupaten Subang</title>
-    <link rel="icon" type="image/png" href="logo.png">
+    <!-- Menggunakan favicon.png yang ada di folder dan parameter ?v=2 untuk menghindari cache -->
+    <link rel="icon" type="image/png" href="favicon.png?v=2">
     <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
@@ -101,8 +102,10 @@
         }
 
         .guide-box { background: #f9f9f9; padding: 15px; border-radius: 8px; font-size: 13px; line-height: 1.5; color: #555; border: 1px solid #eee; margin-top: 20px; margin-bottom: 30px; }
-        .guide-box p { margin: 0 0 8px 0; }
-        .guide-box p:last-child { margin-bottom: 0; }
+        .guide-item { margin-bottom: 15px; }
+        .guide-item:last-child { margin-bottom: 0; }
+        .guide-item .guide-title { font-weight: bold; color: var(--dark-green); margin-bottom: 4px; display: block; }
+        .guide-item .guide-desc { margin: 0; }
 
         .pdf-area { flex-grow: 1; padding: 15px; overflow: auto; display: flex; justify-content: center; align-items: flex-start; background: #eef2f7; position: relative; width: 100%; }
         #pdfContainer { position: relative; box-shadow: 0 0 15px rgba(0,0,0,0.2); background: white; touch-action: auto; }
@@ -118,29 +121,29 @@
         .annotation-box.active .resize-handle, .annotation-box:hover .resize-handle { display: block; }
         
         .menu-trigger {
-            position: absolute; top: 50%; right: -35px; transform: translateY(-50%);
+            position: absolute; top: -14px; right: -14px; 
             background: #fff; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;
-            width: 28px; height: 28px; display: none; 
+            width: 26px; height: 26px; display: none; 
             align-items: center; justify-content: center;
-            font-weight: bold; color: #333; font-size: 18px; line-height: 1; z-index: 1001; box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            font-weight: bold; color: #333; font-size: 16px; line-height: 1; z-index: 1001; box-shadow: 0 2px 4px rgba(0,0,0,0.15);
         }
         .annotation-box.active .menu-trigger, .annotation-box:hover .menu-trigger { display: flex; }
         
         .popover-menu {
-            position: absolute; top: 50%; right: calc(100% + 10px); transform: translateY(-50%);
-            background: #333; color: white; border-radius: 5px; padding: 5px; display: none;
-            flex-direction: column; gap: 2px; z-index: 1002; box-shadow: 0 4px 8px rgba(0,0,0,0.2); 
-            width: 150px; min-width: 150px; max-width: 150px; box-sizing: border-box;
+            position: absolute; top: 14px; right: -14px; 
+            background: #2c3e50; color: white; border-radius: 6px; padding: 6px; display: none;
+            flex-direction: column; gap: 2px; z-index: 1002; box-shadow: 0 6px 12px rgba(0,0,0,0.3); 
+            width: 175px; min-width: 175px; max-width: 175px; box-sizing: border-box;
         }
         .popover-menu button {
-            background: none; border: none; color: white; text-align: left; padding: 10px; cursor: pointer;
-            font-size: 14px; border-radius: 3px; display: flex; align-items: center; gap: 8px; width: 100%; font-family: 'Segoe UI', sans-serif;
+            background: none; border: none; color: white; text-align: left; padding: 8px 10px; cursor: pointer;
+            font-size: 13px; border-radius: 4px; display: flex; align-items: center; gap: 8px; width: 100%; font-family: 'Segoe UI', sans-serif;
         }
-        .popover-menu button:hover { background: #555; }
-        .spacing-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-top: 1px solid #555; font-size: 14px; }
-        .spacing-controls { display: flex; align-items: center; gap: 8px; }
-        .spacing-btn { background: #555; border: none; color: white; width: 28px; height: 28px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .spacing-val { width: 45px; min-width: 45px; max-width: 45px; text-align: center; font-weight: bold; display: inline-block; white-space: nowrap; overflow: hidden; flex: 0 0 45px; }
+        .popover-menu button:hover { background: #34495e; }
+        .spacing-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-top: 1px solid #3d5266; font-size: 13px; }
+        .spacing-controls { display: flex; align-items: center; gap: 5px; }
+        .spacing-btn { background: #34495e; border: none; color: white; width: 24px; height: 24px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .spacing-val { width: 45px; min-width: 45px; max-width: 45px; text-align: center; font-weight: bold; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 0 0 45px; }
 
         .float-tools {
             position: fixed; top: 85px; right: 15px; z-index: 9999; background: white; padding: 8px;
@@ -264,7 +267,8 @@
     <header>
         <div class="header-left">
             <button class="menu-toggle" onclick="toggleSidebar()">&#9776;</button>
-            <img src="logo.png" alt="Logo Karya Abadi" class="logo-karya-abadi-img"
+            <!-- Menambahkan ?v=2 agar browser memuat ulang gambar dan tidak tersangkut cache lama -->
+            <img src="Logo.png?v=2" alt="Logo Karya Abadi" class="logo-karya-abadi-img"
                  onerror="this.style.display='none'; document.getElementById('logoSvgFallback').style.display='block';">
             <svg class="logo-fallback-svg" id="logoSvgFallback" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                 <rect x="0" y="0" width="100" height="100" rx="15" fill="#ffffff"/>
@@ -329,10 +333,22 @@
 
             <h3>5. Panduan Tool</h3>
             <div class="guide-box">
-                <p><b>1. Tambah & Edit Teks:</b> Klik "Tambah Teks", lalu klik teks tersebut. Klik ikon <b>⋮</b> di kanan teks dan pilih <b>Edit Teks</b>.</p>
-                <p><b>2. Geser & Perbesar:</b> Tahan dan geser objek. Tarik kotak kuning di pojok kanan bawah untuk memperbesar.</p>
-                <p><b>3. Spasi Huruf:</b> Klik ikon <b>⋮</b>, gunakan tombol <b>[+]</b> dan <b>[-]</b> untuk melebarkan huruf agar pas di kolom tabel.</p>
-                <p><b>4. Undo/Redo:</b> Tombol mengambang di kanan atas layar untuk membatalkan/mengulang aksi.</p>
+                <div class="guide-item">
+                    <span class="guide-title">1. Tambah & Edit Teks</span>
+                    <p class="guide-desc">Klik "Tambah Teks", lalu klik teks tersebut. Klik ikon <b>⋮</b> di pojok kanan atas teks dan pilih <b>Edit Teks</b>.</p>
+                </div>
+                <div class="guide-item">
+                    <span class="guide-title">2. Geser & Perbesar</span>
+                    <p class="guide-desc">Tahan dan geser objek. Tarik kotak kuning di pojok kanan bawah untuk memperbesar.</p>
+                </div>
+                <div class="guide-item">
+                    <span class="guide-title">3. Spasi & Jarak Baris</span>
+                    <p class="guide-desc">Klik ikon <b>⋮</b>, gunakan tombol <b>[+]</b> dan <b>[-]</b> untuk melebarkan huruf atau menjauhkan baris ke bawah agar pas di kolom tabel.</p>
+                </div>
+                <div class="guide-item">
+                    <span class="guide-title">4. Undo/Redo</span>
+                    <p class="guide-desc">Tombol mengambang di kanan atas layar untuk membatalkan/mengulang aksi.</p>
+                </div>
             </div>
         </div>
 
@@ -567,7 +583,7 @@
 
         function addText() {
             if (!pdfDoc) return alert('Pilih formulir dulu!');
-            let annot = { page: currentPage, x: 50, y: 50, type: 'text', text: 'Teks Baru', size: 16, letterSpacing: 0 };
+            let annot = { page: currentPage, x: 50, y: 50, type: 'text', text: 'Teks Baru', size: 16, letterSpacing: 0, lineHeight: 1.15 };
             annotations.push(annot); saveHistory(); renderAnnotations();
             if(window.innerWidth < 768) toggleSidebar();
             setTimeout(() => {
@@ -607,8 +623,11 @@
                 div.style.left = a.x + 'px'; div.style.top = a.y + 'px';
                 
                 if (a.type === 'text') {
-                    div.classList.add('text-annot'); div.style.fontSize = a.size + 'px'; div.innerText = a.text;
+                    div.classList.add('text-annot'); 
+                    div.style.fontSize = a.size + 'px'; 
+                    div.innerText = a.text;
                     div.style.letterSpacing = a.letterSpacing + 'px';
+                    div.style.lineHeight = a.lineHeight;
                     div.appendChild(createMenu(globalIndex, true, div));
                 } else if (a.type === 'circle') {
                     div.classList.add('circle-annot'); div.style.width = a.width + 'px'; div.style.height = a.height + 'px'; div.style.transform = 'translate(-50%, -50%)'; 
@@ -662,7 +681,7 @@
 
                 const spacingRow = document.createElement('div');
                 spacingRow.className = 'spacing-row';
-                spacingRow.innerHTML = `<span>Spasi</span>`;
+                spacingRow.innerHTML = `<span>Spasi Huruf</span>`;
                 const controls = document.createElement('div'); controls.className = 'spacing-controls';
                 
                 const minusBtn = document.createElement('button'); minusBtn.className = 'spacing-btn'; minusBtn.innerText = '-';
@@ -670,18 +689,54 @@
                 const plusBtn = document.createElement('button'); plusBtn.className = 'spacing-btn'; plusBtn.innerText = '+';
                 
                 minusBtn.onclick = (e) => { 
-                    e.stopPropagation(); annotations[idx].letterSpacing = (annotations[idx].letterSpacing || 0) - 1; 
+                    e.stopPropagation(); 
+                    annotations[idx].letterSpacing = (annotations[idx].letterSpacing || 0) - 1; 
                     element.style.letterSpacing = annotations[idx].letterSpacing + 'px';
-                    valDisplay.innerText = annotations[idx].letterSpacing + 'px'; saveHistory(); 
+                    valDisplay.innerText = annotations[idx].letterSpacing + 'px'; 
+                    saveHistory(); 
                 };
                 plusBtn.onclick = (e) => { 
-                    e.stopPropagation(); annotations[idx].letterSpacing = (annotations[idx].letterSpacing || 0) + 1; 
+                    e.stopPropagation(); 
+                    annotations[idx].letterSpacing = (annotations[idx].letterSpacing || 0) + 1; 
                     element.style.letterSpacing = annotations[idx].letterSpacing + 'px';
-                    valDisplay.innerText = annotations[idx].letterSpacing + 'px'; saveHistory(); 
+                    valDisplay.innerText = annotations[idx].letterSpacing + 'px'; 
+                    saveHistory(); 
                 };
 
                 controls.appendChild(minusBtn); controls.appendChild(valDisplay); controls.appendChild(plusBtn);
                 spacingRow.appendChild(controls); popover.appendChild(spacingRow);
+
+                const lineSpRow = document.createElement('div');
+                lineSpRow.className = 'spacing-row';
+                lineSpRow.innerHTML = `<span>Jarak Baris</span>`;
+                const lineControls = document.createElement('div'); lineControls.className = 'spacing-controls';
+                
+                const minusLineBtn = document.createElement('button'); minusLineBtn.className = 'spacing-btn'; minusLineBtn.innerText = '-';
+                const valLineDisplay = document.createElement('span'); valLineDisplay.className = 'spacing-val'; 
+                valLineDisplay.innerText = parseFloat(annotations[idx].lineHeight || 1.15).toFixed(2);
+                const plusLineBtn = document.createElement('button'); plusLineBtn.className = 'spacing-btn'; plusLineBtn.innerText = '+';
+                
+                minusLineBtn.onclick = (e) => { 
+                    e.stopPropagation(); 
+                    let curr = parseFloat(annotations[idx].lineHeight || 1.15);
+                    curr = Math.max(0.8, curr - 0.05); 
+                    annotations[idx].lineHeight = curr; 
+                    element.style.lineHeight = curr;
+                    valLineDisplay.innerText = curr.toFixed(2); 
+                    saveHistory(); 
+                };
+                plusLineBtn.onclick = (e) => { 
+                    e.stopPropagation(); 
+                    let curr = parseFloat(annotations[idx].lineHeight || 1.15);
+                    curr = curr + 0.05; 
+                    annotations[idx].lineHeight = curr; 
+                    element.style.lineHeight = curr;
+                    valLineDisplay.innerText = curr.toFixed(2); 
+                    saveHistory(); 
+                };
+
+                lineControls.appendChild(minusLineBtn); lineControls.appendChild(valLineDisplay); lineControls.appendChild(plusLineBtn);
+                lineSpRow.appendChild(lineControls); popover.appendChild(lineSpRow);
             }
             
             const delBtn = document.createElement('button');
@@ -789,7 +844,7 @@
                     if (a.type === 'text') {
                         const textStr = a.text || ' '; 
                         const fs = a.size / scale; 
-                        const lines = textStr.split('\n'), lh = fs * 1.15;
+                        const lines = textStr.split('\n'), lh = fs * (a.lineHeight || 1.15); 
                         const y_offset = (fs * 0.075) + (fs * 0.729) + (2 / scale); 
                         const y_pdf = pdfY_base - y_offset; 
                         
