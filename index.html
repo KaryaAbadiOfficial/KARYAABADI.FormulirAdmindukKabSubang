@@ -78,14 +78,14 @@
         #interactionLayer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; touch-action: pan-y pinch-zoom; }
         .annotation-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
         
-        .annotation-box { position: absolute; pointer-events: auto; touch-action: none; }
+        .annotation-box { position: absolute; pointer-events: auto; touch-action: none; width: max-content; }
         .text-annot { color: black; font-family: Arial, sans-serif; white-space: pre; line-height: 1.15; font-weight: bold; outline: none; cursor: move; min-width: 20px; padding: 2px; }
         .text-annot:focus { border: 1px dashed var(--dark-green); cursor: text; background: rgba(255,255,255,0.8); }
         .circle-annot { border: 2.5px solid black; border-radius: 50%; cursor: move; }
         .check-annot { overflow: visible; cursor: move; }
         .resize-handle { position: absolute; bottom: -12px; right: -12px; width: 24px; height: 24px; background: var(--gold); border: 2px solid var(--dark-green); border-radius: 50%; cursor: se-resize; pointer-events: auto; touch-action: none; z-index: 10; }
         
-        /* MENU TITIK 3 DIPINDAH KE KANAN TEKS */
+        /* MENU TITIK 3 (SELALU MUNCUL & DI KANAN) */
         .menu-trigger {
             position: absolute; top: 50%; right: -35px; transform: translateY(-50%);
             background: #fff; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;
@@ -198,10 +198,10 @@
             <!-- PANDUAN TOOL -->
             <h3>5. Panduan Tool</h3>
             <div class="guide-box">
-                <p><b>1. Tambah & Edit Teks:</b> Klik tombol "Tambah Teks", lalu klik ikon <b>⋮</b> di kanan teks dan pilih <b>Edit Teks</b>.</p>
-                <p><b>2. Geser & Perbesar:</b> Tahan dan geser objek langsung. Tarik kotak kuning di pojok kanan bawah untuk memperbesar/memperkecil.</p>
-                <p><b>3. Spasi Huruf:</b> Klik ikon <b>⋮</b> pada teks, gunakan tombol <b>[+]</b> dan <b>[-]</b> untuk merenggangkan huruf agar pas di kolom.</p>
-                <p><b>4. Undo/Redo:</b> Tombol mengambang di kanan atas layar bisa diklik untuk membatalkan/mengulang aksi.</p>
+                <p><b>1. Tambah & Edit Teks:</b> Klik tombol "Tambah Teks", lalu klik ikon <b>⋮</b> di kanan teks dan pilih <b>Edit Teks</b> untuk mengetik.</p>
+                <p><b>2. Geser & Perbesar:</b> Tahan dan geser objek. Tarik kotak kuning di pojok kanan bawah untuk memperbesar.</p>
+                <p><b>3. Spasi Huruf:</b> Klik ikon <b>⋮</b>, gunakan tombol <b>[+]</b> dan <b>[-]</b> untuk melebarkan huruf agar pas di kolom tabel.</p>
+                <p><b>4. Undo/Redo:</b> Tombol mengambang di kanan atas layar untuk membatalkan/mengulang aksi.</p>
             </div>
         </div>
 
@@ -305,7 +305,8 @@
                 const response = await fetch(encodeURIComponent(fileName));
                 if (!response.ok) throw new Error("File PDF tidak ditemukan");
                 const arrayBuffer = await response.arrayBuffer();
-                pdfBytes = arrayBuffer.slice(0); const viewerBuffer = arrayBuffer.slice(0); 
+                pdfBytes = new Uint8Array(arrayBuffer.slice(0)); // Simpan sebagai Uint8Array agar PDF-Lib stabil
+                const viewerBuffer = arrayBuffer.slice(0); 
                 pdfDoc = await pdfjsLib.getDocument({ data: viewerBuffer }).promise;
                 totalPages = pdfDoc.numPages; currentPage = 1; annotations = [];
                 saveHistory(); renderPage(1);
@@ -346,15 +347,9 @@
 
         function addText() {
             if (!pdfDoc) return alert('Pilih formulir dulu!');
-            let annot = {
-                page: currentPage,
-                x: 50, y: 50,
-                type: 'text', text: 'Teks Baru',
-                size: 16, letterSpacing: 0
-            };
+            let annot = { page: currentPage, x: 50, y: 50, type: 'text', text: 'Teks Baru', size: 16, letterSpacing: 0 };
             annotations.push(annot); saveHistory(); renderAnnotations();
             if(window.innerWidth < 768) toggleSidebar();
-            
             setTimeout(() => {
                 let lastDiv = annotationLayer.querySelector('.annotation-box:last-child');
                 if (lastDiv) makeEditable(annotations.length - 1, lastDiv);
@@ -545,6 +540,7 @@
                 const { PDFDocument, rgb } = PDFLib;
                 const pdfDocLib = await PDFDocument.load(pdfBytes);
                 const helveticaBoldFont = await pdfDocLib.embedFont(PDFLib.StandardFonts.HelveticaBold);
+                
                 for (let a of annotations) {
                     const page = pdfDocLib.getPage(a.page - 1);
                     const { width: pdfW, height: pdfH } = page.getSize();
@@ -552,9 +548,11 @@
                     const pdfX = (a.x / canvasW) * pdfW, pdfY_base = pdfH - (a.y / canvasH) * pdfH;
 
                     if (a.type === 'text') {
-                        const fs = a.size / scale; const lines = a.text.split('\n'), lh = fs * 1.15;
-                        const y_pdf = pdfY_base - (fs * 0.8); // Presisi Y untuk Teks
+                        const textStr = a.text || ' '; // Cegah crash jika teks kosong
+                        const fs = a.size / scale; const lines = textStr.split('\n'), lh = fs * 1.15;
+                        const y_pdf = pdfY_base - (fs * 0.8); 
                         lines.forEach((line, i) => { 
+                            if (line.length === 0) return; // Skip baris kosong agar tidak crash PDF-Lib
                             if (a.letterSpacing && a.letterSpacing > 0) {
                                 let currentX = pdfX; const spacingPdf = a.letterSpacing / scale;
                                 for (let char of line) {
@@ -567,26 +565,26 @@
                         });
                     } else if (a.type === 'circle') {
                         const w = (a.width / canvasW) * pdfW, h = (a.height / canvasH) * pdfH;
-                        // Presisi Y untuk Lingkaran (Pusat)
                         page.drawEllipse({ x: pdfX, y: pdfY_base, xScale: w/2, yScale: h/2, borderColor: rgb(0, 0, 0), borderWidth: 2.5 });
                     } else if (a.type === 'check') {
                         const w = (a.width / canvasW) * pdfW, h = (a.height / canvasH) * pdfH;
-                        // Presisi Y untuk Ceklis (Pusat)
                         page.drawLine({ start: { x: pdfX - w * 0.4, y: pdfY_base - h * 0.1 }, end: { x: pdfX - w * 0.1, y: pdfY_base - h * 0.3 }, thickness: w * 0.12, color: rgb(0, 0, 0) });
                         page.drawLine({ start: { x: pdfX - w * 0.1, y: pdfY_base - h * 0.3 }, end: { x: pdfX + w * 0.4, y: pdfY_base + h * 0.3 }, thickness: w * 0.12, color: rgb(0, 0, 0) });
                     } else if (a.type === 'sign' || a.type === 'materai') {
                         const bytes = a.type === 'sign' ? signImgBytes : materaiImgBytes; if (!bytes) continue;
                         let img; try { img = await pdfDocLib.embedPng(bytes); } catch { img = await pdfDocLib.embedJpg(bytes); }
                         const w = (a.width / canvasW) * pdfW, h = (a.height / canvasH) * pdfH;
-                        // Presisi Y untuk Gambar (Bawah)
                         page.drawImage(img, { x: pdfX, y: pdfY_base, width: w, height: h });
                     }
                 }
                 const pdfOut = await pdfDocLib.save(); const blob = new Blob([pdfOut], { type: 'application/pdf' });
                 const link = document.createElement('a'); link.href = URL.createObjectURL(blob);
                 link.download = "Karya_Abadi_Formulir_Subang_Terisi.pdf"; link.click();
-            } catch (err) { alert("Gagal download PDF."); console.error(err); } 
-            finally { downloadBtn.disabled = false; downloadBtn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width: 20px; height: 20px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="11" x2="12" y2="17"/><polyline points="9 14 12 17 15 14"/></svg> DOWNLOAD PDF`; }
+            } catch (err) { 
+                alert("Gagal download PDF. Error: " + err.message); console.error(err); 
+            } finally { 
+                downloadBtn.disabled = false; downloadBtn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width: 20px; height: 20px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="11" x2="12" y2="17"/><polyline points="9 14 12 17 15 14"/></svg> DOWNLOAD PDF`; 
+            }
         }
         function nextPage() { if (currentPage < totalPages) renderPage(currentPage + 1); }
         function prevPage() { if (currentPage > 1) renderPage(currentPage - 1); }
