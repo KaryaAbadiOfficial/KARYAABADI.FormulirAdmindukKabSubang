@@ -72,6 +72,14 @@
             border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px;
         }
         
+        /* CSS untuk Spasi di Sidebar */
+        .sidebar-spacing .spacing-row { color: #333; border-top: none; padding: 8px 0; font-size: 14px; font-weight: 600; justify-content: space-between; }
+        .sidebar-spacing .spacing-controls { gap: 8px; }
+        .sidebar-spacing .spacing-btn { background: var(--light-bg); color: var(--dark-green); border: 1px solid #ccc; width: 32px; height: 32px; font-size: 18px; border-radius: 6px; }
+        .sidebar-spacing .spacing-btn:not(:disabled):hover { background: var(--gold); color: var(--dark-green); border-color: var(--gold); }
+        .sidebar-spacing .spacing-btn:disabled { background: #f0f0f0; color: #aaa; cursor: not-allowed; border-color: #ddd; }
+        .sidebar-spacing .spacing-val { color: #333; font-size: 14px; width: 50px; }
+
         .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .btn-mode {
             background: var(--white); color: var(--dark-green); border: 2px solid var(--dark-green);
@@ -124,7 +132,7 @@
             top: 0; left: 0; 
             background: #2c3e50; color: white; border-radius: 8px; padding: 8px; display: none;
             flex-direction: column; gap: 4px; z-index: 1005; box-shadow: 0 8px 16px rgba(0,0,0,0.4); 
-            width: 220px; box-sizing: border-box;
+            width: 150px; box-sizing: border-box;
         }
         
         .popover-menu button {
@@ -132,12 +140,6 @@
             font-size: 13px; border-radius: 4px; display: flex; align-items: center; gap: 8px; width: 100%; font-family: 'Segoe UI', sans-serif;
         }
         .popover-menu button:hover { background: #34495e; }
-        
-        .spacing-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; font-size: 13px; }
-        .spacing-controls { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-        .spacing-btn { background: #34495e; border: none; color: white; width: 26px; height: 26px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .spacing-btn:active { background: var(--gold); color: var(--dark-green); }
-        .spacing-val { width: 40px; min-width: 40px; max-width: 40px; text-align: center; font-weight: bold; flex: 0 0 40px; font-family: 'Courier New', monospace; }
 
         .float-tools {
             position: fixed; top: 85px; right: 15px; z-index: 9999; background: white; padding: 8px;
@@ -304,7 +306,27 @@
                 Tambah Teks
             </button>
 
-            <h3>3. Pilih Mode Tanda</h3>
+            <h3>3. Atur Teks</h3>
+            <div class="sidebar-spacing">
+                <div class="spacing-row">
+                    <span>Spasi Huruf</span>
+                    <div class="spacing-controls">
+                        <button id="sbMinusLetter" class="spacing-btn" onclick="changeSpacing('letter', -1)" disabled>-</button>
+                        <span id="sbValLetter" class="spacing-val">0</span>
+                        <button id="sbPlusLetter" class="spacing-btn" onclick="changeSpacing('letter', 1)" disabled>+</button>
+                    </div>
+                </div>
+                <div class="spacing-row" style="margin-bottom: 15px;">
+                    <span>Jarak Baris</span>
+                    <div class="spacing-controls">
+                        <button id="sbMinusLine" class="spacing-btn" onclick="changeSpacing('line', -0.05)" disabled>-</button>
+                        <span id="sbValLine" class="spacing-val">1.15</span>
+                        <button id="sbPlusLine" class="spacing-btn" onclick="changeSpacing('line', 0.05)" disabled>+</button>
+                    </div>
+                </div>
+            </div>
+
+            <h3>4. Pilih Mode Tanda</h3>
             <div class="mode-grid">
                 <button class="btn-mode" data-mode="check" onclick="setMode('check')"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg> Ceklis</button>
                 <button class="btn-mode" data-mode="circle" onclick="setMode('circle')"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/></svg> Lingkaran</button>
@@ -312,7 +334,7 @@
                 <label class="btn-mode btn-upload" data-mode="materai"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 12h16M4 20h16M6 16h12M9 8a3 3 0 1 1 6 0c0 1.5-.5 2-1 3H10c-.5-1-1-1.5-1-3z"/></svg> Materai<input type="file" id="materaiUpload" accept="image/*"></label>
             </div>
 
-            <h3>4. Halaman</h3>
+            <h3>5. Halaman</h3>
             <div class="row-nav">
                 <button class="btn-nav" onclick="prevPage()">◀ PREV</button>
                 <span class="page-info" id="pageInfo">Hal 0 / 0</span>
@@ -324,7 +346,7 @@
                 DOWNLOAD PDF
             </button>
 
-            <h3>5. Panduan Tool</h3>
+            <h3>6. Panduan Tool</h3>
             <div class="guide-box">
                 <div class="guide-item">
                     <span class="guide-title">1. Tambah & Edit Teks</span>
@@ -336,7 +358,7 @@
                 </div>
                 <div class="guide-item">
                     <span class="guide-title">3. Spasi & Jarak Baris</span>
-                    <p class="guide-desc">Klik ikon <b>⋮</b>, gunakan tombol <b>[+]</b> dan <b>[-]</b> untuk melebarkan huruf atau menjauhkan baris ke bawah agar pas di kolom tabel.</p>
+                    <p class="guide-desc">Klik teks yang ingin diatur, lalu gunakan tombol <b>[+]</b> dan <b>[-]</b> di panel kiri pada bagian "Atur Teks".</p>
                 </div>
                 <div class="guide-item">
                     <span class="guide-title">4. Undo/Redo</span>
@@ -444,7 +466,7 @@
             terms: { title: 'Syarat dan Ketentuan', body: `<h4>1. Penerimaan Ketentuan</h4><p>Dengan menggunakan layanan Sistem Digital Pengisian Formulir Kependudukan Kabupaten Subang yang disediakan oleh <b>Karya Abadi</b>, pengguna dianggap telah membaca, memahami, dan menyetujui seluruh syarat dan ketentuan berikut.</p><h4>2. Penggunaan Layanan</h4><ul><li>Layanan ini disediakan untuk membantu masyarakat mengisi formulir kependudukan secara digital.</li><li>Pengguna wajib memberikan data yang benar, akurat, dan sah.</li><li>Pengguna dilarang menggunakan layanan untuk tujuan melanggar hukum atau peraturan yang berlaku.</li></ul><h4>3. Tanggung Jawab Pengguna</h4><p>Pengguna bertanggung jawab penuh atas kebenaran data yang dimasukkan ke dalam formulir. Karya Abadi tidak bertanggung jawab atas kesalahan pengisian yang dilakukan oleh pengguna.</p><h4>4. Hak Kekayaan Intelektual</h4><p>Seluruh konten, desain, logo, dan kode aplikasi merupakan milik Karya Abadi dan dilindungi oleh hukum hak cipta. Dilarang menyalin, memodifikasi, atau mendistribusikan tanpa izin tertulis.</p><h4>5. Batasan Tanggung Jawab</h4><p>Layanan disediakan "sebagaimana adanya" tanpa jaminan eksplisit. Karya Abadi tidak bertanggung jawab atas kerugian langsung maupun tidak langsung yang timbul dari penggunaan layanan.</p><h4>6. Perubahan Ketentuan</h4><p>Karya Abadi berhak mengubah syarat dan ketentuan ini sewaktu-waktu. Perubahan berlaku sejak dipublikasikan di halaman ini.</p>` },
             disclaimer: { title: 'Disclaimer', body: `<h4>Penyangkalan Umum</h4><p>Informasi dan layanan pada platform <b>Karya Abadi - Formulir Subang</b> disediakan untuk tujuan membantu masyarakat dalam pengisian formulir kependudukan secara digital.</p><h4>Ketepatan Data</h4><p>Kami berupaya menyediakan formulir yang sesuai dengan standar resmi. Namun, pengguna wajib memverifikasi kembali kebenaran data sebelum dokumen diserahkan kepada instansi berwenang. Karya Abadi tidak bertanggung jawab atas konsekuensi hukum akibat kesalahan pengisian data oleh pengguna.</p><h4>Bukan Instansi Resmi</h4><p>Karya Abadi <b>BUKAN</b> instansi pemerintah, Dinas Kependudukan dan Pencatatan Sipil (Disdukcapil), maupun Badan Kependudukan dan Keluarga Berencana Nasional (BKKBN). Layanan ini bersifat independen dan hanya berfungsi sebagai alat bantu digital pengisian formulir.</p><h4>Validitas Dokumen</h4><p>Dokumen yang dihasilkan melalui platform ini tetap perlu diverifikasi, ditandatangani, dan disahkan oleh pejabat berwenang agar sah secara hukum. Karya Abadi tidak menjamin diterimanya dokumen oleh pihak tertentu.</p><h4>Link Eksternal</h4><p>Platform dapat mengandung link ke situs pihak ketiga. Karya Abadi tidak bertanggung jawab atas konten atau kebijakan privasi situ eksternal tersebut.</p><h4>Paksaan Mayoret (Force Majeure)</h4><p>Karya Abadi tidak bertanggung jawab atas kegagalan layanan akibat kondisi di luar kendali, seperti bencana alam, gangguan jaringan, atau perubahan kebijakan pemerintah.</p>` },
             services: { title: 'Layanan Formulir', body: `<h4>Jenis Formulir Tersedia</h4><p>Platform Karya Abadi menyediakan pengisian digital berbagai formulir kependudukan, antara lain:</p><ul><li><b>F-1.01</b> - Formulir Biodata WNI</li><li><b>F-1.02</b> - Pendaftaran Peristiwa Kependudukan</li><li><b>F-1.03</b> - Pendaftaran Perpindahan Penduduk</li><li><b>F-1.06</b> - Surat Pernyataan Perubahan Elemen Data</li><li><b>F-1.07</b> - Surat Kuasa</li><li><b>F-1.21</b> - Permohonan KTP WNI</li><li><b>F-2.01</b> - Pelaporan Pencatatan Sipil</li><li><b>F-2.03</b> - SPTJM Kelahiran</li><li><b>F-2.04</b> - SPTJM Kebenaran Suami Istri</li><li>Surat Pernyataan Domisili Subang</li></ul><h4>Fitur Utama</h4><ul><li>Penambahan teks dengan pengaturan ukuran dan spasi huruf.</li><li>Tanda tangan digital dan materai yang dapat diunggah.</li><li>Mode tanda ceklis dan lingkaran.</li><li>Undo dan Redo untuk koreksi kesalahan.</li><li>Unduh hasil dalam format PDF.</li></ul>` },
-            guide: { title: 'Panduan Penggunaan', body: `<h4>Langkah 1 - Pilih Formulir</h4><p>Buka panel di sisi kiri, pilih formulir kependudukan yang sesuai dari dropdown "Pilih Formulir".</p><h4>Langkah 2 - Tambahkan Teks</h4><p>Klik tombol "Tambah Teks", lalu klik teks baru yang muncul di halaman PDF. Klik ikon <b>⋮</b> di samping teks dan pilih <b>Edit Teks</b> untuk mengubah isi sesuai kebutuhan.</p><h4>Langkah 3 - Geser & Atur Posisi</h4><p>Tahan dan geser objek teks atau tanda untuk memindahkan ke posisi yang diinginkan. Tarik kotak kuning di pojok kanan bawah untuk memperbesar atau memperkecil objek.</p><h4>Langkah 4 - Atur Spasi Huruf</h4><p>Untuk melebarkan huruf agar pas dengan kolom tabel, klik ikon <b>⋮</b> dan gunakan tombol <b>[+]</b> atau <b>[-]</b> pada menu Spasi.</p><h4>Langkah 5 - Tanda Tangan & Materai</h4><p>Pilih mode "TTD" atau "Materai" di panel kiri, lalu unggah file gambar tanda tangan atau materai Anda. Setelah terunggah, klik di posisi yang diinginkan pada PDF untuk menempatkannya.</p><h4>Langkah 6 - Navigasi Halaman</h4><p>Gunakan tombol <b>PREV</b> dan <b>NEXT</b> untuk berpindah antar halaman formulir jika memiliki lebih dari satu halaman.</p><h4>Langkah 7 - Undo / Redo</h4><p>Gunakan tombol mengambang di pojok kanan atas untuk membatalkan (Undo) atau mengulang (Redo) aksi terakhir Anda.</p><h4>Langkah 8 - Unduh PDF</h4><p>Setelah semua data terisi, klik tombol <b>DOWNLOAD PDF</b> untuk menyimpan hasil ke perangkat Anda.</p>` }
+            guide: { title: 'Panduan Penggunaan', body: `<h4>Langkah 1 - Pilih Formulir</h4><p>Buka panel di sisi kiri, pilih formulir kependudukan yang sesuai dari dropdown "Pilih Formulir".</p><h4>Langkah 2 - Tambahkan Teks</h4><p>Klik tombol "Tambah Teks", lalu klik teks baru yang muncul di halaman PDF. Klik ikon <b>⋮</b> di samping teks dan pilih <b>Edit Teks</b> untuk mengubah isi sesuai kebutuhan.</p><h4>Langkah 3 - Geser & Atur Posisi</h4><p>Tahan dan geser objek teks atau tanda untuk memindahkan ke posisi yang diinginkan. Tarik kotak kuning di pojok kanan bawah untuk memperbesar atau memperkecil objek.</p><h4>Langkah 4 - Atur Spasi Huruf</h4><p>Untuk melebarkan huruf agar pas dengan kolom tabel, klik teks tersebut, lalu gunakan tombol <b>[+]</b> atau <b>[-]</b> di bagian "Atur Teks" pada panel kiri.</p><h4>Langkah 5 - Tanda Tangan & Materai</h4><p>Pilih mode "TTD" atau "Materai" di panel kiri, lalu unggah file gambar tanda tangan atau materai Anda. Setelah terunggah, klik di posisi yang diinginkan pada PDF untuk menempatkannya.</p><h4>Langkah 6 - Navigasi Halaman</h4><p>Gunakan tombol <b>PREV</b> dan <b>NEXT</b> untuk berpindah antar halaman formulir jika memiliki lebih dari satu halaman.</p><h4>Langkah 7 - Undo / Redo</h4><p>Gunakan tombol mengambang di pojok kanan atas untuk membatalkan (Undo) atau mengulang (Redo) aksi terakhir Anda.</p><h4>Langkah 8 - Unduh PDF</h4><p>Setelah semua data terisi, klik tombol <b>DOWNLOAD PDF</b> untuk menyimpan hasil ke perangkat Anda.</p>` }
         };
 
         function openModal(key) {
@@ -464,6 +486,7 @@
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         let pdfDoc = null, pdfBytes = null, currentMode = null, annotations = [], scale = 1.5, currentPage = 1, totalPages = 1;
         let history = [], historyIndex = -1, signImgBytes = null, materaiImgBytes = null;
+        let activeAnnotId = null; // Menggunakan ID unik agar anti-bug saat array berubah
 
         const formSelect = document.getElementById('formSelect');
         const canvas = document.getElementById('pdfViewer');
@@ -576,14 +599,16 @@
 
         function addText() {
             if (!pdfDoc) return alert('Pilih formulir dulu!');
-            let annot = { page: currentPage, x: 50, y: 50, type: 'text', text: 'Teks Baru', size: 16, letterSpacing: 0, lineHeight: 1.15 };
+            let annot = { id: Date.now() + Math.random(), page: currentPage, x: 50, y: 50, type: 'text', text: 'Teks Baru', size: 16, letterSpacing: 0, lineHeight: 1.15 };
             annotations.push(annot); saveHistory(); renderAnnotations();
             if(window.innerWidth < 768) toggleSidebar();
             setTimeout(() => {
                 let lastDiv = annotationLayer.querySelector('.annotation-box:last-child');
                 if (lastDiv) {
                     lastDiv.classList.add('active');
-                    makeEditable(annotations.length - 1, lastDiv);
+                    activeAnnotId = annot.id;
+                    updateSidebarTools(lastDiv, annot);
+                    makeEditable(annot, lastDiv);
                 }
             }, 100);
         }
@@ -593,7 +618,7 @@
             const rect = canvas.getBoundingClientRect();
             const c = getCoords(e);
             const x = c.x - rect.left, y = c.y - rect.top;
-            let annot = { page: currentPage, x, y, type: currentMode, letterSpacing: 0 };
+            let annot = { id: Date.now() + Math.random(), page: currentPage, x, y, type: currentMode, letterSpacing: 0 };
 
             if (currentMode === 'check' || currentMode === 'circle') {
                 annot.width = 20; annot.height = 20;
@@ -609,8 +634,10 @@
 
         function renderAnnotations() {
             annotationLayer.innerHTML = '';
+            activeAnnotId = null; 
+            updateSidebarTools(null, null); 
+            
             annotations.filter(a => a.page === currentPage).forEach((a) => {
-                const globalIndex = annotations.indexOf(a);
                 const div = document.createElement('div');
                 div.className = 'annotation-box';
                 div.style.left = a.x + 'px'; div.style.top = a.y + 'px';
@@ -621,15 +648,15 @@
                     div.innerText = a.text;
                     div.style.letterSpacing = a.letterSpacing + 'px';
                     div.style.lineHeight = a.lineHeight;
-                    div.appendChild(createMenu(globalIndex, true, div));
+                    div.appendChild(createMenu(a.id, true, div));
                 } else if (a.type === 'circle') {
                     div.classList.add('circle-annot'); div.style.width = a.width + 'px'; div.style.height = a.height + 'px'; div.style.transform = 'translate(-50%, -50%)'; 
-                    div.appendChild(createMenu(globalIndex, false, div));
+                    div.appendChild(createMenu(a.id, false, div));
                 } else if (a.type === 'check') {
                     div.classList.add('check-annot'); div.style.width = a.width + 'px'; div.style.height = a.height + 'px';
                     div.style.transform = 'translate(-50%, -50%)';
                     div.innerHTML = `<svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none"><polyline points="10,60 40,80 90,20" fill="none" stroke="black" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-                    div.appendChild(createMenu(globalIndex, false, div));
+                    div.appendChild(createMenu(a.id, false, div));
                 } else if (a.type === 'sign' || a.type === 'materai') {
                     const img = document.createElement('img');
                     const bytes = a.type === 'sign' ? signImgBytes : materaiImgBytes;
@@ -637,30 +664,74 @@
                     img.src = URL.createObjectURL(new Blob([bytes]));
                     img.style.width = a.width + 'px'; img.style.height = a.height + 'px'; img.style.opacity = 0.9;
                     div.appendChild(img); div.style.transform = 'translateY(-100%)';
-                    div.appendChild(createMenu(globalIndex, false, div));
+                    div.appendChild(createMenu(a.id, false, div));
                 }
                 
                 div.addEventListener('mousedown', () => {
                     document.querySelectorAll('.annotation-box').forEach(b => b.classList.remove('active'));
                     div.classList.add('active');
+                    activeAnnotId = a.id;
+                    updateSidebarTools(div, a);
                 });
                 div.addEventListener('touchstart', () => {
                     document.querySelectorAll('.annotation-box').forEach(b => b.classList.remove('active'));
                     div.classList.add('active');
+                    activeAnnotId = a.id;
+                    updateSidebarTools(div, a);
                 }, { passive: true });
 
-                attachInteractions(div, globalIndex);
+                attachInteractions(div, a.id);
                 annotationLayer.appendChild(div);
             });
         }
         
+        function updateSidebarTools(div, annot) {
+            const isText = annot && annot.type === 'text';
+            document.getElementById('sbMinusLetter').disabled = !isText;
+            document.getElementById('sbPlusLetter').disabled = !isText;
+            document.getElementById('sbMinusLine').disabled = !isText;
+            document.getElementById('sbPlusLine').disabled = !isText;
+            
+            if (isText) {
+                document.getElementById('sbValLetter').innerText = (annot.letterSpacing || 0);
+                document.getElementById('sbValLine').innerText = parseFloat(annot.lineHeight || 1.15).toFixed(2);
+            } else {
+                document.getElementById('sbValLetter').innerText = '-';
+                document.getElementById('sbValLine').innerText = '-';
+            }
+        }
+
+        function changeSpacing(type, delta) {
+            if (!activeAnnotId) return;
+            let annot = annotations.find(a => a.id === activeAnnotId);
+            if (!annot || annot.type !== 'text') return;
+            
+            let activeDiv = document.querySelector('.annotation-box.active');
+            if (!activeDiv) return;
+
+            if (type === 'letter') {
+                annot.letterSpacing = (annot.letterSpacing || 0) + delta;
+                activeDiv.style.letterSpacing = annot.letterSpacing + 'px';
+                document.getElementById('sbValLetter').innerText = annot.letterSpacing;
+            } else if (type === 'line') {
+                let curr = parseFloat(annot.lineHeight || 1.15);
+                curr = Math.max(0.8, curr + delta);
+                annot.lineHeight = curr;
+                activeDiv.style.lineHeight = curr;
+                document.getElementById('sbValLine').innerText = curr.toFixed(2);
+            }
+            saveHistory();
+        }
+
         document.addEventListener('mousedown', (e) => {
-            if (!e.target.closest('.annotation-box')) {
+            if (!e.target.closest('.annotation-box') && !e.target.closest('.popover-menu') && !e.target.closest('.sidebar') && !e.target.closest('.float-tools')) {
                 document.querySelectorAll('.annotation-box').forEach(b => b.classList.remove('active'));
+                activeAnnotId = null;
+                updateSidebarTools(null, null);
             }
         });
 
-        function createMenu(idx, isText, element) {
+        function createMenu(annotId, isText, element) {
             const trigger = document.createElement('div');
             trigger.className = 'menu-trigger'; trigger.innerHTML = '⋮';
             const popover = document.createElement('div'); 
@@ -669,72 +740,29 @@
             if (isText) {
                 const editBtn = document.createElement('button');
                 editBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit Teks`;
-                editBtn.onclick = (e) => { e.stopPropagation(); popover.style.display = 'none'; makeEditable(idx, element); };
+                editBtn.onclick = (e) => { 
+                    e.stopPropagation(); 
+                    popover.style.display = 'none'; 
+                    let annot = annotations.find(a => a.id === annotId);
+                    if (annot) makeEditable(annot, element); 
+                };
                 popover.appendChild(editBtn);
-
-                const spacingRow = document.createElement('div');
-                spacingRow.className = 'spacing-row';
-                spacingRow.innerHTML = `<span>Spasi Huruf</span>`;
-                const controls = document.createElement('div'); controls.className = 'spacing-controls';
-                
-                const minusBtn = document.createElement('button'); minusBtn.className = 'spacing-btn'; minusBtn.innerText = '-';
-                const valDisplay = document.createElement('span'); valDisplay.className = 'spacing-val'; valDisplay.innerText = (annotations[idx].letterSpacing || 0);
-                const plusBtn = document.createElement('button'); plusBtn.className = 'spacing-btn'; plusBtn.innerText = '+';
-                
-                minusBtn.onclick = (e) => { 
-                    e.stopPropagation(); 
-                    annotations[idx].letterSpacing = (annotations[idx].letterSpacing || 0) - 1; 
-                    element.style.letterSpacing = annotations[idx].letterSpacing + 'px';
-                    valDisplay.innerText = annotations[idx].letterSpacing; 
-                    saveHistory(); 
-                };
-                plusBtn.onclick = (e) => { 
-                    e.stopPropagation(); 
-                    annotations[idx].letterSpacing = (annotations[idx].letterSpacing || 0) + 1; 
-                    element.style.letterSpacing = annotations[idx].letterSpacing + 'px';
-                    valDisplay.innerText = annotations[idx].letterSpacing; 
-                    saveHistory(); 
-                };
-
-                controls.appendChild(minusBtn); controls.appendChild(valDisplay); controls.appendChild(plusBtn);
-                spacingRow.appendChild(controls); popover.appendChild(spacingRow);
-
-                const lineSpRow = document.createElement('div');
-                lineSpRow.className = 'spacing-row';
-                lineSpRow.innerHTML = `<span>Jarak Baris</span>`;
-                const lineControls = document.createElement('div'); lineControls.className = 'spacing-controls';
-                
-                const minusLineBtn = document.createElement('button'); minusLineBtn.className = 'spacing-btn'; minusLineBtn.innerText = '-';
-                const valLineDisplay = document.createElement('span'); valLineDisplay.className = 'spacing-val'; 
-                valLineDisplay.innerText = parseFloat(annotations[idx].lineHeight || 1.15).toFixed(2);
-                const plusLineBtn = document.createElement('button'); plusLineBtn.className = 'spacing-btn'; plusLineBtn.innerText = '+';
-                
-                minusLineBtn.onclick = (e) => { 
-                    e.stopPropagation(); 
-                    let curr = parseFloat(annotations[idx].lineHeight || 1.15);
-                    curr = Math.max(0.8, curr - 0.05); 
-                    annotations[idx].lineHeight = curr; 
-                    element.style.lineHeight = curr;
-                    valLineDisplay.innerText = curr.toFixed(2); 
-                    saveHistory(); 
-                };
-                plusLineBtn.onclick = (e) => { 
-                    e.stopPropagation(); 
-                    let curr = parseFloat(annotations[idx].lineHeight || 1.15);
-                    curr = curr + 0.05; 
-                    annotations[idx].lineHeight = curr; 
-                    element.style.lineHeight = curr;
-                    valLineDisplay.innerText = curr.toFixed(2); 
-                    saveHistory(); 
-                };
-
-                lineControls.appendChild(minusLineBtn); lineControls.appendChild(valLineDisplay); lineControls.appendChild(plusLineBtn);
-                lineSpRow.appendChild(lineControls); popover.appendChild(lineSpRow);
             }
             
             const delBtn = document.createElement('button');
             delBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Hapus`;
-            delBtn.onclick = (e) => { e.stopPropagation(); popover.style.display = 'none'; annotations.splice(idx, 1); saveHistory(); renderAnnotations(); };
+            delBtn.onclick = (e) => { 
+                e.stopPropagation(); 
+                popover.style.display = 'none'; 
+                let annotIndex = annotations.findIndex(a => a.id === annotId);
+                if (annotIndex !== -1) {
+                    annotations.splice(annotIndex, 1); 
+                    activeAnnotId = null; 
+                    updateSidebarTools(null, null); 
+                    saveHistory(); 
+                    renderAnnotations(); 
+                }
+            };
             popover.appendChild(delBtn);
             
             trigger.onclick = (e) => {
@@ -743,17 +771,14 @@
                 document.querySelectorAll('.popover-menu').forEach(m => m.style.display = 'none');
                 
                 if (!isDisplayed) {
-                    // MASUKKAN POPUP KE LAYER UTAMA AGAR TIDAK TERIKAT OLEH UKURAN TEKS
                     annotationLayer.appendChild(popover);
                     popover.style.display = 'flex';
                     
-                    // Kalkulasi posisi mutlak berdasarkan kondisi TEKS SAAT INI
                     const annotX = parseFloat(element.style.left) || 0;
                     const annotY = parseFloat(element.style.top) || 0;
                     const annotHeight = element.offsetHeight;
                     const annotWidth = element.offsetWidth;
                     
-                    // Sesuaikan jika teks memiliki transformasi (circle/check/img)
                     let visualTop = annotY;
                     let visualLeft = annotX;
                     if (element.style.transform.includes('translateY(-100%)')) {
@@ -763,7 +788,6 @@
                         visualLeft = annotX - annotWidth / 2;
                     }
                     
-                    // KUNCI Posisi di bawah teks dengan jarak 15px
                     let popTop = visualTop + annotHeight + 15;
                     let popLeft = visualLeft;
                     
@@ -772,7 +796,6 @@
                     const popWidth = popover.offsetWidth;
                     const popHeight = popover.offsetHeight;
                     
-                    // Cegah keluar layar
                     if (popTop + popHeight > layerHeight - 10) {
                         popTop = visualTop - popHeight - 15;
                     }
@@ -782,7 +805,6 @@
                     if (popLeft < 10) popLeft = 10;
                     if (popTop < 10) popTop = 10;
                     
-                    // TERAPKAN DALAM PIXEL (PX) MUTLAK
                     popover.style.left = popLeft + 'px';
                     popover.style.top = popTop + 'px';
                     popover.style.zIndex = 1005;
@@ -792,21 +814,21 @@
             return trigger;
         }
 
-        function makeEditable(idx, element) {
+        function makeEditable(annot, element) {
             element.contentEditable = "true"; element.focus();
             const range = document.createRange(); range.selectNodeContents(element); 
             const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
 
             const finishEdit = () => {
                 element.contentEditable = "false";
-                annotations[idx].text = element.innerText.replace(/\n$/, '');
+                annot.text = element.innerText.replace(/\n$/, '');
                 saveHistory();
             };
             element.addEventListener('blur', finishEdit, { once: true });
             element.addEventListener('keydown', (e) => { if (e.key === 'Escape') element.blur(); e.stopPropagation(); });
         }
 
-        function attachInteractions(element, annotIndex) {
+        function attachInteractions(element, annotId) {
             function startDragMove(e) {
                 if (e.target.classList.contains('menu-trigger') || e.target.closest('.popover-menu') || e.target.classList.contains('resize-handle') || element.isContentEditable) return;
                 e.preventDefault();
@@ -817,7 +839,8 @@
                     mv.preventDefault(); const mc = getCoords(mv);
                     let nx = startLeft + (mc.x - startX), ny = startTop + (mc.y - startY);
                     element.style.left = nx + 'px'; element.style.top = ny + 'px';
-                    annotations[annotIndex].x = nx; annotations[annotIndex].y = ny;
+                    let annot = annotations.find(a => a.id === annotId);
+                    if (annot) { annot.x = nx; annot.y = ny; }
                 }
                 function onUp() {
                     document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp);
@@ -833,7 +856,8 @@
             const handle = document.createElement('div'); handle.className = 'resize-handle'; element.appendChild(handle);
             function startDragResize(e) {
                 e.stopPropagation(); e.preventDefault();
-                const annot = annotations[annotIndex];
+                let annot = annotations.find(a => a.id === annotId);
+                if (!annot) return;
                 const c = getCoords(e); const startX = c.x, startY = c.y;
                 const startW = element.offsetWidth, startH = element.offsetHeight;
                 const startFontSize = annot.type === 'text' ? annot.size : 0;
@@ -887,7 +911,7 @@
                         
                         lines.forEach((line, i) => { 
                             if (line.length === 0) return; 
-                            if (a.letterSpacing && a.letterSpacing > 0) {
+                            if (a.letterSpacing && a.letterSpacing !== 0) { // Diperbaiki: Mendukung spasi negatif
                                 let currentX = pdfX; const spacingPdf = a.letterSpacing / scale;
                                 for (let char of line) {
                                     page.drawText(char, { x: currentX, y: y_pdf - (i * lh), size: fs, font: helveticaBoldFont, color: rgb(0, 0, 0) });
