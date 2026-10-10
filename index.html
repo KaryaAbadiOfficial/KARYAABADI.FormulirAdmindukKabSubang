@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>KARYA ABADI FORMULIR SUBANG</title>
     <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -11,43 +11,53 @@
             --dark-green: #0b3d2e; --gold: #d4af37; --gold-light: #f3e5ab;
             --red-download: #c0392b; --white: #ffffff; --light-bg: #f4f6f5;
         }
-        * { box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; background-color: var(--light-bg); color: #333; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; background-color: var(--light-bg); color: #333; overflow-x: hidden; }
         
         header {
-            background: var(--dark-green); color: var(--gold); padding: 15px 40px;
+            background: var(--dark-green); color: var(--gold); padding: 10px 15px;
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 4px solid var(--gold); box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            border-bottom: 4px solid var(--gold); box-shadow: 0 4px 6px rgba(0,0,0,0.2); position: relative; z-index: 1000;
         }
-        .header-left img, .header-right img { height: 70px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
-        .header-left { display: flex; align-items: center; }
-        .header-right { display: flex; align-items: center; gap: 15px; }
-        .header-right h2 { margin: 0; font-size: 20px; color: var(--gold); letter-spacing: 1px; text-align: right; }
-        .header-center { flex-grow: 1; text-align: center; }
-        .header-center h1 { margin: 0; font-size: 24px; text-transform: uppercase; color: var(--white); }
-        .header-center p { margin: 5px 0 0; font-size: 12px; color: var(--gold-light); }
+        .header-left img, .header-right img { height: 50px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+        .header-left { display: flex; align-items: center; gap: 10px; }
+        .header-right { display: flex; align-items: center; gap: 10px; }
+        .header-right h2 { margin: 0; font-size: 14px; color: var(--gold); text-align: right; display: none; }
+        .header-center { display: none; }
+        .menu-toggle {
+            background: var(--gold); color: var(--dark-green); border: none; width: 40px; height: 40px;
+            border-radius: 6px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
 
-        .main-layout { display: flex; min-height: calc(100vh - 110px); }
+        .main-layout { display: flex; min-height: calc(100vh - 70px); }
         .sidebar {
-            width: 340px; flex-shrink: 0; background: var(--white); padding: 25px;
+            width: 320px; max-width: 85vw; flex-shrink: 0; background: var(--white); padding: 20px;
             box-shadow: 2px 0 10px rgba(0,0,0,0.1); overflow-y: auto; border-right: 4px solid var(--dark-green);
+            position: fixed; top: 70px; left: 0; height: calc(100% - 70px); z-index: 999;
+            transform: translateX(-100%); transition: transform 0.3s ease;
         }
+        .sidebar.active { transform: translateX(0); }
         .sidebar h3 { font-size: 14px; color: var(--dark-green); text-transform: uppercase; letter-spacing: 1px; margin: 20px 0 10px; border-bottom: 2px solid var(--gold); padding-bottom: 5px; }
         .sidebar h3:first-child { margin-top: 0; }
         
-        select { width: 100%; padding: 12px; border: 2px solid var(--dark-green); border-radius: 6px; font-size: 14px; cursor: pointer; background: var(--white); margin-bottom: 15px; }
-        textarea { width: 100%; min-height: 100px; padding: 12px; border: 2px solid var(--dark-green); border-radius: 6px; font-family: 'Segoe UI', sans-serif; font-size: 14px; resize: vertical; }
+        .backdrop { position: fixed; top: 70px; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 998; display: none; }
+        .backdrop.active { display: block; }
+
+        select { width: 100%; padding: 12px; border: 2px solid var(--dark-green); border-radius: 6px; font-size: 16px; cursor: pointer; background: var(--white); margin-bottom: 15px; }
+        
+        .btn-add-text {
+            background: var(--gold); color: var(--dark-green); border: none; width: 100%; padding: 15px;
+            border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px;
+        }
         
         .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .btn-mode {
             background: var(--white); color: var(--dark-green); border: 2px solid var(--dark-green);
-            padding: 12px 5px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;
+            padding: 15px 5px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;
             display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s;
         }
-        .btn-mode:hover { background: #e6f0ed; }
-        .btn-mode.active { background: var(--dark-green); color: var(--gold); border-color: var(--dark-green); box-shadow: 0 0 10px rgba(11, 61, 46, 0.5); transform: translateY(-1px); }
-        .btn-upload { display: flex; width: 100%; justify-content: center; padding: 12px 5px; box-sizing: border-box; cursor: pointer; }
-        .btn-upload.active { background: var(--dark-green); color: var(--gold); border-color: var(--dark-green); box-shadow: 0 0 10px rgba(11, 61, 46, 0.5); }
+        .btn-mode.active { background: var(--dark-green); color: var(--gold); border-color: var(--dark-green); box-shadow: 0 0 10px rgba(11, 61, 46, 0.5); }
+        .btn-upload { display: flex; width: 100%; justify-content: center; box-sizing: border-box; cursor: pointer; }
         
         .row-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; margin-bottom: 20px; }
         .btn-nav { background: var(--dark-green); color: var(--gold); border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; }
@@ -56,94 +66,84 @@
         .btn-download {
             background: var(--red-download); color: var(--white); border: none; padding: 15px;
             width: 100%; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            box-shadow: 0 4px 6px rgba(192, 57, 43, 0.4); transition: 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 6px rgba(192, 57, 43, 0.4);
         }
-        .btn-download:hover { background: #e74c3c; transform: translateY(-2px); }
-        .btn-download:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; transform: none; }
 
-        .pdf-area { flex-grow: 1; padding: 40px; overflow: auto; display: flex; justify-content: center; align-items: flex-start; background: #eef2f7; position: relative; }
-        #pdfContainer { position: relative; box-shadow: 0 0 15px rgba(0,0,0,0.2); background: white; }
-        #interactionLayer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: crosshair; }
+        .pdf-area { flex-grow: 1; padding: 15px; overflow: auto; display: flex; justify-content: center; align-items: flex-start; background: #eef2f7; position: relative; width: 100%; }
+        #pdfContainer { position: relative; box-shadow: 0 0 15px rgba(0,0,0,0.2); background: white; touch-action: auto; }
+        #interactionLayer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; touch-action: pan-y pinch-zoom; }
         .annotation-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
         
-        .annotation-box { position: absolute; pointer-events: auto; cursor: move; user-select: none; }
-        .text-annot { color: black; font-family: Arial, sans-serif; white-space: pre; line-height: 1.15; transform: translateY(-100%); font-weight: bold; outline: none; }
-        .text-annot:focus { border: 1px dashed var(--dark-green); cursor: text; }
-        .circle-annot { border: 2.5px solid black; border-radius: 50%; }
-        .check-annot { overflow: visible; }
-        .resize-handle { position: absolute; bottom: -5px; right: -5px; width: 12px; height: 12px; background: var(--gold); border: 1px solid var(--dark-green); border-radius: 50%; cursor: se-resize; pointer-events: auto; }
+        .annotation-box { position: absolute; pointer-events: auto; touch-action: none; }
+        /* Perbaikan: Hilangkan translateY agar presisi Y mutlak */
+        .text-annot { color: black; font-family: Arial, sans-serif; white-space: pre; line-height: 1.15; font-weight: bold; outline: none; cursor: move; min-width: 20px; padding: 2px; }
+        .text-annot:focus { border: 1px dashed var(--dark-green); cursor: text; background: rgba(255,255,255,0.8); }
+        .circle-annot { border: 2.5px solid black; border-radius: 50%; cursor: move; }
+        .check-annot { overflow: visible; cursor: move; }
+        .resize-handle { position: absolute; bottom: -12px; right: -12px; width: 24px; height: 24px; background: var(--gold); border: 2px solid var(--dark-green); border-radius: 50%; cursor: se-resize; pointer-events: auto; touch-action: none; z-index: 10; }
         
-        /* MENU TITIK 3 */
+        /* MENU TITIK 3 DIPINDAH KE ATAS */
         .menu-trigger {
-            position: absolute; top: -25px; right: -5px; background: #fff; border: 1px solid #ccc;
-            border-radius: 4px; cursor: pointer; width: 24px; height: 24px; display: flex;
-            align-items: center; justify-content: center; font-weight: bold; color: #333; font-size: 16px;
-            line-height: 1; z-index: 1001; box-shadow: 0 2px 4px rgba(0,0,0,0.15); display: none;
+            position: absolute; top: -35px; right: -5px; background: #fff; border: 1px solid #ccc;
+            border-radius: 4px; cursor: pointer; width: 28px; height: 28px; display: flex;
+            align-items: center; justify-content: center; font-weight: bold; color: #333; font-size: 18px;
+            line-height: 1; z-index: 1001; box-shadow: 0 2px 4px rgba(0,0,0,0.15);
         }
-        .annotation-box:hover .menu-trigger { display: flex; }
         .popover-menu {
-            position: absolute; top: -50px; right: 0; background: #333; color: white; border-radius: 5px;
-            padding: 5px; display: none; flex-direction: column; gap: 2px; z-index: 1002;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2); width: 130px;
+            position: absolute; top: -130px; right: 0; background: #333; color: white; border-radius: 5px;
+            padding: 5px; display: none; flex-direction: column; gap: 2px; z-index: 1002; box-shadow: 0 4px 8px rgba(0,0,0,0.2); width: 150px;
         }
         .popover-menu button {
-            background: none; border: none; color: white; text-align: left; padding: 8px 10px;
-            cursor: pointer; font-size: 13px; border-radius: 3px; display: flex; align-items: center;
-            gap: 8px; width: 100%; font-family: 'Segoe UI', sans-serif;
+            background: none; border: none; color: white; text-align: left; padding: 10px; cursor: pointer;
+            font-size: 14px; border-radius: 3px; display: flex; align-items: center; gap: 8px; width: 100%; font-family: 'Segoe UI', sans-serif;
         }
         .popover-menu button:hover { background: #555; }
-        .spacing-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 8px 10px; border-top: 1px solid #555; margin-top: 2px; font-size: 13px;
-        }
-        .spacing-controls { display: flex; align-items: center; gap: 8px; }
-        .spacing-btn {
-            background: #555; border: none; color: white; width: 24px; height: 24px;
-            border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .spacing-btn:hover { background: #777; }
-        .spacing-val { min-width: 25px; text-align: center; font-weight: bold; }
+        .spacing-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-top: 1px solid #555; font-size: 14px; }
+        .spacing-controls { display: flex; align-items: center; gap: 10px; }
+        .spacing-btn { background: #555; border: none; color: white; width: 30px; height: 30px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+        .spacing-val { min-width: 30px; text-align: center; font-weight: bold; }
 
-        /* TOMBOL UNDO REDO MENGAMBANG (FLOAT) */
         .float-tools {
-            position: absolute; top: 20px; right: 20px; z-index: 9999; background: white; padding: 8px;
-            border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.25); display: flex; align-items: center; gap: 8px;
-            border: 2px solid var(--dark-green); user-select: none;
+            position: fixed; top: 85px; right: 15px; z-index: 9999; background: white; padding: 8px;
+            border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.25); display: flex; align-items: center; gap: 8px; border: 2px solid var(--dark-green); touch-action: none;
         }
-        .drag-handle {
-            cursor: grab; padding: 0 5px; display: flex; align-items: center; color: #888;
-        }
-        .drag-handle:active { cursor: grabbing; }
-        .btn-icon-float {
-            width: 36px; height: 36px; background: var(--gold); color: var(--dark-green); border: none;
-            border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .btn-icon-float:hover:not(:disabled) { background: var(--gold-light); transform: scale(1.1); }
+        .drag-handle { cursor: grab; padding: 0 5px; display: flex; align-items: center; color: #888; }
+        .btn-icon-float { width: 40px; height: 40px; background: var(--gold); color: var(--dark-green); border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .btn-icon-float:disabled { background: #e0e0e0; color: #999; cursor: not-allowed; box-shadow: none; }
-        .btn-reset-pos {
-            width: 28px; height: 28px; background: #eee; color: var(--dark-green); border: 1px solid #ccc;
-            border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            font-size: 12px;
-        }
-        .btn-reset-pos:hover { background: #ddd; }
+        .btn-reset-pos { width: 30px; height: 30px; background: #eee; color: var(--dark-green); border: 1px solid #ccc; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; }
         
         footer { background: var(--dark-green); color: var(--gold); text-align: center; padding: 15px; font-size: 13px; }
         input[type="file"] { display: none; }
         .icon { width: 16px; height: 16px; stroke-width: 2.5; }
+
+        @media (min-width: 768px) {
+            header { padding: 15px 40px; }
+            .header-left img, .header-right img { height: 70px; }
+            .header-right h2 { display: block; font-size: 20px; }
+            .header-center { display: block; flex-grow: 1; text-align: center; }
+            .header-center h1 { margin: 0; font-size: 24px; text-transform: uppercase; color: var(--white); }
+            .header-center p { margin: 5px 0 0; font-size: 12px; color: var(--gold-light); }
+            .menu-toggle { display: none; }
+            .sidebar { position: relative; top: 0; height: calc(100vh - 110px); transform: translateX(0); width: 340px; }
+            .backdrop { display: none !important; }
+            .pdf-area { padding: 40px; }
+        }
     </style>
 </head>
 <body>
     <header>
-        <div class="header-left"><img src="logo-subang.png" alt="Logo Kabupaten Subang"></div>
+        <div class="header-left">
+            <button class="menu-toggle" onclick="toggleSidebar()">&#9776;</button>
+            <img src="logo-subang.png" alt="Logo Kabupaten Subang">
+        </div>
         <div class="header-center"><h1>KARYA ABADI FORMULIR SUBANG</h1><p>Sistem Digital Pengisian Formulir Kependudukan</p></div>
         <div class="header-right"><h2>KARYA ABADI</h2><img src="logo-karya-abadi.png" alt="Logo Karya Abadi"></div>
     </header>
 
+    <div class="backdrop" id="backdrop" onclick="toggleSidebar()"></div>
+
     <div class="main-layout">
-        <div class="sidebar">
+        <div class="sidebar" id="sidebar">
             <h3>1. Pilih Formulir</h3>
             <select id="formSelect">
                 <option value="">-- Pilih Formulir --</option>
@@ -160,15 +160,16 @@
             </select>
 
             <h3>2. Masukkan Teks</h3>
-            <textarea id="textInput" placeholder="Ketik teks di sini... (Bisa Enter)"></textarea>
+            <button class="btn-add-text" onclick="addText()">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Tambah Teks (Klik PDF)
+            </button>
+            <p style="font-size:12px; color:#666; margin-top:-10px; margin-bottom:20px;">*Setelah muncul di PDF, klik tombol ⋮ lalu Edit untuk mengetik langsung.</p>
 
-            <h3>3. Pilih Mode</h3>
+            <h3>3. Pilih Mode Tanda</h3>
             <div class="mode-grid">
-                <button class="btn-mode" data-mode="text" onclick="setMode('text')"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg> Teks</button>
                 <button class="btn-mode" data-mode="check" onclick="setMode('check')"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg> Ceklis</button>
                 <button class="btn-mode" data-mode="circle" onclick="setMode('circle')"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/></svg> Lingkaran</button>
-                <button class="btn-mode" data-mode="edit" onclick="setMode('edit')"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg> Geser</button>
-                <button class="btn-mode" data-mode="delete" onclick="setMode('delete')" style="grid-column: span 2;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Hapus Objek</button>
                 <label class="btn-mode btn-upload" data-mode="sign"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg> TTD<input type="file" id="signUpload" accept="image/*"></label>
                 <label class="btn-mode btn-upload" data-mode="materai"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 12h16M4 20h16M6 16h12M9 8a3 3 0 1 1 6 0c0 1.5-.5 2-1 3H10c-.5-1-1-1.5-1-3z"/></svg> Materai<input type="file" id="materaiUpload" accept="image/*"></label>
             </div>
@@ -187,7 +188,6 @@
         </div>
 
         <div class="pdf-area" id="pdfArea">
-            <!-- TOMBOL MENGAMBANG UNDO REDO -->
             <div class="float-tools" id="floatTools">
                 <div class="drag-handle" title="Geser Posisi">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>
@@ -215,7 +215,7 @@
 
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        let pdfDoc = null, pdfBytes = null, currentMode = 'text', annotations = [], scale = 1.5, currentPage = 1, totalPages = 1;
+        let pdfDoc = null, pdfBytes = null, currentMode = null, annotations = [], scale = 1.5, currentPage = 1, totalPages = 1;
         let history = [], historyIndex = -1, signImgBytes = null, materaiImgBytes = null;
 
         const formSelect = document.getElementById('formSelect');
@@ -225,47 +225,56 @@
         const annotationLayer = document.getElementById('annotationLayer');
         const downloadBtn = document.getElementById('downloadBtn');
         const pdfArea = document.getElementById('pdfArea');
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('backdrop');
 
-        // LOGIC TOMBOL UNDO/REDO MENGAMBANG
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            backdrop.classList.toggle('active');
+        }
+
+        function getCoords(e) {
+            if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            if (e.changedTouches && e.changedTouches.length > 0) return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+            return { x: e.clientX, y: e.clientY };
+        }
+
         const floatTools = document.getElementById('floatTools');
         let isDragging = false, startX, startY, startLeft, startTop;
-
-        floatTools.addEventListener('mousedown', (e) => {
-            if (e.target.closest('button')) return; // Jangan drag jika klik tombol
-            isDragging = true;
-            startX = e.clientX;
-            startY = e.clientY;
-            const rect = floatTools.getBoundingClientRect();
-            startLeft = rect.left;
-            startTop = rect.top;
-            floatTools.style.left = startLeft + 'px';
-            floatTools.style.top = startTop + 'px';
-            floatTools.style.right = 'auto';
-        });
-
-        document.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            let newX = startLeft + (e.clientX - startX);
-            let newY = startTop + (e.clientY - startY);
-            newY = Math.max(110, newY); // Cegah naik ke header
-            floatTools.style.left = newX + 'px';
-            floatTools.style.top = newY + 'px';
-        });
-
-        document.addEventListener('mouseup', () => { isDragging = false; });
-
-        function resetFloatPos() {
-            floatTools.style.left = 'auto';
-            floatTools.style.top = '20px';
-            floatTools.style.right = '20px';
+        function startFloatDrag(e) {
+            if (e.target.closest('button')) return;
+            e.preventDefault(); isDragging = true;
+            const c = getCoords(e); startX = c.x; startY = c.y;
+            const rect = floatTools.getBoundingClientRect(); startLeft = rect.left; startTop = rect.top;
+            floatTools.style.left = startLeft + 'px'; floatTools.style.top = startTop + 'px'; floatTools.style.right = 'auto';
         }
+        function moveFloatDrag(e) {
+            if (!isDragging) return; e.preventDefault();
+            const c = getCoords(e);
+            let newX = startLeft + (c.x - startX), newY = Math.max(80, startTop + (c.y - startY));
+            
+            // Batasan layar agar tombol tidak hilang
+            let maxX = window.innerWidth - floatTools.offsetWidth - 10;
+            let maxY = window.innerHeight - floatTools.offsetHeight - 10;
+            newX = Math.max(10, Math.min(newX, maxX));
+            newY = Math.max(80, Math.min(newY, maxY));
+            
+            floatTools.style.left = newX + 'px'; floatTools.style.top = newY + 'px';
+        }
+        function endFloatDrag() { isDragging = false; }
+        floatTools.addEventListener('mousedown', startFloatDrag);
+        document.addEventListener('mousemove', moveFloatDrag);
+        document.addEventListener('mouseup', endFloatDrag);
+        floatTools.addEventListener('touchstart', startFloatDrag, { passive: false });
+        document.addEventListener('touchmove', moveFloatDrag, { passive: false });
+        document.addEventListener('touchend', endFloatDrag);
+        function resetFloatPos() { floatTools.style.left = 'auto'; floatTools.style.top = '85px'; floatTools.style.right = '15px'; }
 
         function saveHistory() {
             history = history.slice(0, historyIndex + 1);
             let cleanAnnotations = annotations.map(a => { let copy = {...a}; delete copy.imgBytes; return copy; });
             history.push(JSON.stringify(cleanAnnotations));
-            historyIndex++;
-            updateHistoryButtons();
+            historyIndex++; updateHistoryButtons();
         }
         function updateHistoryButtons() {
             document.getElementById('undoBtn').disabled = historyIndex <= 0;
@@ -278,12 +287,12 @@
         formSelect.addEventListener('change', async (e) => {
             const fileName = e.target.value;
             if (!fileName) return;
+            if(window.innerWidth < 768) toggleSidebar();
             try {
                 const response = await fetch(encodeURIComponent(fileName));
                 if (!response.ok) throw new Error("File PDF tidak ditemukan");
                 const arrayBuffer = await response.arrayBuffer();
-                pdfBytes = arrayBuffer.slice(0); 
-                const viewerBuffer = arrayBuffer.slice(0); 
+                pdfBytes = arrayBuffer.slice(0); const viewerBuffer = arrayBuffer.slice(0); 
                 pdfDoc = await pdfjsLib.getDocument({ data: viewerBuffer }).promise;
                 totalPages = pdfDoc.numPages; currentPage = 1; annotations = [];
                 saveHistory(); renderPage(1);
@@ -298,6 +307,11 @@
             currentPage = num;
             document.getElementById('pageInfo').innerText = `Hal ${num} / ${totalPages}`;
             const page = await pdfDoc.getPage(num);
+            if(window.innerWidth < 768) {
+                const contWidth = pdfArea.clientWidth - 30;
+                const viewportTemp = page.getViewport({ scale: 1 });
+                scale = contWidth / viewportTemp.width;
+            } else { scale = 1.5; }
             const viewport = page.getViewport({ scale });
             canvas.height = viewport.height; canvas.width = viewport.width;
             interactionLayer.style.width = viewport.width + 'px'; interactionLayer.style.height = viewport.height + 'px';
@@ -312,29 +326,46 @@
             document.querySelectorAll('[data-mode]').forEach(btn => {
                 if(btn.dataset.mode === mode) btn.classList.add('active'); else btn.classList.remove('active');
             });
-            if (mode === 'edit' || mode === 'delete') { interactionLayer.style.pointerEvents = 'none'; } 
-            else { interactionLayer.style.pointerEvents = 'auto'; }
+            if (mode) { interactionLayer.style.pointerEvents = 'auto'; } 
+            else { interactionLayer.style.pointerEvents = 'none'; }
+            if(window.innerWidth < 768 && mode) toggleSidebar();
         }
-        setMode('text');
+
+        function addText() {
+            if (!pdfDoc) return alert('Pilih formulir dulu!');
+            let annot = {
+                page: currentPage,
+                x: canvas.width / 2 - 50,
+                y: canvas.height / 3,
+                type: 'text', text: 'Ketik teks di sini...',
+                size: 16, letterSpacing: 0
+            };
+            annotations.push(annot); saveHistory(); renderAnnotations();
+            if(window.innerWidth < 768) toggleSidebar();
+            
+            setTimeout(() => {
+                let div = annotationLayer.querySelector('.annotation-box:last-child');
+                if (div) makeEditable(annotations.length - 1, div);
+            }, 100);
+        }
 
         interactionLayer.addEventListener('click', (e) => {
-            if (currentMode === 'edit' || currentMode === 'delete' || !pdfDoc) return;
+            if (!pdfDoc || !currentMode) return;
             const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left, y = e.clientY - rect.top;
+            const c = getCoords(e);
+            const x = c.x - rect.left, y = c.y - rect.top;
             let annot = { page: currentPage, x, y, type: currentMode, letterSpacing: 0 };
 
-            if (currentMode === 'text') {
-                const text = document.getElementById('textInput').value;
-                if (!text.trim()) return alert('Ketik teks dulu!');
-                annot.text = text; annot.size = 14;
-            } else if (currentMode === 'check' || currentMode === 'circle') {
+            if (currentMode === 'check' || currentMode === 'circle') {
                 annot.width = 20; annot.height = 20;
+                annotations.push(annot); saveHistory(); renderAnnotations();
             } else if (currentMode === 'sign' || currentMode === 'materai') {
                 if (currentMode === 'sign' && !signImgBytes) return alert('Upload TTD dulu!');
                 if (currentMode === 'materai' && !materaiImgBytes) return alert('Upload Materai dulu!');
                 annot.width = currentMode === 'sign' ? 100 : 90; annot.height = currentMode === 'sign' ? 50 : 90;
+                annotations.push(annot); saveHistory(); renderAnnotations();
             }
-            annotations.push(annot); saveHistory(); renderAnnotations();
+            setMode(null);
         });
 
         function renderAnnotations() {
@@ -374,49 +405,42 @@
         function createMenu(idx, isText, element) {
             const container = document.createElement('div');
             const trigger = document.createElement('div');
-            trigger.className = 'menu-trigger';
-            trigger.innerHTML = '⋮';
-            
-            const popover = document.createElement('div');
-            popover.className = 'popover-menu';
+            trigger.className = 'menu-trigger'; trigger.innerHTML = '⋮';
+            const popover = document.createElement('div'); popover.className = 'popover-menu';
             
             if (isText) {
                 const editBtn = document.createElement('button');
-                editBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit`;
+                editBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit Teks`;
                 editBtn.onclick = (e) => { e.stopPropagation(); popover.style.display = 'none'; makeEditable(idx, element); };
                 popover.appendChild(editBtn);
 
                 const spacingRow = document.createElement('div');
                 spacingRow.className = 'spacing-row';
                 spacingRow.innerHTML = `<span>Spasi</span>`;
-                const controls = document.createElement('div');
-                controls.className = 'spacing-controls';
+                const controls = document.createElement('div'); controls.className = 'spacing-controls';
                 
-                const minusBtn = document.createElement('button');
-                minusBtn.className = 'spacing-btn';
-                minusBtn.innerText = '-';
-                minusBtn.onclick = (e) => { e.stopPropagation(); annotations[idx].letterSpacing = (annotations[idx].letterSpacing || 0) - 1; saveHistory(); renderAnnotations(); };
+                const minusBtn = document.createElement('button'); minusBtn.className = 'spacing-btn'; minusBtn.innerText = '-';
+                const valDisplay = document.createElement('span'); valDisplay.className = 'spacing-val'; valDisplay.innerText = (annotations[idx].letterSpacing || 0) + 'px';
+                const plusBtn = document.createElement('button'); plusBtn.className = 'spacing-btn'; plusBtn.innerText = '+';
                 
-                const valDisplay = document.createElement('span');
-                valDisplay.className = 'spacing-val';
-                valDisplay.innerText = (annotations[idx].letterSpacing || 0) + 'px';
-                
-                const plusBtn = document.createElement('button');
-                plusBtn.className = 'spacing-btn';
-                plusBtn.innerText = '+';
-                plusBtn.onclick = (e) => { e.stopPropagation(); annotations[idx].letterSpacing = (annotations[idx].letterSpacing || 0) + 1; saveHistory(); renderAnnotations(); };
+                minusBtn.onclick = (e) => { 
+                    e.stopPropagation(); 
+                    annotations[idx].letterSpacing = (annotations[idx].letterSpacing || 0) - 1; 
+                    element.style.letterSpacing = annotations[idx].letterSpacing + 'px';
+                    valDisplay.innerText = annotations[idx].letterSpacing + 'px';
+                    saveHistory(); 
+                };
+                plusBtn.onclick = (e) => { 
+                    e.stopPropagation(); 
+                    annotations[idx].letterSpacing = (annotations[idx].letterSpacing || 0) + 1; 
+                    element.style.letterSpacing = annotations[idx].letterSpacing + 'px';
+                    valDisplay.innerText = annotations[idx].letterSpacing + 'px';
+                    saveHistory(); 
+                };
 
-                controls.appendChild(minusBtn);
-                controls.appendChild(valDisplay);
-                controls.appendChild(plusBtn);
-                spacingRow.appendChild(controls);
-                popover.appendChild(spacingRow);
+                controls.appendChild(minusBtn); controls.appendChild(valDisplay); controls.appendChild(plusBtn);
+                spacingRow.appendChild(controls); popover.appendChild(spacingRow);
             }
-            
-            const moveBtn = document.createElement('button');
-            moveBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg> Geser`;
-            moveBtn.onclick = (e) => { e.stopPropagation(); popover.style.display = 'none'; setMode('edit'); };
-            popover.appendChild(moveBtn);
             
             const delBtn = document.createElement('button');
             delBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Hapus`;
@@ -430,60 +454,74 @@
                 popover.style.display = isDisplayed ? 'none' : 'flex';
             };
             
-            container.appendChild(trigger);
-            container.appendChild(popover);
+            container.appendChild(trigger); container.appendChild(popover);
             return container;
         }
 
         function makeEditable(idx, element) {
-            setMode('edit');
-            element.contentEditable = "true";
-            element.style.border = "1px dashed #0b3d2e";
-            element.focus();
-            const range = document.createRange();
-            range.selectNodeContents(element);
-            range.collapse(false);
-            const sel = window.getSelection();
-            sel.removeAllRanges();
-            sel.addRange(range);
+            element.contentEditable = "true"; element.focus();
+            const range = document.createRange(); range.selectNodeContents(element); range.collapse(false);
+            const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
 
             const finishEdit = () => {
                 element.contentEditable = "false";
-                element.style.border = "none";
                 annotations[idx].text = element.innerText;
                 saveHistory();
-                renderAnnotations();
             };
             element.addEventListener('blur', finishEdit, { once: true });
             element.addEventListener('keydown', (e) => { if (e.key === 'Escape') element.blur(); });
         }
 
         function attachInteractions(element, annotIndex) {
-            element.addEventListener('mousedown', (e) => {
-                if (e.target.classList.contains('menu-trigger') || e.target.closest('.popover-menu') || element.isContentEditable) return;
-                e.stopPropagation(); e.preventDefault();
-                if (currentMode === 'edit') {
-                    const startX = e.clientX, startY = e.clientY;
-                    const startLeft = parseFloat(element.style.left), startTop = parseFloat(element.style.top);
-                    const onMove = (mv) => { let nx = startLeft + (mv.clientX - startX), ny = startTop + (mv.clientY - startY); element.style.left = nx + 'px'; element.style.top = ny + 'px'; annotations[annotIndex].x = nx; annotations[annotIndex].y = ny; };
-                    const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); saveHistory(); };
-                    document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onUp);
+            function startDragMove(e) {
+                if (e.target.classList.contains('menu-trigger') || e.target.closest('.popover-menu') || e.target.classList.contains('resize-handle') || element.isContentEditable) return;
+                e.preventDefault();
+                const c = getCoords(e); const startX = c.x, startY = c.y;
+                const startLeft = parseFloat(element.style.left), startTop = parseFloat(element.style.top);
+
+                function onMove(mv) {
+                    mv.preventDefault(); const mc = getCoords(mv);
+                    let nx = startLeft + (mc.x - startX), ny = startTop + (mc.y - startY);
+                    element.style.left = nx + 'px'; element.style.top = ny + 'px';
+                    annotations[annotIndex].x = nx; annotations[annotIndex].y = ny;
                 }
-            });
-            const handle = document.createElement('div'); handle.className = 'resize-handle'; element.appendChild(handle);
-            handle.addEventListener('mousedown', (e) => {
-                e.stopPropagation(); e.preventDefault(); const annot = annotations[annotIndex];
-                const startX = e.clientX, startY = e.clientY, startW = element.offsetWidth, startH = element.offsetHeight;
-                const startFontSize = annot.type === 'text' ? annot.size : 0;
-                const onMove = (mv) => {
-                    let dx = mv.clientX - startX, dy = mv.clientY - startY;
-                    let delta = (Math.abs(dx) > Math.abs(dy)) ? dx : dy;
-                    if (annot.type === 'text') { let s = Math.max(8, startFontSize + delta); element.style.fontSize = s + 'px'; annot.size = s; } 
-                    else { let aspectRatio = startW / startH; let newW = Math.max(10, startW + delta); let newH = newW / aspectRatio; element.style.width = newW + 'px'; element.style.height = newH + 'px'; annot.width = newW; annot.height = newH; } 
-                };
-                const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); saveHistory(); };
+                function onUp() {
+                    document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp);
+                    document.removeEventListener('touchmove', onMove); document.removeEventListener('touchend', onUp);
+                    saveHistory();
+                }
                 document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onUp);
-            });
+                document.addEventListener('touchmove', onMove, { passive: false }); document.addEventListener('touchend', onUp);
+            }
+            element.addEventListener('mousedown', startDragMove);
+            element.addEventListener('touchstart', startDragMove, { passive: false });
+
+            const handle = document.createElement('div'); handle.className = 'resize-handle'; element.appendChild(handle);
+            function startDragResize(e) {
+                e.stopPropagation(); e.preventDefault();
+                const annot = annotations[annotIndex];
+                const c = getCoords(e); const startX = c.x, startY = c.y;
+                const startW = element.offsetWidth, startH = element.offsetHeight;
+                const startFontSize = annot.type === 'text' ? annot.size : 0;
+
+                function onResize(rv) {
+                    rv.preventDefault(); const rc = getCoords(rv);
+                    let dx = rc.x - startX, dy = rc.y - startY;
+                    let delta = (Math.abs(dx) > Math.abs(dy)) ? dx : dy;
+                    
+                    if (annot.type === 'text') { let s = Math.max(8, startFontSize + delta); element.style.fontSize = s + 'px'; annot.size = s; } 
+                    else { let aspectRatio = startW / startH; let newW = Math.max(20, startW + delta); let newH = newW / aspectRatio; element.style.width = newW + 'px'; element.style.height = newH + 'px'; annot.width = newW; annot.height = newH; }
+                }
+                function stopResize() {
+                    document.removeEventListener('mousemove', onResize); document.removeEventListener('mouseup', stopResize);
+                    document.removeEventListener('touchmove', onResize); document.removeEventListener('touchend', stopResize);
+                    saveHistory();
+                }
+                document.addEventListener('mousemove', onResize); document.addEventListener('mouseup', stopResize);
+                document.addEventListener('touchmove', onResize, { passive: false }); document.addEventListener('touchend', stopResize);
+            }
+            handle.addEventListener('mousedown', startDragResize);
+            handle.addEventListener('touchstart', startDragResize, { passive: false });
         }
 
         document.addEventListener('click', (e) => {
@@ -507,11 +545,11 @@
 
                     if (a.type === 'text') {
                         const fs = a.size / scale; const lines = a.text.split('\n'), lh = fs * 1.15;
-                        const y_pdf = pdfY_base + (fs * 0.22); 
+                        // Y_pdf dihitung dari top canvas, turunkan sedikit agar pas baseline
+                        const y_pdf = pdfY_base - (fs * 0.85); 
                         lines.forEach((line, i) => { 
                             if (a.letterSpacing && a.letterSpacing > 0) {
-                                let currentX = pdfX;
-                                const spacingPdf = a.letterSpacing / scale;
+                                let currentX = pdfX; const spacingPdf = a.letterSpacing / scale;
                                 for (let char of line) {
                                     page.drawText(char, { x: currentX, y: y_pdf - (i * lh), size: fs, font: helveticaBoldFont, color: rgb(0, 0, 0) });
                                     currentX += helveticaBoldFont.widthOfTextAtSize(char, fs) + spacingPdf;
@@ -543,6 +581,7 @@
         }
         function nextPage() { if (currentPage < totalPages) renderPage(currentPage + 1); }
         function prevPage() { if (currentPage > 1) renderPage(currentPage - 1); }
+        window.addEventListener('resize', () => { if (pdfDoc) renderPage(currentPage); });
     </script>
 </body>
 </html>
