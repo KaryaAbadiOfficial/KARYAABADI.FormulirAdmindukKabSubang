@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KARYA ABADI FORMULIR SUBANG</title>
+    <title>FORMULIR SUBANG</title>
     <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
@@ -19,10 +19,58 @@
             display: flex; justify-content: space-between; align-items: center;
             border-bottom: 4px solid var(--gold); box-shadow: 0 4px 6px rgba(0,0,0,0.2); position: relative; z-index: 1000;
         }
-        .header-left img, .header-right img { height: 50px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+        
+        /* PERBAIKAN LOGO: Tambah image-rendering untuk ketajaman maksimal */
+        .header-left img,
+        .footer-right img {
+            height: auto;
+            width: auto;
+            object-fit: contain;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            image-rendering: high-quality;
+            image-rendering: auto;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)) drop-shadow(0 0 0.5px rgba(0,0,0,0.1));
+            -ms-interpolation-mode: nearest-neighbor;
+            backface-visibility: hidden;
+            transform: translateZ(0);
+        }
+        .header-left img { height: 45px; max-width: 45px; }
+        
+        /* FALLBACK: Style bila logo gagal load */
+        .logo-fallback {
+            display: none;
+            color: var(--gold);
+            font-weight: bold;
+            font-size: 11px;
+            text-align: center;
+            padding: 8px 12px;
+            border: 2px solid var(--gold);
+            border-radius: 6px;
+            background: rgba(255,255,255,0.05);
+            line-height: 1.3;
+            letter-spacing: 0.5px;
+        }
+        .footer-right .logo-fallback {
+            color: var(--gold);
+            border-color: var(--gold);
+            background: rgba(255,255,255,0.05);
+            font-size: 13px;
+            padding: 10px 14px;
+        }
+        
         .header-left { display: flex; align-items: center; gap: 10px; }
-        .header-right { display: flex; align-items: center; gap: 10px; }
-        .header-right h2 { margin: 0; font-size: 14px; color: var(--gold); text-align: right; display: none; }
+        
+        /* Widget Waktu & Tanggal */
+        .datetime-widget {
+            background: rgba(255,255,255,0.1); border: 1px solid var(--gold);
+            border-radius: 8px; padding: 6px 12px; text-align: center; color: var(--gold);
+            min-width: 160px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        .datetime-widget .dw-date { font-size: 12px; font-weight: 600; }
+        .datetime-widget .dw-day { font-size: 10px; color: var(--gold-light); margin-top: 2px; }
+        .datetime-widget .dw-time { font-size: 16px; font-weight: bold; margin-top: 2px; font-family: 'Courier New', monospace; letter-spacing: 1px; }
+        
         .header-center { display: none; }
         .menu-toggle {
             background: var(--gold); color: var(--dark-green); border: none; width: 40px; height: 40px;
@@ -86,7 +134,6 @@
         .resize-handle { position: absolute; bottom: -12px; right: -12px; width: 24px; height: 24px; background: var(--gold); border: 2px solid var(--dark-green); border-radius: 50%; cursor: se-resize; pointer-events: auto; touch-action: none; z-index: 10; display: none; }
         .annotation-box.active .resize-handle, .annotation-box:hover .resize-handle { display: block; }
         
-        /* MENU TITIK 3 (MUNCUL SAAT DIPILIHOVER) */
         .menu-trigger {
             position: absolute; top: 50%; right: -35px; transform: translateY(-50%);
             background: #fff; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;
@@ -108,10 +155,14 @@
         }
         .popover-menu button:hover { background: #555; }
         .spacing-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-top: 1px solid #555; font-size: 14px; }
-        .spacing-controls { display: flex; align-items: center; gap: 10px; }
-        .spacing-btn { background: #555; border: none; color: white; width: 30px; height: 30px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center; }
-        /* Lebar angka spasi dikunci agar menu tidak melebar */
-        .spacing-val { width: 40px; text-align: center; font-weight: bold; display: inline-block; }
+        .spacing-controls { display: flex; align-items: center; gap: 8px; }
+        .spacing-btn { background: #555; border: none; color: white; width: 28px; height: 28px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        
+        .spacing-val { 
+            width: 45px; min-width: 45px; max-width: 45px; 
+            text-align: center; font-weight: bold; display: inline-block; 
+            white-space: nowrap; overflow: hidden; flex: 0 0 45px;
+        }
 
         .float-tools {
             position: fixed; top: 85px; right: 15px; z-index: 9999; background: white; padding: 8px;
@@ -122,22 +173,61 @@
         .btn-icon-float:disabled { background: #e0e0e0; color: #999; cursor: not-allowed; box-shadow: none; }
         .btn-reset-pos { width: 30px; height: 30px; background: #eee; color: var(--dark-green); border: 1px solid #ccc; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; }
         
-        footer { background: var(--dark-green); color: var(--gold); text-align: center; padding: 15px; font-size: 13px; }
+        /* FOOTER DENGAN KARYA ABADI DI POJOK BAWAH KANAN */
+        footer {
+            background: var(--dark-green); color: var(--gold); 
+            padding: 15px 25px; font-size: 13px; position: relative;
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 20px; flex-wrap: wrap; border-top: 3px solid var(--gold);
+        }
+        .footer-left { display: flex; flex-direction: column; gap: 4px; }
+        .footer-left p { margin: 0; font-weight: 600; letter-spacing: 0.3px; }
+        .footer-right {
+            display: flex; align-items: center; gap: 12px; justify-content: flex-end;
+        }
+        .footer-right img { height: 50px; max-width: 50px; }
+        .footer-right .ka-text {
+            text-align: right; color: var(--gold);
+        }
+        .footer-right .ka-text .ka-title { font-size: 16px; font-weight: bold; letter-spacing: 1.5px; }
+        .footer-right .ka-text .ka-sub { font-size: 10px; color: var(--gold-light); margin-top: 2px; }
+
         input[type="file"] { display: none; }
         .icon { width: 16px; height: 16px; stroke-width: 2.5; }
 
         @media (min-width: 768px) {
-            header { padding: 15px 40px; }
-            .header-left img, .header-right img { height: 70px; }
-            .header-right h2 { display: block; font-size: 20px; }
+            header { padding: 12px 30px; }
+            .header-left img { height: 60px; max-width: 60px; }
+            .datetime-widget { min-width: 200px; padding: 8px 16px; }
+            .datetime-widget .dw-date { font-size: 13px; }
+            .datetime-widget .dw-day { font-size: 11px; }
+            .datetime-widget .dw-time { font-size: 20px; }
             .header-center { display: block; flex-grow: 1; text-align: center; }
-            .header-center h1 { margin: 0; font-size: 24px; text-transform: uppercase; color: var(--white); }
-            .header-center p { margin: 5px 0 0; font-size: 12px; color: var(--gold-light); }
+            .header-center h1 { margin: 0; font-size: 26px; text-transform: uppercase; color: var(--white); letter-spacing: 2px; }
+            .header-center p { margin: 4px 0 0; font-size: 13px; color: var(--gold-light); letter-spacing: 0.5px; }
             .menu-toggle { display: none; }
             .main-layout { align-items: stretch; }
             .sidebar { position: relative; top: 0; height: auto; transform: translateX(0); width: 340px; overflow-y: visible; min-height: calc(100vh - 110px); }
             .backdrop { display: none !important; }
             .pdf-area { padding: 40px; }
+            footer { padding: 20px 40px; }
+            .footer-right img { height: 60px; max-width: 60px; }
+            .footer-right .ka-text .ka-title { font-size: 18px; }
+            .footer-right .ka-text .ka-sub { font-size: 11px; }
+        }
+
+        @media (max-width: 767px) {
+            .header-center { display: block; flex-grow: 1; text-align: center; padding: 0 8px; }
+            .header-center h1 { margin: 0; font-size: 15px; text-transform: uppercase; color: var(--white); font-weight: bold; }
+            .header-center p { margin: 2px 0 0; font-size: 9px; color: var(--gold-light); }
+            .datetime-widget { min-width: 0; padding: 4px 8px; }
+            .datetime-widget .dw-date { font-size: 10px; }
+            .datetime-widget .dw-day { font-size: 9px; }
+            .datetime-widget .dw-time { font-size: 13px; }
+            .header-left img { height: 38px; max-width: 38px; }
+            footer { flex-direction: column; text-align: center; align-items: center; }
+            .footer-right { justify-content: center; }
+            .footer-right img { height: 45px; max-width: 45px; }
         }
     </style>
 </head>
@@ -145,10 +235,22 @@
     <header>
         <div class="header-left">
             <button class="menu-toggle" onclick="toggleSidebar()">&#9776;</button>
-            <img src="logo-subang.png" alt="Logo Kabupaten Subang">
+            <img id="logoSubang" src="https://z-cdn-media.chatglm.cn/files/3a95c24e-f8ee-466e-a5ce-942bfd309749.png" 
+                 alt="Logo Kabupaten Subang" 
+                 decoding="async" 
+                 loading="eager"
+                 onerror="this.style.display='none'; document.getElementById('subangFallback').style.display='block';">
+            <div class="logo-fallback" id="subangFallback">PEMKAB<br>SUBANG</div>
         </div>
-        <div class="header-center"><h1>KARYA ABADI FORMULIR SUBANG</h1><p>Sistem Digital Pengisian Formulir Kependudukan</p></div>
-        <div class="header-right"><h2>KARYA ABADI</h2><img src="logo-karya-abadi.png" alt="Logo Karya Abadi"></div>
+        <div class="header-center">
+            <h1>FORMULIR SUBANG</h1>
+            <p>Sistem Digital Pengisian Formulir Kependudukan.</p>
+        </div>
+        <div class="datetime-widget" id="datetimeWidget">
+            <div class="dw-date" id="dwDate">--</div>
+            <div class="dw-day" id="dwDay">--</div>
+            <div class="dw-time" id="dwTime">--:--:--</div>
+        </div>
     </header>
 
     <div class="backdrop" id="backdrop" onclick="toggleSidebar()"></div>
@@ -229,9 +331,46 @@
         </div>
     </div>
 
-    <footer><p>&copy; 2024 KARYA ABADI FORMULIR SUBANG. All Rights Reserved.</p></footer>
+    <footer>
+        <div class="footer-left">
+            <p>&copy; 2026 Karya Abadi. All Right Reserved.</p>
+        </div>
+        <div class="footer-right">
+            <div class="ka-text">
+                <div class="ka-title">KARYA ABADI</div>
+                <div class="ka-sub">Layanan Formulir Digital</div>
+            </div>
+            <img id="logoKaryaAbadi" 
+                 src="https://z-cdn-media.chatglm.cn/files/2e34a657-bcc2-4405-bb4c-362180c2ad4c.png" 
+                 alt="Logo Karya Abadi" 
+                 decoding="async" 
+                 loading="eager"
+                 onerror="this.style.display='none'; document.getElementById('kaFallback').style.display='block';">
+            <div class="logo-fallback" id="kaFallback">KARYA<br>ABADI</div>
+        </div>
+    </footer>
 
     <script>
+        /* ===== WIDGET WAKTU & TANGGAL ===== */
+        const days = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+        const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+        function updateDateTime() {
+            const now = new Date();
+            const dayName = days[now.getDay()];
+            const dd = String(now.getDate()).padStart(2,'0');
+            const mm = String(now.getMonth()+1).padStart(2,'0');
+            const yyyy = now.getFullYear();
+            const hh = String(now.getHours()).padStart(2,'0');
+            const mi = String(now.getMinutes()).padStart(2,'0');
+            const ss = String(now.getSeconds()).padStart(2,'0');
+            document.getElementById('dwDate').innerText = `${dd}/${mm}/${yyyy}`;
+            document.getElementById('dwDay').innerText = dayName + ', ' + now.getDate() + ' ' + months[now.getMonth()] + ' ' + yyyy;
+            document.getElementById('dwTime').innerText = `${hh}:${mi}:${ss}`;
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+        /* ===== END WIDGET WAKTU ===== */
+
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         let pdfDoc = null, pdfBytes = null, currentMode = null, annotations = [], scale = 1.5, currentPage = 1, totalPages = 1;
         let history = [], historyIndex = -1, signImgBytes = null, materaiImgBytes = null;
@@ -408,7 +547,6 @@
                     div.appendChild(createMenu(globalIndex, false, div));
                 }
                 
-                // Event agar kelas active hilang jika klik di luar
                 div.addEventListener('mousedown', () => {
                     document.querySelectorAll('.annotation-box').forEach(b => b.classList.remove('active'));
                     div.classList.add('active');
@@ -423,7 +561,6 @@
             });
         }
         
-        // Global listener untuk menghapus kelas active jika klik di luar annotation
         document.addEventListener('mousedown', (e) => {
             if (!e.target.closest('.annotation-box')) {
                 document.querySelectorAll('.annotation-box').forEach(b => b.classList.remove('active'));
@@ -572,7 +709,6 @@
                         const textStr = a.text || ' '; 
                         const fs = a.size / scale; 
                         const lines = textStr.split('\n'), lh = fs * 1.15;
-                        // Y offset presisi: (line-height - 1)/2 + ascent (0.729)
                         const y_offset = (fs * 0.075) + (fs * 0.729) + (2 / scale); 
                         const y_pdf = pdfY_base - y_offset; 
                         
@@ -604,7 +740,7 @@
                 }
                 const pdfOut = await pdfDocLib.save(); const blob = new Blob([pdfOut], { type: 'application/pdf' });
                 const link = document.createElement('a'); link.href = URL.createObjectURL(blob);
-                link.download = "Karya_Abadi_Formulir_Subang_Terisi.pdf"; link.click();
+                link.download = "Formulir_Subang_Terisi.pdf"; link.click();
             } catch (err) { 
                 alert("Gagal download PDF. Error: " + err.message); console.error(err); 
             } finally { 
