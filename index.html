@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FORMULIR SUBANG</title>
+    <title>SISTEM DIGITAL PENGISIAN FORMULIR KEPENDUDUKAN FORMULIR SUBANG</title>
     <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
@@ -20,43 +20,11 @@
             border-bottom: 4px solid var(--gold); box-shadow: 0 4px 6px rgba(0,0,0,0.2); position: relative; z-index: 1000;
         }
         
-        /* PERBAIKAN LOGO: Tambah image-rendering untuk ketajaman maksimal */
-        .header-left img,
-        .footer-right img {
-            height: auto;
-            width: auto;
-            object-fit: contain;
-            image-rendering: -webkit-optimize-contrast;
-            image-rendering: crisp-edges;
-            image-rendering: high-quality;
-            image-rendering: auto;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)) drop-shadow(0 0 0.5px rgba(0,0,0,0.1));
-            -ms-interpolation-mode: nearest-neighbor;
-            backface-visibility: hidden;
-            transform: translateZ(0);
-        }
-        .header-left img { height: 45px; max-width: 45px; }
-        
-        /* FALLBACK: Style bila logo gagal load */
-        .logo-fallback {
-            display: none;
-            color: var(--gold);
-            font-weight: bold;
-            font-size: 11px;
-            text-align: center;
-            padding: 8px 12px;
-            border: 2px solid var(--gold);
-            border-radius: 6px;
-            background: rgba(255,255,255,0.05);
-            line-height: 1.3;
-            letter-spacing: 0.5px;
-        }
-        .footer-right .logo-fallback {
-            color: var(--gold);
-            border-color: var(--gold);
-            background: rgba(255,255,255,0.05);
-            font-size: 13px;
-            padding: 10px 14px;
+        /* LOGO KARYA ABADI - SVG INLINE, SELALU TAJAM */
+        .logo-karya-abadi {
+            width: 42px; height: 42px; flex-shrink: 0;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+            display: block;
         }
         
         .header-left { display: flex; align-items: center; gap: 10px; }
@@ -157,12 +125,7 @@
         .spacing-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-top: 1px solid #555; font-size: 14px; }
         .spacing-controls { display: flex; align-items: center; gap: 8px; }
         .spacing-btn { background: #555; border: none; color: white; width: 28px; height: 28px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        
-        .spacing-val { 
-            width: 45px; min-width: 45px; max-width: 45px; 
-            text-align: center; font-weight: bold; display: inline-block; 
-            white-space: nowrap; overflow: hidden; flex: 0 0 45px;
-        }
+        .spacing-val { width: 45px; min-width: 45px; max-width: 45px; text-align: center; font-weight: bold; display: inline-block; white-space: nowrap; overflow: hidden; flex: 0 0 45px; }
 
         .float-tools {
             position: fixed; top: 85px; right: 15px; z-index: 9999; background: white; padding: 8px;
@@ -173,61 +136,112 @@
         .btn-icon-float:disabled { background: #e0e0e0; color: #999; cursor: not-allowed; box-shadow: none; }
         .btn-reset-pos { width: 30px; height: 30px; background: #eee; color: var(--dark-green); border: 1px solid #ccc; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; }
         
-        /* FOOTER DENGAN KARYA ABADI DI POJOK BAWAH KANAN */
+        /* FOOTER MULTI-KOLOM */
         footer {
-            background: var(--dark-green); color: var(--gold); 
-            padding: 15px 25px; font-size: 13px; position: relative;
-            display: flex; justify-content: space-between; align-items: center;
-            gap: 20px; flex-wrap: wrap; border-top: 3px solid var(--gold);
+            background: var(--dark-green); color: var(--gold); padding: 30px 25px 15px;
+            border-top: 4px solid var(--gold);
         }
-        .footer-left { display: flex; flex-direction: column; gap: 4px; }
-        .footer-left p { margin: 0; font-weight: 600; letter-spacing: 0.3px; }
-        .footer-right {
-            display: flex; align-items: center; gap: 12px; justify-content: flex-end;
+        .footer-grid {
+            display: grid; grid-template-columns: 1fr; gap: 25px; max-width: 1200px; margin: 0 auto;
         }
-        .footer-right img { height: 50px; max-width: 50px; }
-        .footer-right .ka-text {
-            text-align: right; color: var(--gold);
+        .footer-col h4 {
+            color: var(--gold); font-size: 14px; font-weight: bold; margin: 0 0 12px 0;
+            text-transform: uppercase; letter-spacing: 1.2px; border-bottom: 2px solid rgba(212,175,55,0.4);
+            padding-bottom: 6px;
         }
-        .footer-right .ka-text .ka-title { font-size: 16px; font-weight: bold; letter-spacing: 1.5px; }
-        .footer-right .ka-text .ka-sub { font-size: 10px; color: var(--gold-light); margin-top: 2px; }
+        .footer-col p { margin: 0 0 6px 0; font-size: 13px; line-height: 1.6; color: var(--gold-light); }
+        .footer-col ul { list-style: none; padding: 0; margin: 0; }
+        .footer-col ul li { margin-bottom: 8px; }
+        .footer-col ul li a, .footer-link {
+            color: var(--gold-light); text-decoration: none; font-size: 13px; cursor: pointer;
+            transition: color 0.2s; display: inline-block;
+        }
+        .footer-col ul li a:hover, .footer-link:hover { color: var(--white); text-decoration: underline; }
+        .footer-col .email-link { color: var(--gold); font-weight: 600; }
+        
+        /* TENTANG KAMI: JUSTIFY PADAT RAPI */
+        .footer-col.about-col p {
+            text-align: justify;
+            text-justify: inter-word;
+            -webkit-hyphens: auto;
+            hyphens: auto;
+            font-size: 12.5px;
+            line-height: 1.55;
+            margin-bottom: 8px;
+            color: var(--gold-light);
+        }
+        .footer-col.about-col p:last-child { margin-bottom: 0; }
+        .footer-col.about-col b { color: var(--gold); }
+        
+        .footer-bottom {
+            border-top: 1px solid rgba(212,175,55,0.3); margin-top: 20px; padding-top: 15px;
+            text-align: center; font-size: 12px; color: var(--gold-light); letter-spacing: 0.3px;
+        }
 
         input[type="file"] { display: none; }
         .icon { width: 16px; height: 16px; stroke-width: 2.5; }
 
+        /* MODAL */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); z-index: 10000; display: none;
+            align-items: center; justify-content: center; padding: 20px;
+            backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content {
+            background: white; border-radius: 12px; max-width: 700px; width: 100%;
+            max-height: 85vh; overflow: hidden; display: flex; flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4); border: 3px solid var(--gold);
+            animation: modalIn 0.25s ease;
+        }
+        @keyframes modalIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-header {
+            background: var(--dark-green); color: var(--gold); padding: 18px 25px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 3px solid var(--gold);
+        }
+        .modal-header h3 { margin: 0; font-size: 18px; font-weight: bold; letter-spacing: 0.5px; }
+        .modal-close {
+            background: var(--gold); color: var(--dark-green); border: none; width: 32px; height: 32px;
+            border-radius: 50%; font-size: 18px; cursor: pointer; font-weight: bold;
+            display: flex; align-items: center; justify-content: center; transition: 0.2s;
+        }
+        .modal-close:hover { background: var(--white); transform: rotate(90deg); }
+        .modal-body { padding: 25px; overflow-y: auto; color: #333; font-size: 14px; line-height: 1.7; }
+        .modal-body h4 { color: var(--dark-green); margin: 18px 0 8px 0; font-size: 15px; border-bottom: 1px solid var(--gold); padding-bottom: 4px; }
+        .modal-body h4:first-child { margin-top: 0; }
+        .modal-body p { margin: 0 0 10px 0; }
+        .modal-body ul { margin: 0 0 10px 18px; padding: 0; }
+        .modal-body li { margin-bottom: 6px; }
+        .modal-body p { text-align: justify; }
+
         @media (min-width: 768px) {
             header { padding: 12px 30px; }
-            .header-left img { height: 60px; max-width: 60px; }
+            .logo-karya-abadi { width: 56px; height: 56px; }
             .datetime-widget { min-width: 200px; padding: 8px 16px; }
             .datetime-widget .dw-date { font-size: 13px; }
             .datetime-widget .dw-day { font-size: 11px; }
             .datetime-widget .dw-time { font-size: 20px; }
             .header-center { display: block; flex-grow: 1; text-align: center; }
-            .header-center h1 { margin: 0; font-size: 26px; text-transform: uppercase; color: var(--white); letter-spacing: 2px; }
-            .header-center p { margin: 4px 0 0; font-size: 13px; color: var(--gold-light); letter-spacing: 0.5px; }
+            .header-center h1 { margin: 0; font-size: 16px; text-transform: uppercase; color: var(--white); letter-spacing: 1px; line-height: 1.3; font-weight: bold; }
             .menu-toggle { display: none; }
             .main-layout { align-items: stretch; }
             .sidebar { position: relative; top: 0; height: auto; transform: translateX(0); width: 340px; overflow-y: visible; min-height: calc(100vh - 110px); }
             .backdrop { display: none !important; }
             .pdf-area { padding: 40px; }
-            footer { padding: 20px 40px; }
-            .footer-right img { height: 60px; max-width: 60px; }
-            .footer-right .ka-text .ka-title { font-size: 18px; }
-            .footer-right .ka-text .ka-sub { font-size: 11px; }
+            footer { padding: 40px 40px 20px; }
+            .footer-grid { grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 40px; }
         }
 
         @media (max-width: 767px) {
             .header-center { display: block; flex-grow: 1; text-align: center; padding: 0 8px; }
-            .header-center h1 { margin: 0; font-size: 15px; text-transform: uppercase; color: var(--white); font-weight: bold; }
-            .header-center p { margin: 2px 0 0; font-size: 9px; color: var(--gold-light); }
+            .header-center h1 { margin: 0; font-size: 9px; text-transform: uppercase; color: var(--white); font-weight: bold; line-height: 1.3; }
             .datetime-widget { min-width: 0; padding: 4px 8px; }
             .datetime-widget .dw-date { font-size: 10px; }
             .datetime-widget .dw-day { font-size: 9px; }
             .datetime-widget .dw-time { font-size: 13px; }
-            .header-left img { height: 38px; max-width: 38px; }
-            footer { flex-direction: column; text-align: center; align-items: center; }
-            .footer-right { justify-content: center; }
-            .footer-right img { height: 45px; max-width: 45px; }
+            .logo-karya-abadi { width: 36px; height: 36px; }
         }
     </style>
 </head>
@@ -235,16 +249,26 @@
     <header>
         <div class="header-left">
             <button class="menu-toggle" onclick="toggleSidebar()">&#9776;</button>
-            <img id="logoSubang" src="https://z-cdn-media.chatglm.cn/files/3a95c24e-f8ee-466e-a5ce-942bfd309749.png" 
-                 alt="Logo Kabupaten Subang" 
-                 decoding="async" 
-                 loading="eager"
-                 onerror="this.style.display='none'; document.getElementById('subangFallback').style.display='block';">
-            <div class="logo-fallback" id="subangFallback">PEMKAB<br>SUBANG</div>
+            <!-- LOGO KARYA ABADI - SVG INLINE (SELALU TAJAM, TIDAK PECAH) -->
+            <svg class="logo-karya-abadi" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#1a1a1a"/>
+                        <stop offset="100%" stop-color="#000000"/>
+                    </linearGradient>
+                    <linearGradient id="redGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#e74c3c"/>
+                        <stop offset="100%" stop-color="#c0392b"/>
+                    </linearGradient>
+                </defs>
+                <rect x="3" y="3" width="94" height="94" rx="22" fill="url(#bgGrad)" stroke="#d4af37" stroke-width="1.5"/>
+                <line x1="25" y1="25" x2="75" y2="75" stroke="url(#redGrad)" stroke-width="9" stroke-linecap="round"/>
+                <line x1="75" y1="25" x2="25" y2="75" stroke="#ffffff" stroke-width="9" stroke-linecap="round"/>
+                <circle cx="50" cy="50" r="4.5" fill="#d4af37"/>
+            </svg>
         </div>
         <div class="header-center">
-            <h1>FORMULIR SUBANG</h1>
-            <p>Sistem Digital Pengisian Formulir Kependudukan.</p>
+            <h1>SISTEM DIGITAL PENGISIAN FORMULIR KEPENDUDUKAN FORMULIR SUBANG</h1>
         </div>
         <div class="datetime-widget" id="datetimeWidget">
             <div class="dw-date" id="dwDate">--</div>
@@ -332,23 +356,50 @@
     </div>
 
     <footer>
-        <div class="footer-left">
+        <div class="footer-grid">
+            <div class="footer-col about-col">
+                <h4>Tentang Kami</h4>
+                <p><b>Karya Abadi</b> merupakan penyedia layanan digital yang berfokus pada sistem pengisian formulir kependudukan secara online untuk wilayah Kabupaten Subang, Provinsi Jawa Barat. Layanan ini hadir sebagai solusi modernisasi administrasi kependudukan yang bertujuan mempermudah masyarakat dalam mengisi, menandai, serta mengunduh formulir kependudukan secara digital tanpa perlu mencetak dokumen terlebih dahulu.</p>
+                <p>Sebagai platform independen, Karya Abadi berkomitmen untuk memberikan kemudahan akses, kecepatan proses, dan akurasi data dalam pengelolaan dokumen administrasi kependudukan. Seluruh proses pengisian dilakukan secara langsung di perangkat pengguna, sehingga data pribadi tidak disimpan pada server pihak ketiga dan tetap berada dalam kendali penuh pengguna.</p>
+                <p>Layanan ini mendukung berbagai jenis formulir kependudukan standar pemerintah, mulai dari pendaftaran peristiwa kependudukan, perubahan elemen data, perpindahan penduduk, hingga surat keterangan dan permohonan KTP. Dengan demikian, masyarakat Subang dapat menyelesaikan administrasi kependudukan dengan lebih efisien, hemat, dan ramah lingkungan.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Kontak</h4>
+                <p>Email:</p>
+                <p><a href="mailto:karyaabadi24434@gmail.com" class="email-link">karyaabadi24434@gmail.com</a></p>
+            </div>
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a onclick="openModal('privacy')">Kebijakan Privasi</a></li>
+                    <li><a onclick="openModal('terms')">Syarat dan Ketentuan</a></li>
+                    <li><a onclick="openModal('disclaimer')">Disclaimer</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Layanan</h4>
+                <ul>
+                    <li><a onclick="openModal('about')">Tentang Kami</a></li>
+                    <li><a onclick="openModal('services')">Layanan Formulir</a></li>
+                    <li><a onclick="openModal('guide')">Panduan Penggunaan</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
             <p>&copy; 2026 Karya Abadi. All Right Reserved.</p>
         </div>
-        <div class="footer-right">
-            <div class="ka-text">
-                <div class="ka-title">KARYA ABADI</div>
-                <div class="ka-sub">Layanan Formulir Digital</div>
-            </div>
-            <img id="logoKaryaAbadi" 
-                 src="https://z-cdn-media.chatglm.cn/files/2e34a657-bcc2-4405-bb4c-362180c2ad4c.png" 
-                 alt="Logo Karya Abadi" 
-                 decoding="async" 
-                 loading="eager"
-                 onerror="this.style.display='none'; document.getElementById('kaFallback').style.display='block';">
-            <div class="logo-fallback" id="kaFallback">KARYA<br>ABADI</div>
-        </div>
     </footer>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) closeModal()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Judul</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
 
     <script>
         /* ===== WIDGET WAKTU & TANGGAL ===== */
@@ -369,8 +420,144 @@
         }
         updateDateTime();
         setInterval(updateDateTime, 1000);
-        /* ===== END WIDGET WAKTU ===== */
 
+        /* ===== MODAL SYSTEM ===== */
+        const modalContents = {
+            about: {
+                title: 'Tentang Kami',
+                body: `<h4>Profil Karya Abadi</h4>
+                <p><b>Karya Abadi</b> merupakan penyedia layanan digital yang berfokus pada sistem pengisian formulir kependudukan secara online untuk wilayah Kabupaten Subang, Jawa Barat.</p>
+                <h4>Visi</h4>
+                <p>Menjadi mitra terpercaya masyarakat dan pemerintah dalam digitalisasi layanan administrasi kependudukan yang cepat, akurat, dan mudah diakses oleh seluruh lapisan masyarakat.</p>
+                <h4>Misi</h4>
+                <ul>
+                <li>Menyediakan platform digital yang ramah pengguna untuk pengisian formulir kependudukan.</li>
+                <li>Mendukung efisiensi pelayanan publik di Kabupaten Subang melalui teknologi.</li>
+                <li>Memberikan kemudahan akses tanpa biaya tambahan untuk dokumen administrasi dasar.</li>
+                <li>Menjaga kerahasiaan dan keamanan data pengguna sesuai standar yang berlaku.</li>
+                </ul>
+                <h4>Lokasi Layanan</h4>
+                <p>Kabupaten Subang, Provinsi Jawa Barat, Indonesia.</p>`
+            },
+            privacy: {
+                title: 'Kebijakan Privasi',
+                body: `<h4>Pendahuluan</h4>
+                <p>Kebijakan Privasi ini menjelaskan bagaimana <b>Karya Abadi</b> mengumpulkan, menggunakan, dan melindungi data pengguna saat menggunakan layanan Sistem Digital Pengisian Formulir Kependudukan Kabupaten Subang.</p>
+                <h4>Data yang Dikumpulkan</h4>
+                <ul>
+                <li>Data formulir yang diisi pengguna (nama, NIK, alamat, dan data kependudukan lainnya).</li>
+                <li>Berkas unggahan seperti tanda tangan digital dan materai.</li>
+                <li>Informasi teknis perangkat (jenis browser, sistem operasi) untuk keperluan teknis.</li>
+                </ul>
+                <h4>Penggunaan Data</h4>
+                <p>Data yang dikumpulkan hanya digunakan untuk:</p>
+                <ul>
+                <li>Proses pengisian dan pengunduhan formulir kependudukan.</li>
+                <li>Verifikasi data sesuai kebutuhan layanan.</li>
+                <li>Peningkatan kualitas dan fitur layanan.</li>
+                </ul>
+                <h4>Perlindungan Data</h4>
+                <p>Kami menerapkan langkah-langkah teknis dan organisasi untuk melindungi data pengguna dari akses tidak sah, perubahan, atau pengungkapan. Seluruh pemrosesan data dilakukan secara lokal di perangkat pengguna.</p>
+                <h4>Hak Pengguna</h4>
+                <p>Pengguna berhak untuk mengakses, memperbaiki, atau menghapus data yang telah diinputkan. Pengguna juga berhak untuk tidak menggunakan layanan ini jika tidak menyetujui kebijakan privasi.</p>
+                <h4>Perubahan Kebijakan</h4>
+                <p>Kami dapat memperbarui Kebijakan Privasi ini sewaktu-waktu. Perubahan akan diumumkan melalui halaman ini.</p>`
+            },
+            terms: {
+                title: 'Syarat dan Ketentuan',
+                body: `<h4>1. Penerimaan Ketentuan</h4>
+                <p>Dengan menggunakan layanan Sistem Digital Pengisian Formulir Kependudukan Kabupaten Subang yang disediakan oleh <b>Karya Abadi</b>, pengguna dianggap telah membaca, memahami, dan menyetujui seluruh syarat dan ketentuan berikut.</p>
+                <h4>2. Penggunaan Layanan</h4>
+                <ul>
+                <li>Layanan ini disediakan untuk membantu masyarakat mengisi formulir kependudukan secara digital.</li>
+                <li>Pengguna wajib memberikan data yang benar, akurat, dan sah.</li>
+                <li>Pengguna dilarang menggunakan layanan untuk tujuan melanggar hukum atau peraturan yang berlaku.</li>
+                </ul>
+                <h4>3. Tanggung Jawab Pengguna</h4>
+                <p>Pengguna bertanggung jawab penuh atas kebenaran data yang dimasukkan ke dalam formulir. Karya Abadi tidak bertanggung jawab atas kesalahan pengisian yang dilakukan oleh pengguna.</p>
+                <h4>4. Hak Kekayaan Intelektual</h4>
+                <p>Seluruh konten, desain, logo, dan kode aplikasi merupakan milik Karya Abadi dan dilindungi oleh hukum hak cipta. Dilarang menyalin, memodifikasi, atau mendistribusikan tanpa izin tertulis.</p>
+                <h4>5. Batasan Tanggung Jawab</h4>
+                <p>Layanan disediakan "sebagaimana adanya" tanpa jaminan eksplisit. Karya Abadi tidak bertanggung jawab atas kerugian langsung maupun tidak langsung yang timbul dari penggunaan layanan.</p>
+                <h4>6. Perubahan Ketentuan</h4>
+                <p>Karya Abadi berhak mengubah syarat dan ketentuan ini sewaktu-waktu. Perubahan berlaku sejak dipublikasikan di halaman ini.</p>`
+            },
+            disclaimer: {
+                title: 'Disclaimer',
+                body: `<h4>Penyangkalan Umum</h4>
+                <p>Informasi dan layanan pada platform <b>Karya Abadi - Formulir Subang</b> disediakan untuk tujuan membantu masyarakat dalam pengisian formulir kependudukan secara digital.</p>
+                <h4>Ketepatan Data</h4>
+                <p>Kami berupaya menyediakan formulir yang sesuai dengan standar resmi. Namun, pengguna wajib memverifikasi kembali kebenaran data sebelum dokumen diserahkan kepada instansi berwenang. Karya Abadi tidak bertanggung jawab atas konsekuensi hukum akibat kesalahan pengisian data oleh pengguna.</p>
+                <h4>Bukan Instansi Resmi</h4>
+                <p>Karya Abadi <b>BUKAN</b> instansi pemerintah, Dinas Kependudukan dan Pencatatan Sipil (Disdukcapil), maupun Badan Kependudukan dan Keluarga Berencana Nasional (BKKBN). Layanan ini bersifat independen dan hanya berfungsi sebagai alat bantu digital pengisian formulir.</p>
+                <h4>Validitas Dokumen</h4>
+                <p>Dokumen yang dihasilkan melalui platform ini tetap perlu diverifikasi, ditandatangani, dan disahkan oleh pejabat berwenang agar sah secara hukum. Karya Abadi tidak menjamin diterimanya dokumen oleh pihak tertentu.</p>
+                <h4>Link Eksternal</h4>
+                <p>Platform dapat mengandung link ke situs pihak ketiga. Karya Abadi tidak bertanggung jawab atas konten atau kebijakan privasi situs eksternal tersebut.</p>
+                <h4>Paksaan Mayoret (Force Majeure)</h4>
+                <p>Karya Abadi tidak bertanggung jawab atas kegagalan layanan akibat kondisi di luar kendali, seperti bencana alam, gangguan jaringan, atau perubahan kebijakan pemerintah.</p>`
+            },
+            services: {
+                title: 'Layanan Formulir',
+                body: `<h4>Jenis Formulir Tersedia</h4>
+                <p>Platform Karya Abadi menyediakan pengisian digital berbagai formulir kependudukan, antara lain:</p>
+                <ul>
+                <li><b>F-1.01</b> - Formulir Biodata WNI</li>
+                <li><b>F-1.02</b> - Pendaftaran Peristiwa Kependudukan</li>
+                <li><b>F-1.03</b> - Pendaftaran Perpindahan Penduduk</li>
+                <li><b>F-1.06</b> - Surat Pernyataan Perubahan Elemen Data</li>
+                <li><b>F-1.07</b> - Surat Kuasa</li>
+                <li><b>F-1.21</b> - Permohonan KTP WNI</li>
+                <li><b>F-2.01</b> - Pelaporan Pencatatan Sipil</li>
+                <li><b>F-2.03</b> - SPTJM Kelahiran</li>
+                <li><b>F-2.04</b> - SPTJM Kebenaran Suami Istri</li>
+                <li>Surat Pernyataan Domisili Subang</li>
+                </ul>
+                <h4>Fitur Utama</h4>
+                <ul>
+                <li>Penambahan teks dengan pengaturan ukuran dan spasi huruf.</li>
+                <li>Tanda tangan digital dan materai yang dapat diunggah.</li>
+                <li>Mode tanda ceklis dan lingkaran.</li>
+                <li>Undo dan Redo untuk koreksi kesalahan.</li>
+                <li>Unduh hasil dalam format PDF.</li>
+                </ul>`
+            },
+            guide: {
+                title: 'Panduan Penggunaan',
+                body: `<h4>Langkah 1 - Pilih Formulir</h4>
+                <p>Buka panel di sisi kiri, pilih formulir kependudukan yang sesuai dari dropdown "Pilih Formulir".</p>
+                <h4>Langkah 2 - Tambahkan Teks</h4>
+                <p>Klik tombol "Tambah Teks", lalu klik teks baru yang muncul di halaman PDF. Klik ikon <b>⋮</b> di samping teks dan pilih <b>Edit Teks</b> untuk mengubah isi sesuai kebutuhan.</p>
+                <h4>Langkah 3 - Geser & Atur Posisi</h4>
+                <p>Tahan dan geser objek teks atau tanda untuk memindahkan ke posisi yang diinginkan. Tarik kotak kuning di pojok kanan bawah untuk memperbesar atau memperkecil objek.</p>
+                <h4>Langkah 4 - Atur Spasi Huruf</h4>
+                <p>Untuk melebarkan huruf agar pas dengan kolom tabel, klik ikon <b>⋮</b> dan gunakan tombol <b>[+]</b> atau <b>[-]</b> pada menu Spasi.</p>
+                <h4>Langkah 5 - Tanda Tangan & Materai</h4>
+                <p>Pilih mode "TTD" atau "Materai" di panel kiri, lalu unggah file gambar tanda tangan atau materai Anda. Setelah terunggah, klik di posisi yang diinginkan pada PDF untuk menempatkannya.</p>
+                <h4>Langkah 6 - Navigasi Halaman</h4>
+                <p>Gunakan tombol <b>PREV</b> dan <b>NEXT</b> untuk berpindah antar halaman formulir jika memiliki lebih dari satu halaman.</p>
+                <h4>Langkah 7 - Undo / Redo</h4>
+                <p>Gunakan tombol mengambang di pojok kanan atas untuk membatalkan (Undo) atau mengulang (Redo) aksi terakhir Anda.</p>
+                <h4>Langkah 8 - Unduh PDF</h4>
+                <p>Setelah semua data terisi, klik tombol <b>DOWNLOAD PDF</b> untuk menyimpan hasil ke perangkat Anda.</p>`
+            }
+        };
+
+        function openModal(key) {
+            const content = modalContents[key];
+            if (!content) return;
+            document.getElementById('modalTitle').innerText = content.title;
+            document.getElementById('modalBody').innerHTML = content.body;
+            document.getElementById('modalOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+        /* ===== PDF SYSTEM ===== */
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         let pdfDoc = null, pdfBytes = null, currentMode = null, annotations = [], scale = 1.5, currentPage = 1, totalPages = 1;
         let history = [], historyIndex = -1, signImgBytes = null, materaiImgBytes = null;
