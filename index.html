@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KARYA ABADI FORMULIR SUBANG</title>
+    <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+        :root {
+            --primary: #004aad; --white: #ffffff; --danger: #dc3545;
+            --warning: #ffc107; --success: #28a745; --gray: #6c757d;
+        }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; background-color: #eef2f7; color: #333; }
+        header {
+            background: linear-gradient(135deg, #004aad 0%, #002a6b 100%);
+            color: white; padding: 20px 50px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        header h1 { margin: 0; font-size: 28px; text-transform: uppercase; }
+        header p { margin: 5px 0 0; font-size: 14px; opacity: 0.9; }
+
+        .info-section {
+            background: white; max-width: 1000px; margin: 20px auto; padding: 20px;
+            border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 5px solid var(--primary);
+        }
+        .info-section h2 { margin-top: 0; color: var(--primary); font-size: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .info-section ol { padding-left: 20px; line-height: 1.6; font-size: 15px; }
+
+        .toolbar { 
+            background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+            margin: 0 auto 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center;
+            max-width: 1000px; position: sticky; top: 0; z-index: 100;
+        }
+        .toolbar button, .toolbar select { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-warning { background: var(--warning); color: black; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-secondary { background: var(--gray); color: white; }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        
+        input[type="text"] { padding: 10px; border: 1px solid #ccc; border-radius: 5px; width: 200px; }
+        select { padding: 10px; border: 1px solid #ccc; border-radius: 5px; min-width: 250px; }
+        #statusMode { font-weight: bold; color: var(--primary); background: #e9ecef; padding: 10px 15px; border-radius: 5px; }
+
+        #pdfWrapper { display: flex; justify-content: center; padding-bottom: 40px; }
+        #pdfContainer { position: relative; box-shadow: 0 0 15px rgba(0,0,0,0.2); background: white; }
+        #interactionLayer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: crosshair; }
+        .annotation-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+        
+        .annotation-box { position: absolute; pointer-events: auto; cursor: move; user-select: none; }
+        .text-annot { color: black; font-family: Arial, sans-serif; white-space: nowrap; line-height: 1; transform: translateY(-100%); font-weight: bold; }
+        .circle-annot { border: 1.5px solid black; border-radius: 50%; }
+        .check-annot { overflow: visible; }
+        .resize-handle { position: absolute; bottom: -5px; right: -5px; width: 12px; height: 12px; background: var(--primary); border-radius: 50%; cursor: se-resize; pointer-events: auto; }
+        
+        .page-nav { display: flex; gap: 10px; align-items: center; margin-left: auto; }
+        footer { background: #002a6b; color: white; text-align: center; padding: 20px; margin-top: 20px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>KARYA ABADI FORMULIR SUBANG</h1>
+        <p>Sistem Digital Pengisian Formulir Kependudukan - Rapi, Presisi, Tanpa Merusak Format Asli</p>
+    </header>
+
+    <section class="info-section">
+        <h2>Panduan Penggunaan Cepat</h2>
+        <ol>
+            <li>Pilih formulir pada <b>Dropdown</b>. PDF akan <b>LANGSUNG TAMPIL</b> di bawah secara instan.</li>
+            <li>Ketik teks di kolom input, klik <b>Mode Teks</b>, lalu klik di atas PDF untuk menempelkan teks (Font akan otomatis tebal).</li>
+            <li>Klik <b>Mode Ceklis (✓)</b> atau <b>Mode Lingkaran</b> untuk memberi tanda pada pilihan ganda.</li>
+            <li>Gunakan <b>Mode Edit/Geser</b> untuk memindahkan/memperbesar objek (tarik titik biru di pojok objek).</li>
+            <li>Gunakan <b>Mode Hapus</b> lalu klik langsung objek yang ingin dihapus.</li>
+            <li>Klik <b>Download PDF</b> jika sudah selesai.</li>
+        </ol>
+    </section>
+
+    <div class="toolbar">
+        <select id="formSelect">
+            <option value="">-- Pilih Formulir --</option>
+            <option value="F 1.02 FORMULIR PENDAFTARAN PERISTIWA KEPENDUDUKAN.pdf">F 1.02 Pendaftaran Peristiwa</option>
+            <option value="F 1.06 SURAT PERNYATAAN PERUBAHAN ELEMEN DATA KEPENDUDUKAN.pdf">F 1.06 Perubahan Elemen Data</option>
+            <option value="F-1.01 FORMULIR BIODATA WNI.pdf">F-1.01 Biodata WNI</option>
+            <option value="F-1.03 FORMULIR PENDAFTARAN PERPINDAHAN PENDUDUK.pdf">F-1.03 Perpindahan Penduduk</option>
+            <option value="F-1.07 SURAT KUASA.pdf">F-1.07 Surat Kuasa</option>
+            <option value="F-1.21-FORMULIR-PERMOHONAN-KTP-WNI.pdf">F-1.21 Permohonan KTP</option>
+            <option value="F-2.01 FORMULIR PELAPORAN PENCATATAN SIPIL DI DALAM WILAYAH NKRI.pdf">F-2.01 Pelaporan Capil</option>
+            <option value="F-2.03 SPTJM KELAHIRAN.pdf">F-2.03 SPTJM Kelahiran</option>
+            <option value="F-2.04 SPTJM KEBENARAN SUAMI ISTRI.pdf">F-2.04 SPTJM Suami Istri</option>
+            <option value="SURAT PERNYATAAN DOMISILI SUBANG.pdf">Surat Pernyataan Domisili</option>
+        </select>
+        
+        <input type="text" id="textInput" placeholder="Ketik Teks di sini..." value="">
+        
+        <button class="btn-warning" onclick="setMode('text')">Mode Teks</button>
+        <button class="btn-warning" onclick="setMode('check')">Mode Ceklis (✓)</button>
+        <button class="btn-warning" onclick="setMode('circle')">Mode Lingkaran</button>
+        <button class="btn-secondary" onclick="setMode('edit')">Mode Edit/Geser</button>
+        <button class="btn-danger" onclick="setMode('delete')">Mode Hapus</button>
+        
+        <span id="statusMode">Mode Aktif: -</span>
+        
+        <button class="btn-primary" onclick="downloadPDF()">Download PDF</button>
+
+        <div class="page-nav">
+            <button class="btn-success" onclick="prevPage()">Prev</button>
+            <span id="pageInfo">Hal 0/0</span>
+            <button class="btn-success" onclick="nextPage()">Next</button>
+        </div>
+    </div>
+
+    <div id="pdfWrapper">
+        <div id="pdfContainer">
+            <canvas id="pdfViewer"></canvas>
+            <div id="interactionLayer"></div>
+            <div id="annotationLayer" class="annotation-layer"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 KARYA ABADI FORMULIR SUBANG. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        
+        let pdfDoc = null;
+        let pdfBytes = null;
+        let currentMode = 'text';
+        let annotations = []; 
+        let scale = 1.5; 
+        let currentPage = 1;
+        let totalPages = 1;
+
+        const formSelect = document.getElementById('formSelect');
+        const canvas = document.getElementById('pdfViewer');
+        const ctx = canvas.getContext('2d');
+        const interactionLayer = document.getElementById('interactionLayer');
+        const annotationLayer = document.getElementById('annotationLayer');
+        const statusMode = document.getElementById('statusMode');
+
+        // Sistem langsung fetch file PDF dari repository GitHub
+        formSelect.addEventListener('change', async (e) => {
+            const fileName = e.target.value;
+            if (!fileName) return;
+            
+            try {
+                // Encode URI untuk menangani nama file yang ada spasi
+                const response = await fetch(encodeURIComponent(fileName));
+                if (!response.ok) throw new Error("File PDF tidak ditemukan di server GitHub");
+                pdfBytes = await response.arrayBuffer();
+                pdfDoc = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
+                totalPages = pdfDoc.numPages;
+                currentPage = 1;
+                annotations = []; 
+                renderPage(1);
+            } catch (err) {
+                alert("Gagal memuat PDF! Pastikan file PDF asli sudah ter-upload ke repository GitHub yang sama dengan file index.html ini.");
+                console.error(err);
+            }
+        });
+
+        async function renderPage(num) {
+            if (!pdfDoc) return;
+            currentPage = num;
+            document.getElementById('pageInfo').innerText = `Hal ${num}/${totalPages}`;
+            const page = await pdfDoc.getPage(num);
+            const viewport = page.getViewport({ scale });
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+            interactionLayer.style.width = viewport.width + 'px';
+            interactionLayer.style.height = viewport.height + 'px';
+            annotationLayer.style.width = viewport.width + 'px';
+            annotationLayer.style.height = viewport.height + 'px';
+
+            const renderContext = { canvasContext: ctx, viewport: viewport };
+            await page.render(renderContext).promise;
+            renderAnnotations();
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            statusMode.innerText = `Mode: ${mode.toUpperCase()}`;
+            if (mode === 'edit' || mode === 'delete') {
+                interactionLayer.style.pointerEvents = 'none';
+            } else {
+                interactionLayer.style.pointerEvents = 'auto';
+            }
+        }
+
+        interactionLayer.addEventListener('click', (e) => {
+            if (currentMode === 'edit' || currentMode === 'delete' || !pdfDoc) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            let annot = { page: currentPage, x, y, type: currentMode };
+
+            if (currentMode === 'text') {
+                const text = document.getElementById('textInput').value;
+                if (!text) return alert('Ketik teks di kotak sebelum klik di PDF!');
+                annot.text = text;
+                annot.size = 14; 
+            } else if (currentMode === 'check' || currentMode === 'circle') {
+                annot.width = 20;
+                annot.height = 20;
+            }
+
+            annotations.push(annot);
+            renderAnnotations();
+        });
+
+        function renderAnnotations() {
+            annotationLayer.innerHTML = '';
+            annotations.filter(a => a.page === currentPage).forEach((a) => {
+                const globalIndex = annotations.indexOf(a);
+                const div = document.createElement('div');
+                div.className = 'annotation-box';
+                div.style.left = a.x + 'px';
+                div.style.top = a.y + 'px';
+                
+                if (a.type === 'text') {
+                    div.classList.add('text-annot');
+                    div.style.fontSize = a.size + 'px';
+                    div.innerText = a.text;
+                } else if (a.type === 'circle') {
+                    div.classList.add('circle-annot');
+                    div.style.width = a.width + 'px';
+                    div.style.height = a.height + 'px';
+                    div.style.transform = 'translate(-50%, -50%)'; 
+                } else if (a.type === 'check') {
+                    div.classList.add('check-annot');
+                    div.style.width = a.width + 'px';
+                    div.style.height = a.height + 'px';
+                    div.innerHTML = `<svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+                        <polyline points="10,60 40,80 90,20" fill="none" stroke="black" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>`;
+                    div.style.transform = 'translate(-10%, -50%)';
+                }
+
+                attachInteractions(div, globalIndex);
+                annotationLayer.appendChild(div);
+            });
+        }
+
+        function attachInteractions(element, annotIndex) {
+            element.addEventListener('click', (e) => {
+                if (currentMode === 'delete') {
+                    e.stopPropagation();
+                    annotations.splice(annotIndex, 1);
+                    renderAnnotations();
+                }
+            });
+
+            element.addEventListener('mousedown', (e) => {
+                if (e.target.classList.contains('resize-handle') || currentMode === 'delete') return;
+                e.stopPropagation();
+                e.preventDefault();
+                
+                if (currentMode === 'edit') {
+                    const startX = e.clientX;
+                    const startY = e.clientY;
+                    const startLeft = parseFloat(element.style.left);
+                    const startTop = parseFloat(element.style.top);
+
+                    const onMouseMove = (moveEvent) => {
+                        let newX = startLeft + (moveEvent.clientX - startX);
+                        let newY = startTop + (moveEvent.clientY - startY);
+                        element.style.left = newX + 'px';
+                        element.style.top = newY + 'px';
+                        annotations[annotIndex].x = newX;
+                        annotations[annotIndex].y = newY;
+                    };
+                    const onMouseUp = () => {
+                        document.removeEventListener('mousemove', onMouseMove);
+                        document.removeEventListener('mouseup', onMouseUp);
+                    };
+                    document.addEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mouseup', onMouseUp);
+                }
+            });
+
+            const handle = document.createElement('div');
+            handle.className = 'resize-handle';
+            element.appendChild(handle);
+
+            handle.addEventListener('mousedown', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                const annot = annotations[annotIndex];
+                const startX = e.clientX;
+                const startY = e.clientY;
+                const startW = element.offsetWidth;
+                const startH = element.offsetHeight;
+                const startFontSize = annot.type === 'text' ? annot.size : 0;
+
+                const onMouseMove = (moveEvent) => {
+                    let maxDelta = Math.max(moveEvent.clientX - startX, moveEvent.clientY - startY);
+                    
+                    if (annot.type === 'text') {
+                        let newSize = Math.max(8, startFontSize + maxDelta);
+                        element.style.fontSize = newSize + 'px';
+                        annot.size = newSize;
+                    } else {
+                        let newW = Math.max(10, startW + maxDelta);
+                        let newH = Math.max(10, startH + maxDelta);
+                        element.style.width = newW + 'px';
+                        element.style.height = newH + 'px';
+                        annot.width = newW;
+                        annot.height = newH;
+                    }
+                };
+                const onMouseUp = () => {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                };
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            });
+        }
+
+        async function downloadPDF() {
+            if (!pdfBytes) return alert('Pilih formulir dulu!');
+            const { PDFDocument, rgb } = PDFLib;
+            const pdfDocLib = await PDFDocument.load(pdfBytes);
+            const helveticaBoldFont = await pdfDocLib.embedFont(PDFLib.StandardFonts.HelveticaBold);
+
+            for (let a of annotations) {
+                const page = pdfDocLib.getPage(a.page - 1);
+                const { width: pdfW, height: pdfH } = page.getSize();
+                const canvasW = canvas.width;
+                const canvasH = canvas.height;
+
+                const pdfX = (a.x / canvasW) * pdfW;
+                const pdfY_base = pdfH - (a.y / canvasH) * pdfH;
+
+                if (a.type === 'text') {
+                    const fs = a.size / scale; 
+                    const y_pdf = pdfY_base - (fs * 0.8); 
+                    page.drawText(a.text, { x: pdfX, y: y_pdf, size: fs, font: helveticaBoldFont, color: rgb(0, 0, 0) });
+                } 
+                else if (a.type === 'circle') {
+                    const w = (a.width / canvasW) * pdfW;
+                    const h = (a.height / canvasH) * pdfH;
+                    const cx = pdfX;
+                    const cy = pdfY_base;
+                    page.drawEllipse({ x: cx, y: cy, xScale: w/2, yScale: h/2, borderColor: rgb(0, 0, 0), borderWidth: 1.5 });
+                } 
+                else if (a.type === 'check') {
+                    const w = (a.width / canvasW) * pdfW;
+                    const h = (a.height / canvasH) * pdfH;
+                    const x_pdf = pdfX - (w * 0.1);
+                    const y_pdf = pdfY_base - (h * 0.5);
+
+                    const p1 = { x: x_pdf + w * 0.1, y: y_pdf + h * 0.4 };
+                    const p2 = { x: x_pdf + w * 0.4, y: y_pdf + h * 0.2 };
+                    const p3 = { x: x_pdf + w * 0.9, y: y_pdf + h * 0.8 };
+                    
+                    const thickness = w * 0.12;
+                    page.drawLine({ start: p1, end: p2, thickness: thickness, color: rgb(0, 0, 0) });
+                    page.drawLine({ start: p2, end: p3, thickness: thickness, color: rgb(0, 0, 0) });
+                }
+            }
+
+            const pdfOut = await pdfDocLib.save();
+            const blob = new Blob([pdfOut], { type: 'application/pdf' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = "Karya_Abadi_Formulir_Subang_Terisi.pdf";
+            link.click();
+        }
+
+        function nextPage() { if (currentPage < totalPages) renderPage(currentPage + 1); }
+        function prevPage() { if (currentPage > 1) renderPage(currentPage - 1); }
+    </script>
+</body>
+</html>
