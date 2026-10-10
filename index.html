@@ -121,11 +121,15 @@
         
         .popover-menu {
             position: absolute; 
-            top: calc(100% + 25px);   /* muncul jauh di bawah teks agar teks terlihat */
-            left: 0;                  /* default, akan dikunci oleh JS */
-            background: #2c3e50; color: white; border-radius: 8px; padding: 6px; display: none;
-            flex-direction: column; gap: 2px; z-index: 1002; box-shadow: 0 8px 16px rgba(0,0,0,0.4); 
+            top: 0; left: 0; /* Posisi akan diatur mutlak oleh JS saat dibuka */
+            background: #2c3e50; color: white; border-radius: 8px; padding: 8px; display: none;
+            flex-direction: column; gap: 4px; z-index: 1002; box-shadow: 0 8px 16px rgba(0,0,0,0.4); 
             width: 220px; box-sizing: border-box;
+        }
+        .popover-menu::before {
+            content: ''; position: absolute; top: -6px; left: 14px;
+            width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent;
+            border-bottom: 6px solid #2c3e50;
         }
         
         .popover-menu button {
@@ -133,11 +137,12 @@
             font-size: 13px; border-radius: 4px; display: flex; align-items: center; gap: 8px; width: 100%; font-family: 'Segoe UI', sans-serif;
         }
         .popover-menu button:hover { background: #34495e; }
-        .spacing-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-top: 1px solid #3d5266; font-size: 13px; }
+        
+        .spacing-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; font-size: 13px; }
         .spacing-controls { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-        .spacing-btn { background: #34495e; border: none; color: white; width: 28px; height: 28px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .spacing-btn { background: #34495e; border: none; color: white; width: 26px; height: 26px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .spacing-btn:active { background: var(--gold); color: var(--dark-green); }
-        .spacing-val { width: 40px; min-width: 40px; max-width: 40px; text-align: center; font-weight: bold; flex: 0 0 40px; }
+        .spacing-val { width: 40px; min-width: 40px; max-width: 40px; text-align: center; font-weight: bold; flex: 0 0 40px; font-family: 'Courier New', monospace; }
 
         .float-tools {
             position: fixed; top: 85px; right: 15px; z-index: 9999; background: white; padding: 8px;
@@ -440,7 +445,7 @@
 
         const modalContents = {
             about: { title: 'Tentang Kami', body: `<h4>Profil Karya Abadi</h4><p><b>Karya Abadi</b> merupakan penyedia layanan digital yang berfokus pada sistem pengisian formulir kependudukan secara online untuk wilayah Kabupaten Subang, Jawa Barat.</p><h4>Visi</h4><p>Menjadi mitra terpercaya masyarakat dan pemerintah dalam digitalisasi layanan administrasi kependudukan yang cepat, akurat, dan mudah diakses oleh seluruh lapisan masyarakat.</p><h4>Misi</h4><ul><li>Menyediakan platform digital yang ramah pengguna untuk pengisian formulir kependudukan.</li><li>Mendukung efisiensi pelayanan publik di Kabupaten Subang melalui teknologi.</li><li>Memberikan kemudahan akses tanpa biaya tambahan untuk dokumen administrasi dasar.</li><li>Menjaga kerahasiaan dan keamanan data pengguna sesuai standar yang berlaku.</li></ul><h4>Lokasi Layanan</h4><p>Rawameneng, Blanakan, Subang, Jawa Barat, Indonesia - Kode Pos 41259.</p>` },
-            privacy: { title: 'Kebijakan Privasi', body: `<h4>Pendahuluan</h4><p>Kebijakan Privasi ini menjelaskan bagaimana <b>Karya Abadi</b> mengumpulkan, menggunakan, dan melindungi data pengguna saat menggunakan layanan Sistem Digital Pengisian Formulir Kependudukan Kabupaten Subang.</p><h4>Data yang Dikumpulkan</h4><ul><li>Data formulir yang diisi pengguna (nama, NIK, alamat, dan data kependudukan lainnya).</li><li>Berkas unggahan seperti tanda tangan digital dan materai.</li><li>Informasi teknis perangkat (jenis browser, sistem operasi) untuk keperluan teknis.</li></ul><h4>Penggunaan Data</h4><p>Data yang dikumpulkan hanya digunakan untuk:</p><ul><li>Proses pengisian dan pengunduhan formulir kependudukan.</li><li>Verifikasi data sesuai kebutuhan layanan.</li><li>Peningkatan kualitas dan fitur layanan.</li></ul><h4>Perlindungan Data</h4><p>Kami menerapkan langkah-langkah teknis dan organisasi untuk melindungi data pengguna dari akses tidak sah, perubahan, atau pengungkapan. Seluruh pemrosesan data dilakukan secara lokal di perangkat pengguna.</p><h4>Hak Pengguna</h4><p>Pengguna berhak untuk mengakses, memperbaiki, atau menghapus data yang telah diinputkan. Pengguna juga berhak untuk tidak menggunakan layanan ini jika tidak menyetujui kebijakan privasi.</p><h4>Perubahan Kebijakan</h4><p>Kami dapat memperbarui Kebijakan Privasi ini sewaktu-waktu. Perubahan akan diumumkan melalui halaman ini.</p>` },
+            privacy: { title: 'Kebijakan Privasi', body: `<h4>Pendahuluan</h4><p>Kebijakan Privasi ini menjelaskan bagaimana <b>Karya Abadi</b> mengumpulkan, menggunakan, dan melindungi data pengguna saat menggunakan layanan Sistem Digital Pengisian Formulir Kependudukan Kabupaten Subang.</p><h4>Data yang Dikumpulkan</h4><ul><li>Data formulir yang diisi pengguna (nama, NIK, alamat, dan data kependudukan lainnya).</li><li>Berkas unggahan seperti tanda tangan digital dan materai.</li><li>Informasi teknis perangkat (jenis browser, sistem operasi) untuk keperluan teknis.</li></ul><h4>Penggunaan Data</h4><p>Data yang dikumpulkan hanya digunakan untuk:</p><ul><li>Proses pengisian dan pengunduhan formulir kependudukan.</li><li>Verifikasi data sesuai kebutuhan layanan.</li><li>Peningkatan kualitas dan fitur layanan.</li></ul><h4>Perlindungan Data</h4><p>Kami menerapkan langkah-langkah teknis dan organisasi untuk melindungi data pengguna dari akses tidak sah, perubahan, atau pengungkapan. Seluruh pemrosesan data dilakukan secara lokal di perangkat pengguna.</p><h4>Hak Pengguna</h4><p>Pengguna berhak untuk mengakses, memperbaiki, atau menghapus data yang telah diinputkan. Pengguna juga berhak untuk tidak menggunakan layanan ini jika tidak menyetujai kebijakan privasi.</p><h4>Perubahan Kebijakan</h4><p>Kami dapat memperbarui Kebijakan Privasi ini sewaktu-waktu. Perubahan akan diumumkan melalui halaman ini.</p>` },
             terms: { title: 'Syarat dan Ketentuan', body: `<h4>1. Penerimaan Ketentuan</h4><p>Dengan menggunakan layanan Sistem Digital Pengisian Formulir Kependudukan Kabupaten Subang yang disediakan oleh <b>Karya Abadi</b>, pengguna dianggap telah membaca, memahami, dan menyetujui seluruh syarat dan ketentuan berikut.</p><h4>2. Penggunaan Layanan</h4><ul><li>Layanan ini disediakan untuk membantu masyarakat mengisi formulir kependudukan secara digital.</li><li>Pengguna wajib memberikan data yang benar, akurat, dan sah.</li><li>Pengguna dilarang menggunakan layanan untuk tujuan melanggar hukum atau peraturan yang berlaku.</li></ul><h4>3. Tanggung Jawab Pengguna</h4><p>Pengguna bertanggung jawab penuh atas kebenaran data yang dimasukkan ke dalam formulir. Karya Abadi tidak bertanggung jawab atas kesalahan pengisian yang dilakukan oleh pengguna.</p><h4>4. Hak Kekayaan Intelektual</h4><p>Seluruh konten, desain, logo, dan kode aplikasi merupakan milik Karya Abadi dan dilindungi oleh hukum hak cipta. Dilarang menyalin, memodifikasi, atau mendistribusikan tanpa izin tertulis.</p><h4>5. Batasan Tanggung Jawab</h4><p>Layanan disediakan "sebagaimana adanya" tanpa jaminan eksplisit. Karya Abadi tidak bertanggung jawab atas kerugian langsung maupun tidak langsung yang timbul dari penggunaan layanan.</p><h4>6. Perubahan Ketentuan</h4><p>Karya Abadi berhak mengubah syarat dan ketentuan ini sewaktu-waktu. Perubahan berlaku sejak dipublikasikan di halaman ini.</p>` },
             disclaimer: { title: 'Disclaimer', body: `<h4>Penyangkalan Umum</h4><p>Informasi dan layanan pada platform <b>Karya Abadi - Formulir Subang</b> disediakan untuk tujuan membantu masyarakat dalam pengisian formulir kependudukan secara digital.</p><h4>Ketepatan Data</h4><p>Kami berupaya menyediakan formulir yang sesuai dengan standar resmi. Namun, pengguna wajib memverifikasi kembali kebenaran data sebelum dokumen diserahkan kepada instansi berwenang. Karya Abadi tidak bertanggung jawab atas konsekuensi hukum akibat kesalahan pengisian data oleh pengguna.</p><h4>Bukan Instansi Resmi</h4><p>Karya Abadi <b>BUKAN</b> instansi pemerintah, Dinas Kependudukan dan Pencatatan Sipil (Disdukcapil), maupun Badan Kependudukan dan Keluarga Berencana Nasional (BKKBN). Layanan ini bersifat independen dan hanya berfungsi sebagai alat bantu digital pengisian formulir.</p><h4>Validitas Dokumen</h4><p>Dokumen yang dihasilkan melalui platform ini tetap perlu diverifikasi, ditandatangani, dan disahkan oleh pejabat berwenang agar sah secara hukum. Karya Abadi tidak menjamin diterimanya dokumen oleh pihak tertentu.</p><h4>Link Eksternal</h4><p>Platform dapat mengandung link ke situs pihak ketiga. Karya Abadi tidak bertanggung jawab atas konten atau kebijakan privasi situ eksternal tersebut.</p><h4>Paksaan Mayoret (Force Majeure)</h4><p>Karya Abadi tidak bertanggung jawab atas kegagalan layanan akibat kondisi di luar kendali, seperti bencana alam, gangguan jaringan, atau perubahan kebijakan pemerintah.</p>` },
             services: { title: 'Layanan Formulir', body: `<h4>Jenis Formulir Tersedia</h4><p>Platform Karya Abadi menyediakan pengisian digital berbagai formulir kependudukan, antara lain:</p><ul><li><b>F-1.01</b> - Formulir Biodata WNI</li><li><b>F-1.02</b> - Pendaftaran Peristiwa Kependudukan</li><li><b>F-1.03</b> - Pendaftaran Perpindahan Penduduk</li><li><b>F-1.06</b> - Surat Pernyataan Perubahan Elemen Data</li><li><b>F-1.07</b> - Surat Kuasa</li><li><b>F-1.21</b> - Permohonan KTP WNI</li><li><b>F-2.01</b> - Pelaporan Pencatatan Sipil</li><li><b>F-2.03</b> - SPTJM Kelahiran</li><li><b>F-2.04</b> - SPTJM Kebenaran Suami Istri</li><li>Surat Pernyataan Domisili Subang</li></ul><h4>Fitur Utama</h4><ul><li>Penambahan teks dengan pengaturan ukuran dan spasi huruf.</li><li>Tanda tangan digital dan materai yang dapat diunggah.</li><li>Mode tanda ceklis dan lingkaran.</li><li>Undo dan Redo untuk koreksi kesalahan.</li><li>Unduh hasil dalam format PDF.</li></ul>` },
@@ -678,21 +683,21 @@
                 const controls = document.createElement('div'); controls.className = 'spacing-controls';
                 
                 const minusBtn = document.createElement('button'); minusBtn.className = 'spacing-btn'; minusBtn.innerText = '-';
-                const valDisplay = document.createElement('span'); valDisplay.className = 'spacing-val'; valDisplay.innerText = (annotations[idx].letterSpacing || 0) + 'px';
+                const valDisplay = document.createElement('span'); valDisplay.className = 'spacing-val'; valDisplay.innerText = (annotations[idx].letterSpacing || 0);
                 const plusBtn = document.createElement('button'); plusBtn.className = 'spacing-btn'; plusBtn.innerText = '+';
                 
                 minusBtn.onclick = (e) => { 
                     e.stopPropagation(); 
                     annotations[idx].letterSpacing = (annotations[idx].letterSpacing || 0) - 1; 
                     element.style.letterSpacing = annotations[idx].letterSpacing + 'px';
-                    valDisplay.innerText = annotations[idx].letterSpacing + 'px'; 
+                    valDisplay.innerText = annotations[idx].letterSpacing; 
                     saveHistory(); 
                 };
                 plusBtn.onclick = (e) => { 
                     e.stopPropagation(); 
                     annotations[idx].letterSpacing = (annotations[idx].letterSpacing || 0) + 1; 
                     element.style.letterSpacing = annotations[idx].letterSpacing + 'px';
-                    valDisplay.innerText = annotations[idx].letterSpacing + 'px'; 
+                    valDisplay.innerText = annotations[idx].letterSpacing; 
                     saveHistory(); 
                 };
 
@@ -740,40 +745,41 @@
             trigger.onclick = (e) => {
                 e.stopPropagation();
                 const isDisplayed = popover.style.display === 'flex';
-                document.querySelectorAll('.popover-menu').forEach(m => {
-                    m.style.display = 'none';
-                    m.style.left = ''; 
-                    m.style.top = '';
-                });
+                document.querySelectorAll('.popover-menu').forEach(m => m.style.display = 'none');
                 
                 if (!isDisplayed) {
                     popover.style.display = 'flex';
-                    // Pakai requestAnimationFrame agar browser selesai merender dulu, lalu hitung ukuran asli
+                    // Reset dulu agar tidak ada style sisa yang ikut mengganggu perhitungan
+                    popover.style.left = '0px';
+                    popover.style.top = '0px';
+                    
+                    // Gunakan requestAnimationFrame agar browser merender popup lebih dulu untuk mendapatkan ukuran asli
                     requestAnimationFrame(() => {
                         const annotRect = element.getBoundingClientRect();
                         const popRect = popover.getBoundingClientRect();
                         
+                        // 1. Kunci posisi Top berdasarkan tinggi teks. (Mencegah geser saat Jarak Baris bertambah)
+                        let topPos = annotRect.height + 15;
+                        // 2. Kunci posisi Left berdasarkan tepi kiri teks. (Mencegah geser saat Spasi Huruf bertambah)
                         let leftPos = 0;
-                        let topPos = 'calc(100% + 25px)'; // default di bawah teks (25px jaraknya)
                         
-                        // 1. Cek jika pop-up keluar dari layar di sisi BAWAH, pindahkan ke ATAS teks
+                        // 3. Cek jika pop-up keluar layar bawah, pindahkan ke atas teks
                         if (annotRect.bottom + popRect.height > window.innerHeight - 10) {
-                            topPos = `calc(-100% - 25px)`; // pindah ke atas teks
+                            topPos = -popRect.height - 15;
                         }
                         
-                        // 2. Cek jika pop-up keluar dari layar di sisi KANAN, geser ke KIRI
+                        // 4. Cek jika pop-up keluar layar kanan, geser ke kiri
                         if (annotRect.left + popRect.width > window.innerWidth - 10) {
                             leftPos = (window.innerWidth - 10 - popRect.width) - annotRect.left;
                         }
-                        // 3. Cek jika pop-up keluar dari layar di sisi KIRI, geser ke KANAN
+                        // 5. Cek jika pop-up keluar layar kiri, geser ke kanan
                         if (annotRect.left + leftPos < 10) {
                             leftPos = 10 - annotRect.left;
                         }
                         
-                        // Kunci posisi pop-up secara absolut berdasarkan perhitungan di atas
-                        // Ini memastikan pop-up TIDAK akan ikut bergeser saat huruf diperlebar
+                        // Terapkan posisi secara mutlak (px), sehingga tidak akan terpengaruh perubahan ukuran teks selanjutnya
                         popover.style.left = leftPos + 'px';
-                        popover.style.top = topPos;
+                        popover.style.top = topPos + 'px';
                     });
                 }
             };
