@@ -150,13 +150,20 @@
         .guide-item .guide-title { font-weight: bold; color: var(--black); margin-bottom: 4px; display: block; }
         .guide-item .guide-desc { margin: 0; }
 
+        /* CSS untuk Area PDF (Geser & Zoom Bebas) */
         .pdf-area { 
-            flex-grow: 1; padding: 15px; overflow: auto; 
+            flex-grow: 1; padding: 15px; overflow: hidden; 
             display: flex; justify-content: center; align-items: flex-start; 
             background: #eef2f7; position: relative; width: 100%; 
-            touch-action: pan-x pan-y; /* MEMUNGKINKAN GESER 1 JARI */
+            touch-action: none; cursor: grab;
         }
-        #pdfContainer { position: relative; box-shadow: 0 0 15px rgba(0,0,0,0.2); background: white; touch-action: none; margin: auto; }
+        .pdf-area.panning { cursor: grabbing; }
+        
+        #pdfContainer { 
+            position: relative; box-shadow: 0 0 15px rgba(0,0,0,0.2); background: white; 
+            touch-action: none; margin: auto; 
+            transform-origin: 0 0; will-change: transform;
+        }
         #pdfViewer { display: block; max-width: none; }
         #interactionLayer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; touch-action: none; }
         .annotation-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
@@ -290,8 +297,8 @@
             .mobile-nav { display: block; }
             .float-tools { top: 70px; left: 10px; }
             
-            .main-layout { display: block; height: calc(100vh - 65px); overflow: hidden; }
-            .pdf-area { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: auto; padding: 10px; touch-action: auto; }
+            .main-layout { display: flex; flex-direction: column; height: calc(100vh - 65px); overflow: hidden; }
+            .pdf-area { position: relative; flex: 1; width: 100%; height: 100%; overflow: hidden; padding: 10px; touch-action: none; }
             
             .sidebar { 
                 position: fixed; 
@@ -455,15 +462,19 @@
                     <p class="guide-desc">Klik "Tambah Teks", lalu klik teks tersebut. Klik ikon <b>⋮</b> di pojok kanan atas teks dan pilih <b>Edit Teks</b> atau <b>Duplikat Teks</b>.</p>
                 </div>
                 <div class="guide-item">
-                    <span class="guide-title">2. Geser & Perbesar</span>
-                    <p class="guide-desc">Tahan dan geser objek. Gunakan 2 jari (cubitan) pada layar HP untuk memperbesar formulir. Gunakan tombol zoom (+) & (-) untuk memperbesar di PC.</p>
+                    <span class="guide-title">2. Geser & Perbesar Formulir</span>
+                    <p class="guide-desc"><b>PC:</b> Scroll mouse wheel untuk zoom, klik tahan area kosong untuk menggeser formulir.<br><b>HP:</b> Cubit dengan 2 jari untuk memperbesar, geser dengan 1 jari untuk memindahkan halaman.</p>
                 </div>
                 <div class="guide-item">
-                    <span class="guide-title">3. Spasi & Jarak Baris</span>
+                    <span class="guide-title">3. Reset Tampilan</span>
+                    <p class="guide-desc">Jika formulir sudah terlalu diperbesar atau bergeser jauh, klik tombol <b>Reset Tampilan</b> (ikon kotak) di menu mengambang untuk mengembalikan seperti semula.</p>
+                </div>
+                <div class="guide-item">
+                    <span class="guide-title">4. Spasi & Jarak Baris</span>
                     <p class="guide-desc">Klik teks yang ingin diatur, lalu gunakan tombol <b>[+]</b> dan <b>[-]</b> di panel kiri pada bagian "Atur Teks".</p>
                 </div>
                 <div class="guide-item">
-                    <span class="guide-title">4. Undo/Redo</span>
+                    <span class="guide-title">5. Undo/Redo</span>
                     <p class="guide-desc">Tombol mengambang di kiri atas layar untuk membatalkan/mengulang aksi.</p>
                 </div>
             </div>
@@ -480,13 +491,12 @@
                 <button class="btn-icon-float" id="redoBtn" onclick="redo()" title="Redo">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
                 </button>
-                <button class="btn-icon-float" id="zoomOutBtn" onclick="zoomOut()" title="Zoom Out">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <button class="btn-icon-float" id="resetViewBtn" onclick="resetView()" title="Reset Tampilan Formulir">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                    </svg>
                 </button>
-                <button class="btn-icon-float" id="zoomInBtn" onclick="zoomIn()" title="Zoom In">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                </button>
-                <button class="btn-reset-pos" onclick="resetFloatPos()" title="Reset Posisi">
+                <button class="btn-reset-pos" onclick="resetFloatPos()" title="Reset Posisi Tombol">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
                 </button>
             </div>
@@ -574,7 +584,7 @@
             terms: { title: 'Syarat dan Ketentuan', body: `<h4>1. Penerimaan Ketentuan</h4><p>Dengan menggunakan layanan Sistem Digital Pengisian Formulir Kependudukan Kabupaten Subang yang disediakan oleh <b>Karya Abadi</b>, pengguna dianggap telah membaca, memahami, dan menyetujui seluruh syarat dan ketentuan berikut.</p><h4>2. Penggunaan Layanan</h4><ul><li>Layanan ini disediakan untuk membantu masyarakat mengisi formulir kependudukan secara digital.</li><li>Pengguna wajib memberikan data yang benar, akurat, dan sah.</li><li>Pengguna dilarang menggunakan layanan untuk tujuan melanggar hukum atau peraturan yang berlaku.</li></ul><h4>3. Tanggung Jawab Pengguna</h4><p>Pengguna bertanggung jawab penuh atas kebenaran data yang dimasukkan ke dalam formulir. Karya Abadi tidak bertanggung jawab atas kesalahan pengisian yang dilakukan oleh pengguna.</p><h4>4. Hak Kekayaan Intelektual</h4><p>Seluruh konten, desain, logo, dan kode aplikasi merupakan milik Karya Abadi dan dilindungi oleh hukum hak cipta. Dilarang menyalin, memodifikasi, atau mendistribusikan tanpa izin tertulis.</p><h4>5. Batasan Tanggung Jawab</h4><p>Layanan disediakan "sebagaimana adanya" tanpa jaminan eksplisit. Karya Abadi tidak bertanggung jawab atas kerugian langsung maupun tidak langsung yang timbul dari penggunaan layanan.</p><h4>6. Perubahan Ketentuan</h4><p>Karya Abadi berhak mengubah syarat dan ketentuan ini sewaktu-waktu. Perubahan berlaku sejak dipublikasikan di halaman ini.</p>` },
             disclaimer: { title: 'Disclaimer', body: `<h4>Penyangkalan Umum</h4><p>Informasi dan layanan pada platform <b>Karya Abadi - Formulir Subang</b> disediakan untuk tujuan membantu masyarakat dalam pengisian formulir kependudukan secara digital.</p><h4>Ketepatan Data</h4><p>Kami berupaya menyediakan formulir yang sesuai dengan standar resmi. Namun, pengguna wajib memverifikasi kembali kebenaran data sebelum dokumen diserahkan kepada instansi berwenang. Karya Abadi tidak bertanggung jawab atas konsekuensi hukum akibat kesalahan pengisian data oleh pengguna.</p><h4>Bukan Instansi Resmi</h4><p>Karya Abadi <b>BUKAN</b> instansi pemerintah, Dinas Kependudukan dan Pencatatan Sipil (Disdukcapil), maupun Badan Kependudukan dan Keluarga Berencana Nasional (BKKBN). Layanan ini bersifat independen dan hanya berfungsi sebagai alat bantu digital pengisian formulir.</p><h4>Validitas Dokumen</h4><p>Dokumen yang dihasilkan melalui platform ini tetap perlu diverifikasi, ditandatangani, dan disahkan oleh pejabat berwenang agar sah secara hukum. Karya Abadi tidak menjamin diterimanya dokumen oleh pihak tertentu.</p><h4>Link Eksternal</h4><p>Platform dapat mengandung link ke situs pihak ketiga. Karya Abadi tidak bertanggung jawab atas konten atau kebijakan privasi situ eksternal tersebut.</p><h4>Paksaan Mayoret (Force Majeure)</h4><p>Karya Abadi tidak bertanggung jawab atas kegagalan layanan akibat kondisi di luar kendali, seperti bencana alam, gangguan jaringan, atau perubahan kebijakan pemerintah.</p>` },
             services: { title: 'Layanan Formulir', body: `<h4>Jenis Formulir Tersedia</h4><p>Platform Karya Abadi menyediakan pengisian digital berbagai formulir kependudukan, antara lain:</p><ul><li><b>F-1.01</b> - Formulir Biodata WNI</li><li><b>F-1.02</b> - Pendaftaran Peristiwa Kependudukan</li><li><b>F-1.03</b> - Pendaftaran Perpindahan Penduduk</li><li><b>F-1.06</b> - Surat Pernyataan Perubahan Elemen Data</li><li><b>F-1.07</b> - Surat Kuasa</li><li><b>F-1.21</b> - Permohonan KTP WNI</li><li><b>F-2.01</b> - Pelaporan Pencatatan Sipil</li><li><b>F-2.03</b> - SPTJM Kelahiran</li><li><b>F-2.04</b> - SPTJM Kebenaran Suami Istri</li><li>Surat Pernyataan Domisili Subang</li></ul><h4>Fitur Utama</h4><ul><li>Penambahan teks dengan pengaturan ukuran dan spasi huruf.</li><li>Tanda tangan digital dan materai yang dapat diunggah.</li><li>Mode tanda ceklis dan lingkaran.</li><li>Undo dan Redo untuk koreksi kesalahan.</li><li>Unduh hasil dalam format PDF.</li></ul>` },
-            guide: { title: 'Panduan Penggunaan', body: `<h4>Langkah 1 - Pilih Formulir</h4><p>Buka panel di sisi kiri, pilih formulir kependudukan yang sesuai dari dropdown "Pilih Formulir".</p><h4>Langkah 2 - Tambahkan Teks</h4><p>Klik tombol "Tambah Teks", lalu klik teks baru yang muncul di halaman PDF. Klik ikon <b>⋮</b> di samping teks dan pilih <b>Edit Teks</b> untuk mengubah isi sesuai kebutuhan.</p><h4>Langkah 3 - Geser & Atur Posisi</h4><p>Tahan dan geser objek teks atau tanda untuk memindahkan ke posisi yang diinginkan. Gunakan 2 jari (cubitan) pada layar HP untuk memperbesar halaman PDF.</p><h4>Langkah 4 - Atur Spasi Huruf</h4><p>Untuk melebarkan huruf agar pas dengan kolom tabel, klik teks tersebut, lalu gunakan tombol <b>[+]</b> atau <b>[-]</b> di bagian "Atur Teks" pada panel kiri.</p><h4>Langkah 5 - Tanda Tangan & Materai</h4><p>Pilih mode "TTD" atau "Materai" di panel kiri, lalu unggah file gambar tanda tangan atau materai Anda. Setelah terunggah, klik di posisi yang diinginkan pada PDF untuk menempatkannya.</p><h4>Langkah 6 - Navigasi Halaman</h4><p>Gunakan tombol <b>PREV</b> dan <b>NEXT</b> untuk berpindah antar halaman formulir jika memiliki lebih dari satu halaman.</p><h4>Langkah 7 - Undo / Redo</h4><p>Gunakan tombol mengambang di pojok kiri atas layar untuk membatalkan (Undo) atau mengulang (Redo) aksi terakhir Anda.</p><h4>Langkah 8 - Unduh PDF</h4><p>Setelah semua data terisi, klik tombol <b>DOWNLOAD PDF</b> untuk menyimpan hasil ke perangkat Anda.</p>` }
+            guide: { title: 'Panduan Penggunaan', body: `<h4>Langkah 1 - Pilih Formulir</h4><p>Buka panel di sisi kiri, pilih formulir kependudukan yang sesuai dari dropdown "Pilih Formulir".</p><h4>Langkah 2 - Tambahkan Teks</h4><p>Klik tombol "Tambah Teks", lalu klik teks baru yang muncul di halaman PDF. Klik ikon <b>⋮</b> di samping teks dan pilih <b>Edit Teks</b> untuk mengubah isi sesuai kebutuhan.</p><h4>Langkah 3 - Geser & Atur Posisi</h4><p>Tahan dan geser objek teks atau tanda untuk memindahkan ke posisi yang diinginkan. Gunakan 2 jari (cubitan) pada layar HP atau scroll mouse pada PC untuk memperbesar halaman PDF.</p><h4>Langkah 4 - Atur Spasi Huruf</h4><p>Untuk melebarkan huruf agar pas dengan kolom tabel, klik teks tersebut, lalu gunakan tombol <b>[+]</b> atau <b>[-]</b> di bagian "Atur Teks" pada panel kiri.</p><h4>Langkah 5 - Tanda Tangan & Materai</h4><p>Pilih mode "TTD" atau "Materai" di panel kiri, lalu unggah file gambar tanda tangan atau materai Anda. Setelah terunggah, klik di posisi yang diinginkan pada PDF untuk menempatkannya.</p><h4>Langkah 6 - Navigasi Halaman</h4><p>Gunakan tombol <b>PREV</b> dan <b>NEXT</b> untuk berpindah antar halaman formulir jika memiliki lebih dari satu halaman.</p><h4>Langkah 7 - Undo / Redo</h4><p>Gunakan tombol mengambang di pojok kiri atas layar untuk membatalkan (Undo) atau mengulang (Redo) aksi terakhir Anda.</p><h4>Langkah 8 - Unduh PDF</h4><p>Setelah semua data terisi, klik tombol <b>DOWNLOAD PDF</b> untuk menyimpan hasil ke perangkat Anda.</p>` }
         };
 
         function openModal(key) {
@@ -595,6 +605,9 @@
         let pdfDoc = null, pdfBytes = null, currentMode = null, annotations = [], scale = 1.5, currentPage = 1, totalPages = 1;
         let history = [], historyIndex = -1, signImgBytes = null, materaiImgBytes = null;
         let activeAnnotId = null;
+
+        // Variabel untuk Zoom & Pan
+        let cssZoom = 1, panX = 0, panY = 0;
 
         const formSelect = document.getElementById('formSelect');
         const canvas = document.getElementById('pdfViewer');
@@ -654,54 +667,37 @@
             }
         }
 
-        // --- LOGIKA ZOOM (TOMBOL & PINCH 2 JARI) ---
-        function applyZoom(newScale, midScreenX, midScreenY) {
+        // --- LOGIKA PAN & ZOOM (GESER & ZOOM BEBAS) ---
+        function updateTransform() {
+            pdfContainer.style.transform = `translate(${panX}px, ${panY}px) scale(${cssZoom})`;
+        }
+
+        function resetView() {
+            cssZoom = 1; panX = 0; panY = 0;
+            updateTransform();
+        }
+
+        // Zoom dengan Mouse Wheel (PC)
+        pdfArea.addEventListener('wheel', (e) => {
             if (!pdfDoc) return;
-            let oldScale = scale;
-            let ratio = newScale / oldScale;
-            if (ratio === 1) return;
+            e.preventDefault();
+            const rect = pdfArea.getBoundingClientRect();
+            const fx = e.clientX - rect.left;
+            const fy = e.clientY - rect.top;
             
-            const rect = canvas.getBoundingClientRect();
-            // Mid point in canvas pixels
-            const midX = midScreenX - rect.left;
-            const midY = midScreenY - rect.top;
+            let delta = e.deltaY > 0 ? 0.9 : 1.1;
+            let newZoom = Math.max(0.5, Math.min(5.0, cssZoom * delta));
+            let ratio = newZoom / cssZoom;
             
-            annotations.forEach(a => {
-                a.x = (a.x - midX) * ratio + midX;
-                a.y = (a.y - midY) * ratio + midY;
-                if (a.size) a.size *= ratio;
-                if (a.width) a.width *= ratio;
-                if (a.height) a.height *= ratio;
-            });
+            panX = fx - (fx - panX) * ratio;
+            panY = fy - (fy - panY) * ratio;
+            cssZoom = newZoom;
             
-            scale = newScale;
-            renderPage(currentPage).then(() => {
-                // Adjust scroll to keep the focal point centered
-                const newRect = canvas.getBoundingClientRect();
-                pdfArea.scrollLeft += (midScreenX - newRect.left) - midX;
-                pdfArea.scrollTop += (midScreenY - newRect.top) - midY;
-            });
-        }
+            updateTransform();
+        }, { passive: false });
 
-        function zoomIn() {
-            let newScale = Math.min(4.0, scale + 0.25);
-            const areaRect = pdfArea.getBoundingClientRect();
-            applyZoom(newScale, areaRect.left + areaRect.width / 2, areaRect.top + areaRect.height / 2);
-        }
-
-        function zoomOut() {
-            let newScale = Math.max(0.5, scale - 0.25);
-            const areaRect = pdfArea.getBoundingClientRect();
-            applyZoom(newScale, areaRect.left + areaRect.width / 2, areaRect.top + areaRect.height / 2);
-        }
-
-        // Pinch to Zoom Variables
-        let isPinching = false;
-        let pinchInitialDist = 0;
-        let pinchStartScale = 1;
-        let pinchMidScreenX = 0;
-        let pinchMidScreenY = 0;
-        let tempScale = 1;
+        // Pan & Zoom Touch (Mobile)
+        let touchState = { mode: null, startX: 0, startY: 0, startPanX: 0, startPanY: 0, startDist: 0, startZoom: 1 };
 
         function getDistance(touches) {
             const dx = touches[0].clientX - touches[1].clientX;
@@ -709,49 +705,83 @@
             return Math.sqrt(dx * dx + dy * dy);
         }
 
-        pdfArea.addEventListener('touchstart', function(e) {
-            if (e.touches.length === 2) {
-                e.preventDefault();
-                isPinching = true;
-                interactionLayer.style.pointerEvents = 'none'; // Disable placing annotations while pinching
-                
-                pinchInitialDist = getDistance(e.touches);
-                pinchStartScale = scale;
-                
-                pinchMidScreenX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-                pinchMidScreenY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-                
-                tempScale = scale;
+        pdfArea.addEventListener('touchstart', (e) => {
+            if (e.target.closest('.annotation-box') || e.target.closest('.popover-menu') || e.target.closest('.float-tools')) return;
+            
+            if (e.touches.length === 1) {
+                touchState.mode = 'pan';
+                touchState.startX = e.touches[0].clientX;
+                touchState.startY = e.touches[0].clientY;
+                touchState.startPanX = panX;
+                touchState.startPanY = panY;
+            } else if (e.touches.length === 2) {
+                touchState.mode = 'pinch';
+                touchState.startDist = getDistance(e.touches);
+                touchState.startZoom = cssZoom;
             }
         }, { passive: false });
 
-        pdfArea.addEventListener('touchmove', function(e) {
-            if (isPinching && e.touches.length === 2) {
+        pdfArea.addEventListener('touchmove', (e) => {
+            if (touchState.mode === 'pan' && e.touches.length === 1) {
+                e.preventDefault();
+                const dx = e.touches[0].clientX - touchState.startX;
+                const dy = e.touches[0].clientY - touchState.startY;
+                panX = touchState.startPanX + dx;
+                panY = touchState.startPanY + dy;
+                updateTransform();
+            } else if (touchState.mode === 'pinch' && e.touches.length === 2) {
                 e.preventDefault();
                 const currentDist = getDistance(e.touches);
-                let ratio = currentDist / pinchInitialDist;
-                tempScale = pinchStartScale * ratio;
+                let newZoom = touchState.startZoom * (currentDist / touchState.startDist);
+                newZoom = Math.max(0.5, Math.min(5.0, newZoom));
                 
-                // Clamp scale
-                tempScale = Math.max(0.5, Math.min(4.0, tempScale));
+                const rect = pdfArea.getBoundingClientRect();
+                const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
+                const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
                 
-                // Apply smooth visual scaling via CSS Transform
-                pdfContainer.style.transformOrigin = '0 0';
-                pdfContainer.style.transform = `scale(${tempScale / scale})`;
+                const canvasX = (midX - panX) / cssZoom;
+                const canvasY = (midY - panY) / cssZoom;
+                
+                cssZoom = newZoom;
+                panX = midX - canvasX * cssZoom;
+                panY = midY - canvasY * cssZoom;
+                
+                updateTransform();
             }
         }, { passive: false });
 
-        pdfArea.addEventListener('touchend', function(e) {
-            if (isPinching) {
-                isPinching = false;
-                pdfContainer.style.transform = 'none'; // Reset visual transform
-                
-                if (currentMode) interactionLayer.style.pointerEvents = 'auto'; // Restore layer
-                
-                applyZoom(tempScale, pinchMidScreenX, pinchMidScreenY);
-            }
-        }, { passive: false });
+        pdfArea.addEventListener('touchend', () => {
+            touchState.mode = null;
+        });
 
+        // Pan dengan Mouse (PC)
+        let mouseState = { panning: false, startX: 0, startY: 0, startPanX: 0, startPanY: 0 };
+
+        pdfArea.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.annotation-box') || e.target.closest('.popover-menu') || e.target.closest('.float-tools')) return;
+            mouseState.panning = true;
+            mouseState.startX = e.clientX;
+            mouseState.startY = e.clientY;
+            mouseState.startPanX = panX;
+            mouseState.startPanY = panY;
+            pdfArea.classList.add('panning');
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (mouseState.panning) {
+                const dx = e.clientX - mouseState.startX;
+                const dy = e.clientY - mouseState.startY;
+                panX = mouseState.startPanX + dx;
+                panY = mouseState.startPanY + dy;
+                updateTransform();
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            mouseState.panning = false;
+            pdfArea.classList.remove('panning');
+        });
 
         function saveHistory() {
             history = history.slice(0, historyIndex + 1);
@@ -792,7 +822,7 @@
             document.getElementById('pageInfo').innerText = `Hal ${num} / ${totalPages}`;
             const page = await pdfDoc.getPage(num);
             if(window.innerWidth < 768 && annotations.length === 0) { 
-                const contWidth = pdfArea.clientWidth - 30;
+                const contWidth = pdfArea.clientWidth - 20;
                 const viewportTemp = page.getViewport({ scale: 1 });
                 scale = contWidth / viewportTemp.width;
             } else if (window.innerWidth >= 768) { 
@@ -838,7 +868,9 @@
             if (!pdfDoc || !currentMode) return;
             const rect = canvas.getBoundingClientRect();
             const c = getCoords(e);
-            const x = c.x - rect.left, y = c.y - rect.top;
+            // Bagi dengan cssZoom agar posisi klik akurat meski sedang diperbesar
+            const x = (c.x - rect.left) / cssZoom;
+            const y = (c.y - rect.top) / cssZoom;
             let annot = { id: Date.now() + Math.random(), page: currentPage, x, y, type: currentMode, letterSpacing: 0 };
 
             if (currentMode === 'check' || currentMode === 'circle') {
@@ -1080,12 +1112,16 @@
             function startDragMove(e) {
                 if (e.target.classList.contains('menu-trigger') || e.target.closest('.popover-menu') || e.target.classList.contains('resize-handle') || e.target.isContentEditable) return;
                 e.preventDefault();
+                e.stopPropagation(); // Cegah konflik dengan pan view
                 const c = getCoords(e); const startX = c.x, startY = c.y;
                 const startLeft = parseFloat(element.style.left), startTop = parseFloat(element.style.top);
 
                 function onMove(mv) {
                     mv.preventDefault(); const mc = getCoords(mv);
-                    let nx = startLeft + (mc.x - startX), ny = startTop + (mc.y - startY);
+                    // Sesuaikan pergerakan dengan skala zoom
+                    let dx = (mc.x - startX) / cssZoom;
+                    let dy = (mc.y - startY) / cssZoom;
+                    let nx = startLeft + dx, ny = startTop + dy;
                     element.style.left = nx + 'px'; element.style.top = ny + 'px';
                     let annot = annotations.find(a => a.id === annotId);
                     if (annot) { annot.x = nx; annot.y = ny; }
@@ -1116,7 +1152,9 @@
 
                 function onResize(rv) {
                     rv.preventDefault(); const rc = getCoords(rv);
-                    let dx = rc.x - startX, dy = rc.y - startY;
+                    // Sesuaikan perubahan ukuran dengan skala zoom
+                    let dx = (rc.x - startX) / cssZoom;
+                    let dy = (rc.y - startY) / cssZoom;
                     let delta = (Math.abs(dx) > Math.abs(dy)) ? dx : dy;
                     
                     if (annot.type === 'text') { let s = Math.max(8, startFontSize + delta); element.style.fontSize = s + 'px'; annot.size = s; } 
