@@ -51,7 +51,6 @@
             border-radius: 6px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;
         }
 
-        /* Navbar Grid Format */
         .navbar {
             background: var(--red); padding: 15px 15px;
             display: grid;
@@ -153,7 +152,6 @@
         .circle-annot { border: 2.5px solid black; border-radius: 50%; cursor: move; }
         .check-annot { overflow: visible; cursor: move; }
         
-        /* CSS untuk Resize Handle (Ikon Panah) */
         .resize-handle {
             position: absolute; bottom: -10px; right: -10px; 
             width: 20px; height: 20px; 
@@ -184,7 +182,6 @@
         }
         .popover-menu button:hover { background: #333; }
 
-        /* Posisi Float Tools di Kiri Atas Formulir */
         .float-tools {
             position: fixed; top: 120px; left: 10px; right: auto; z-index: 9999; background: white; padding: 5px;
             border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.25); display: flex; align-items: center; gap: 4px; border: 2px solid var(--black); touch-action: none;
@@ -256,7 +253,6 @@
             .sidebar { position: relative; top: 0; height: auto; transform: translateX(0); width: 340px; overflow-y: visible; min-height: calc(100vh - 110px); padding-top: 20px; }
             .backdrop { display: none !important; }
             .pdf-area { padding: 40px; }
-            /* Posisi Undo/Redo pada tampilan PC/Laptop (di kiri atas area PDF) */
             .float-tools { top: 130px; left: 360px; right: auto; padding: 8px; gap: 8px; }
             .btn-icon-float { width: 40px; height: 40px; }
             .btn-reset-pos { width: 30px; height: 30px; }
@@ -592,7 +588,6 @@
         document.addEventListener('touchmove', moveFloatDrag, { passive: false });
         document.addEventListener('touchend', endFloatDrag);
         
-        // Fungsi Reset Posisi ke Kiri Atas Formulir
         function resetFloatPos() {
             floatTools.style.right = 'auto';
             if (window.innerWidth < 768) {
@@ -822,7 +817,6 @@
                 };
                 popover.appendChild(editBtn);
 
-                // Tombol Duplikat Teks
                 const dupBtn = document.createElement('button');
                 dupBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Duplikat Teks`;
                 dupBtn.onclick = (e) => { 
@@ -837,6 +831,16 @@
                         annotations.push(copy);
                         saveHistory();
                         renderAnnotations();
+                        
+                        // Select the newly duplicated text
+                        activeAnnotId = copy.id;
+                        let divs = document.querySelectorAll('.annotation-box');
+                        let newDiv = Array.from(divs).find(d => parseFloat(d.style.left) === copy.x && parseFloat(d.style.top) === copy.y);
+                        if (newDiv) {
+                            document.querySelectorAll('.annotation-box').forEach(b => b.classList.remove('active'));
+                            newDiv.classList.add('active');
+                            updateSidebarTools(newDiv, copy);
+                        }
                     }
                 };
                 popover.appendChild(dupBtn);
@@ -918,7 +922,8 @@
 
         function attachInteractions(element, annotId) {
             function startDragMove(e) {
-                if (e.target.classList.contains('menu-trigger') || e.target.closest('.popover-menu') || e.target.classList.contains('resize-handle') || element.isContentEditable) return;
+                // PERBAIKAN BUG: Mengecek e.target.isContentEditable agar teks bisa diseleksi saat edit
+                if (e.target.classList.contains('menu-trigger') || e.target.closest('.popover-menu') || e.target.classList.contains('resize-handle') || e.target.isContentEditable) return;
                 e.preventDefault();
                 const c = getCoords(e); const startX = c.x, startY = c.y;
                 const startLeft = parseFloat(element.style.left), startTop = parseFloat(element.style.top);
@@ -943,7 +948,6 @@
 
             const handle = document.createElement('div'); 
             handle.className = 'resize-handle'; 
-            // Ikon panah ke kanan bawah
             handle.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="4" y1="4" x2="20" y2="20"/><polyline points="14 20 20 20 20 14"/></svg>';
             element.appendChild(handle);
             
@@ -1040,7 +1044,6 @@
         function nextPage() { if (currentPage < totalPages) renderPage(currentPage + 1); }
         function prevPage() { if (currentPage > 1) renderPage(currentPage - 1); }
         
-        // Panggil resetFloatPos saat resize agar tombol menyesuaikan layout (mobile/desktop)
         window.addEventListener('resize', () => { 
             resetFloatPos(); 
             if (pdfDoc) renderPage(currentPage); 
