@@ -9,92 +9,109 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
         :root {
-            --dark-green: #0b3d2e; --gold: #d4af37; --gold-light: #f3e5ab;
-            --red-download: #c0392b; --white: #ffffff; --light-bg: #f4f6f5;
+            --black: #1a1a1a; --red: #c0392b; --white: #ffffff;
+            --light-bg: #f4f6f5; --light-gray: #e0e0e0; --gray-text: #555;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; background-color: var(--light-bg); color: #333; overflow-x: hidden; }
         
         header {
-            background: var(--dark-green); color: var(--gold); padding: 10px 15px;
+            background: var(--black); color: var(--white); padding: 10px 20px;
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 4px solid var(--gold); box-shadow: 0 4px 6px rgba(0,0,0,0.2); position: relative; z-index: 1000;
+            border-bottom: 4px solid var(--red); box-shadow: 0 4px 6px rgba(0,0,0,0.2); position: relative; z-index: 1000;
         }
         
         .logo-karya-abadi-img {
             width: 50px; height: 50px; flex-shrink: 0; object-fit: contain;
-            image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;
-            image-rendering: high-quality; image-rendering: auto;
             border-radius: 10px; background: rgba(255,255,255,0.95); padding: 4px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 0 0 2px var(--gold); display: block;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 0 0 2px var(--red); display: block;
         }
         .logo-fallback-svg {
             width: 50px; height: 50px; flex-shrink: 0; display: none;
             border-radius: 10px; background: rgba(255,255,255,0.95); padding: 4px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 0 0 2px var(--gold);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 0 0 2px var(--red);
         }
         
-        .header-left { display: flex; align-items: center; gap: 10px; }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .header-title { display: flex; flex-direction: column; justify-content: center; }
+        .header-title h1 { margin: 0; font-size: 20px; color: var(--white); font-weight: bold; line-height: 1.2; text-transform: uppercase; }
+        .header-title p { margin: 2px 0 0; font-size: 12px; color: var(--red); letter-spacing: 1px; font-weight: 500; text-transform: uppercase; }
         
         .datetime-widget {
-            background: rgba(255,255,255,0.1); border: 1px solid var(--gold);
-            border-radius: 8px; padding: 6px 12px; text-align: center; color: var(--gold);
+            background: rgba(255,255,255,0.1); border: 1px solid var(--white);
+            border-radius: 8px; padding: 6px 12px; text-align: center; color: var(--white);
             min-width: 160px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         }
         .datetime-widget .dw-date { font-size: 12px; font-weight: 600; }
-        .datetime-widget .dw-day { font-size: 10px; color: var(--gold-light); margin-top: 2px; }
+        .datetime-widget .dw-day { font-size: 10px; color: #ccc; margin-top: 2px; }
         .datetime-widget .dw-time { font-size: 16px; font-weight: bold; margin-top: 2px; font-family: 'Courier New', monospace; letter-spacing: 1px; }
         
-        .header-center { display: none; }
         .menu-toggle {
-            background: var(--gold); color: var(--dark-green); border: none; width: 40px; height: 40px;
+            background: var(--red); color: var(--white); border: none; width: 40px; height: 40px;
             border-radius: 6px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;
         }
 
-        .main-layout { display: flex; min-height: calc(100vh - 70px); align-items: flex-start; }
+        .navbar {
+            background: var(--red); padding: 10px 20px; display: flex; gap: 20px;
+            z-index: 1000; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .navbar a {
+            color: var(--white); text-decoration: none; font-weight: bold; font-size: 14px;
+            text-transform: uppercase; letter-spacing: 0.5px; transition: color 0.2s;
+        }
+        .navbar a:hover { text-decoration: underline; color: var(--black); }
+
+        .hero-banner {
+            background: linear-gradient(135deg, var(--black) 0%, #2c3e50 100%);
+            color: var(--white); padding: 50px 20px; text-align: center;
+            border-bottom: 4px solid var(--red); position: relative;
+        }
+        .hero-content h1 { font-size: 36px; margin: 0 0 10px 0; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; color: var(--white); }
+        .hero-content p { font-size: 16px; margin: 0; color: var(--red); font-weight: 500; letter-spacing: 0.5px; }
+
+        .main-layout { display: flex; min-height: 800px; align-items: flex-start; }
         .sidebar {
             width: 320px; max-width: 85vw; flex-shrink: 0; background: var(--white); padding: 20px;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1); border-right: 4px solid var(--dark-green);
-            position: fixed; top: 70px; left: 0; height: calc(100% - 70px); z-index: 999;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1); border-right: 4px solid var(--black);
+            position: fixed; top: 150px; left: 0; height: calc(100% - 150px); z-index: 999;
             transform: translateX(-100%); transition: transform 0.3s ease; overflow-y: auto;
         }
         .sidebar.active { transform: translateX(0); }
-        .sidebar h3 { font-size: 14px; color: var(--dark-green); text-transform: uppercase; letter-spacing: 1px; margin: 20px 0 10px; border-bottom: 2px solid var(--gold); padding-bottom: 5px; }
+        .sidebar h3 { font-size: 14px; color: var(--black); text-transform: uppercase; letter-spacing: 1px; margin: 20px 0 10px; border-bottom: 2px solid var(--red); padding-bottom: 5px; }
         .sidebar h3:first-child { margin-top: 0; }
         
-        .backdrop { position: fixed; top: 70px; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 998; display: none; }
+        .backdrop { position: fixed; top: 150px; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 998; display: none; }
         .backdrop.active { display: block; }
 
-        select { width: 100%; padding: 12px; border: 2px solid var(--dark-green); border-radius: 6px; font-size: 16px; cursor: pointer; background: var(--white); margin-bottom: 15px; }
+        select { width: 100%; padding: 12px; border: 2px solid var(--black); border-radius: 6px; font-size: 16px; cursor: pointer; background: var(--white); margin-bottom: 15px; }
         
         .btn-add-text {
-            background: var(--gold); color: var(--dark-green); border: none; width: 100%; padding: 15px;
+            background: var(--red); color: var(--white); border: none; width: 100%; padding: 15px;
             border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px;
         }
         
-        /* CSS untuk Spasi di Sidebar */
         .sidebar-spacing .spacing-row { color: #333; border-top: none; padding: 8px 0; font-size: 14px; font-weight: 600; justify-content: space-between; }
         .sidebar-spacing .spacing-controls { gap: 8px; }
-        .sidebar-spacing .spacing-btn { background: var(--light-bg); color: var(--dark-green); border: 1px solid #ccc; width: 32px; height: 32px; font-size: 18px; border-radius: 6px; }
-        .sidebar-spacing .spacing-btn:not(:disabled):hover { background: var(--gold); color: var(--dark-green); border-color: var(--gold); }
+        .sidebar-spacing .spacing-btn { background: var(--light-bg); color: var(--black); border: 1px solid #ccc; width: 32px; height: 32px; font-size: 18px; border-radius: 6px; }
+        .sidebar-spacing .spacing-btn:not(:disabled):hover { background: var(--red); color: var(--white); border-color: var(--red); }
         .sidebar-spacing .spacing-btn:disabled { background: #f0f0f0; color: #aaa; cursor: not-allowed; border-color: #ddd; }
         .sidebar-spacing .spacing-val { color: #333; font-size: 14px; width: 50px; }
 
         .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .btn-mode {
-            background: var(--white); color: var(--dark-green); border: 2px solid var(--dark-green);
+            background: var(--white); color: var(--black); border: 2px solid var(--black);
             padding: 15px 5px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;
             display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s;
         }
-        .btn-mode.active { background: var(--dark-green); color: var(--gold); border-color: var(--dark-green); box-shadow: 0 0 10px rgba(11, 61, 46, 0.5); }
+        .btn-mode.active { background: var(--black); color: var(--white); border-color: var(--black); box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); }
         .btn-upload { display: flex; width: 100%; justify-content: center; box-sizing: border-box; cursor: pointer; }
         
         .row-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; margin-bottom: 20px; }
-        .btn-nav { background: var(--dark-green); color: var(--gold); border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; }
-        .page-info { font-weight: bold; color: var(--dark-green); font-size: 14px; }
+        .btn-nav { background: var(--black); color: var(--white); border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; }
+        .page-info { font-weight: bold; color: var(--black); font-size: 14px; }
         
         .btn-download {
-            background: var(--red-download); color: var(--white); border: none; padding: 15px;
+            background: var(--red); color: var(--white); border: none; padding: 15px;
             width: 100%; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold;
             display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 6px rgba(192, 57, 43, 0.4);
         }
@@ -102,7 +119,7 @@
         .guide-box { background: #f9f9f9; padding: 15px; border-radius: 8px; font-size: 13px; line-height: 1.5; color: #555; border: 1px solid #eee; margin-top: 20px; margin-bottom: 30px; }
         .guide-item { margin-bottom: 15px; }
         .guide-item:last-child { margin-bottom: 0; }
-        .guide-item .guide-title { font-weight: bold; color: var(--dark-green); margin-bottom: 4px; display: block; }
+        .guide-item .guide-title { font-weight: bold; color: var(--black); margin-bottom: 4px; display: block; }
         .guide-item .guide-desc { margin: 0; }
 
         .pdf-area { flex-grow: 1; padding: 15px; overflow: auto; display: flex; justify-content: center; align-items: flex-start; background: #eef2f7; position: relative; width: 100%; }
@@ -112,10 +129,10 @@
         
         .annotation-box { position: absolute; pointer-events: auto; touch-action: none; width: max-content; min-width: 20px; }
         .text-annot { color: black; font-family: Arial, sans-serif; white-space: pre; line-height: 1.15; font-weight: bold; outline: none; cursor: move; padding: 2px; }
-        .text-annot:focus { border: 1px dashed var(--dark-green); cursor: text; background: rgba(255,255,255,0.8); }
+        .text-content:focus { border: 1px dashed var(--red); cursor: text; background: rgba(255,255,255,0.8); outline: none; }
         .circle-annot { border: 2.5px solid black; border-radius: 50%; cursor: move; }
         .check-annot { overflow: visible; cursor: move; }
-        .resize-handle { position: absolute; bottom: -12px; right: -12px; width: 24px; height: 24px; background: var(--gold); border: 2px solid var(--dark-green); border-radius: 50%; cursor: se-resize; pointer-events: auto; touch-action: none; z-index: 10; display: none; }
+        .resize-handle { position: absolute; bottom: -12px; right: -12px; width: 24px; height: 24px; background: var(--red); border: 2px solid var(--black); border-radius: 50%; cursor: se-resize; pointer-events: auto; touch-action: none; z-index: 10; display: none; }
         .annotation-box.active .resize-handle, .annotation-box:hover .resize-handle { display: block; }
         
         .menu-trigger {
@@ -128,69 +145,45 @@
         .annotation-box.active .menu-trigger, .annotation-box:hover .menu-trigger { display: flex; }
         
         .popover-menu {
-            position: absolute; 
-            top: 0; left: 0; 
-            background: #2c3e50; color: white; border-radius: 8px; padding: 8px; display: none;
+            position: absolute; top: 0; left: 0; 
+            background: var(--black); color: var(--white); border-radius: 8px; padding: 8px; display: none;
             flex-direction: column; gap: 4px; z-index: 1005; box-shadow: 0 8px 16px rgba(0,0,0,0.4); 
             width: 150px; box-sizing: border-box;
         }
-        
         .popover-menu button {
-            background: none; border: none; color: white; text-align: left; padding: 8px 10px; cursor: pointer;
+            background: none; border: none; color: var(--white); text-align: left; padding: 8px 10px; cursor: pointer;
             font-size: 13px; border-radius: 4px; display: flex; align-items: center; gap: 8px; width: 100%; font-family: 'Segoe UI', sans-serif;
         }
-        .popover-menu button:hover { background: #34495e; }
+        .popover-menu button:hover { background: #333; }
 
         .float-tools {
-            position: fixed; top: 85px; right: 15px; z-index: 9999; background: white; padding: 8px;
-            border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.25); display: flex; align-items: center; gap: 8px; border: 2px solid var(--dark-green); touch-action: none;
+            position: fixed; top: 165px; right: 15px; z-index: 9999; background: white; padding: 8px;
+            border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.25); display: flex; align-items: center; gap: 8px; border: 2px solid var(--black); touch-action: none;
         }
         .drag-handle { cursor: grab; padding: 0 5px; display: flex; align-items: center; color: #888; }
-        .btn-icon-float { width: 40px; height: 40px; background: var(--gold); color: var(--dark-green); border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn-icon-float { width: 40px; height: 40px; background: var(--red); color: var(--white); border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .btn-icon-float:disabled { background: #e0e0e0; color: #999; cursor: not-allowed; box-shadow: none; }
-        .btn-reset-pos { width: 30px; height: 30px; background: #eee; color: var(--dark-green); border: 1px solid #ccc; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .btn-reset-pos { width: 30px; height: 30px; background: #eee; color: var(--black); border: 1px solid #ccc; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; }
         
         footer {
-            background: var(--dark-green); color: var(--gold); padding: 30px 25px 15px;
-            border-top: 4px solid var(--gold);
+            background: var(--black); color: var(--white); padding: 30px 25px 15px;
+            border-top: 4px solid var(--red);
         }
-        .footer-grid {
-            display: grid; grid-template-columns: 1fr; gap: 25px; max-width: 1200px; margin: 0 auto;
-        }
-        .footer-col h4 {
-            color: var(--gold); font-size: 14px; font-weight: bold; margin: 0 0 12px 0;
-            text-transform: uppercase; letter-spacing: 1.2px; border-bottom: 2px solid rgba(212,175,55,0.4);
-            padding-bottom: 6px;
-        }
-        .footer-col p { margin: 0 0 6px 0; font-size: 13px; line-height: 1.6; color: var(--gold-light); }
+        .footer-grid { display: grid; grid-template-columns: 1fr; gap: 25px; max-width: 1200px; margin: 0 auto; }
+        .footer-col h4 { color: var(--white); font-size: 14px; font-weight: bold; margin: 0 0 12px 0; text-transform: uppercase; letter-spacing: 1.2px; border-bottom: 2px solid rgba(255,255,255,0.2); padding-bottom: 6px; }
+        .footer-col p { margin: 0 0 6px 0; font-size: 13px; line-height: 1.6; color: #ccc; }
         .footer-col ul { list-style: none; padding: 0; margin: 0; }
         .footer-col ul li { margin-bottom: 8px; }
-        .footer-col ul li a {
-            color: var(--gold-light); text-decoration: none; font-size: 13px; cursor: pointer;
-            transition: color 0.2s; display: inline-block;
-        }
-        .footer-col ul li a:hover { color: var(--white); text-decoration: underline; }
-        .footer-col .email-link { color: var(--gold); font-weight: 600; }
+        .footer-col ul li a { color: #ccc; text-decoration: none; font-size: 13px; cursor: pointer; transition: color 0.2s; display: inline-block; }
+        .footer-col ul li a:hover { color: var(--red); text-decoration: underline; }
+        .footer-col .email-link { color: var(--red); font-weight: 600; }
         
-        .footer-col.address-col .address-block {
-            display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px;
-        }
-        .footer-col.address-col .address-icon {
-            width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px; color: var(--gold);
-        }
-        .footer-col.address-col .address-text {
-            font-size: 13px; line-height: 1.65; color: var(--gold-light); margin: 0;
-        }
-        .footer-col.address-col .postal-code {
-            font-size: 13px; color: var(--gold); font-weight: 600; margin-top: 10px;
-            padding-top: 8px; border-top: 1px solid rgba(212,175,55,0.25);
-        }
-        .footer-col.address-col .postal-code b { color: var(--white); }
-        
-        .footer-bottom {
-            border-top: 1px solid rgba(212,175,55,0.3); margin-top: 20px; padding-top: 15px;
-            text-align: center; font-size: 12px; color: var(--gold-light); letter-spacing: 0.3px;
-        }
+        .footer-col.address-col .address-block { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+        .footer-col.address-col .address-icon { width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px; color: var(--red); }
+        .footer-col.address-col .address-text { font-size: 13px; line-height: 1.65; color: #ccc; margin: 0; }
+        .footer-col.address-col .postal-code { font-size: 13px; color: var(--white); font-weight: 600; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .footer-col.address-col .postal-code b { color: var(--red); }
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); margin-top: 20px; padding-top: 15px; text-align: center; font-size: 12px; color: #ccc; letter-spacing: 0.3px; }
 
         input[type="file"] { display: none; }
         .icon { width: 16px; height: 16px; stroke-width: 2.5; }
@@ -205,24 +198,16 @@
         .modal-content {
             background: white; border-radius: 12px; max-width: 700px; width: 100%;
             max-height: 85vh; overflow: hidden; display: flex; flex-direction: column;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4); border: 3px solid var(--gold);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4); border: 3px solid var(--red);
             animation: modalIn 0.25s ease;
         }
         @keyframes modalIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .modal-header {
-            background: var(--dark-green); color: var(--gold); padding: 18px 25px;
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 3px solid var(--gold);
-        }
+        .modal-header { background: var(--black); color: var(--white); padding: 18px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--red); }
         .modal-header h3 { margin: 0; font-size: 18px; font-weight: bold; letter-spacing: 0.5px; }
-        .modal-close {
-            background: var(--gold); color: var(--dark-green); border: none; width: 32px; height: 32px;
-            border-radius: 50%; font-size: 18px; cursor: pointer; font-weight: bold;
-            display: flex; align-items: center; justify-content: center; transition: 0.2s;
-        }
-        .modal-close:hover { background: var(--white); transform: rotate(90deg); }
+        .modal-close { background: var(--red); color: var(--white); border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .modal-close:hover { background: var(--white); color: var(--black); transform: rotate(90deg); }
         .modal-body { padding: 25px; overflow-y: auto; color: #333; font-size: 14px; line-height: 1.7; }
-        .modal-body h4 { color: var(--dark-green); margin: 18px 0 8px 0; font-size: 15px; border-bottom: 1px solid var(--gold); padding-bottom: 4px; }
+        .modal-body h4 { color: var(--black); margin: 18px 0 8px 0; font-size: 15px; border-bottom: 1px solid var(--red); padding-bottom: 4px; }
         .modal-body h4:first-child { margin-top: 0; }
         .modal-body p { margin: 0 0 10px 0; text-align: justify; }
         .modal-body ul { margin: 0 0 10px 18px; padding: 0; }
@@ -235,9 +220,8 @@
             .datetime-widget .dw-date { font-size: 13px; }
             .datetime-widget .dw-day { font-size: 11px; }
             .datetime-widget .dw-time { font-size: 20px; }
-            .header-center { display: block; flex-grow: 1; text-align: center; }
-            .header-center h1 { margin: 0; font-size: 24px; text-transform: uppercase; color: var(--white); letter-spacing: 2px; line-height: 1.2; font-weight: bold; }
-            .header-center p { margin: 4px 0 0; font-size: 13px; color: var(--gold-light); letter-spacing: 0.8px; font-weight: 500; }
+            .header-title h1 { font-size: 24px; }
+            .header-title p { font-size: 14px; }
             .menu-toggle { display: none; }
             .main-layout { align-items: stretch; }
             .sidebar { position: relative; top: 0; height: auto; transform: translateX(0); width: 340px; overflow-y: visible; min-height: calc(100vh - 110px); }
@@ -248,14 +232,18 @@
         }
 
         @media (max-width: 767px) {
-            .header-center { display: block; flex-grow: 1; text-align: center; padding: 0 8px; }
-            .header-center h1 { margin: 0; font-size: 13px; text-transform: uppercase; color: var(--white); font-weight: bold; line-height: 1.2; }
-            .header-center p { margin: 2px 0 0; font-size: 8px; color: var(--gold-light); line-height: 1.2; }
+            .header-title h1 { font-size: 14px; }
+            .header-title p { font-size: 9px; }
             .datetime-widget { min-width: 0; padding: 4px 8px; }
             .datetime-widget .dw-date { font-size: 10px; }
             .datetime-widget .dw-day { font-size: 9px; }
             .datetime-widget .dw-time { font-size: 13px; }
             .logo-karya-abadi-img, .logo-fallback-svg { width: 40px; height: 40px; padding: 3px; }
+            .hero-content h1 { font-size: 24px; }
+            .hero-content p { font-size: 14px; }
+            .sidebar { top: 130px; height: calc(100% - 130px); }
+            .backdrop { top: 130px; }
+            .float-tools { top: 145px; }
         }
     </style>
 </head>
@@ -269,10 +257,10 @@
                 <rect x="0" y="0" width="100" height="100" rx="15" fill="#ffffff"/>
                 <path d="M30 15 L30 85 M30 50 L65 15 M30 50 L65 85" stroke="#e74c3c" stroke-width="10" stroke-linecap="round" fill="none"/>
             </svg>
-        </div>
-        <div class="header-center">
-            <h1>SISTEM DIGITAL</h1>
-            <p>Pengisian Formulir Kependudukan Kabupaten Subang</p>
+            <div class="header-title">
+                <h1>KARYA ABADI</h1>
+                <p>FORMULIR SUBANG</p>
+            </div>
         </div>
         <div class="datetime-widget" id="datetimeWidget">
             <div class="dw-date" id="dwDate">--</div>
@@ -281,7 +269,19 @@
         </div>
     </header>
 
+    <nav class="navbar">
+        <a href="https://subang.go.id/berita" target="_blank">Berita</a>
+        <a href="https://subang.go.id/pengumuman" target="_blank">Pengumuman</a>
+    </nav>
+
     <div class="backdrop" id="backdrop" onclick="toggleSidebar()"></div>
+
+    <section class="hero-banner">
+        <div class="hero-content">
+            <h1>SISTEM DIGITAL</h1>
+            <p>Pengisian Formulir Kependudukan Kabupaten Subang</p>
+        </div>
+    </section>
 
     <div class="main-layout">
         <div class="sidebar" id="sidebar">
@@ -354,7 +354,7 @@
                 </div>
                 <div class="guide-item">
                     <span class="guide-title">2. Geser & Perbesar</span>
-                    <p class="guide-desc">Tahan dan geser objek. Tarik kotak kuning di pojok kanan bawah untuk memperbesar.</p>
+                    <p class="guide-desc">Tahan dan geser objek. Tarik kotak merah di pojok kanan bawah untuk memperbesar.</p>
                 </div>
                 <div class="guide-item">
                     <span class="guide-title">3. Spasi & Jarak Baris</span>
@@ -466,7 +466,7 @@
             terms: { title: 'Syarat dan Ketentuan', body: `<h4>1. Penerimaan Ketentuan</h4><p>Dengan menggunakan layanan Sistem Digital Pengisian Formulir Kependudukan Kabupaten Subang yang disediakan oleh <b>Karya Abadi</b>, pengguna dianggap telah membaca, memahami, dan menyetujui seluruh syarat dan ketentuan berikut.</p><h4>2. Penggunaan Layanan</h4><ul><li>Layanan ini disediakan untuk membantu masyarakat mengisi formulir kependudukan secara digital.</li><li>Pengguna wajib memberikan data yang benar, akurat, dan sah.</li><li>Pengguna dilarang menggunakan layanan untuk tujuan melanggar hukum atau peraturan yang berlaku.</li></ul><h4>3. Tanggung Jawab Pengguna</h4><p>Pengguna bertanggung jawab penuh atas kebenaran data yang dimasukkan ke dalam formulir. Karya Abadi tidak bertanggung jawab atas kesalahan pengisian yang dilakukan oleh pengguna.</p><h4>4. Hak Kekayaan Intelektual</h4><p>Seluruh konten, desain, logo, dan kode aplikasi merupakan milik Karya Abadi dan dilindungi oleh hukum hak cipta. Dilarang menyalin, memodifikasi, atau mendistribusikan tanpa izin tertulis.</p><h4>5. Batasan Tanggung Jawab</h4><p>Layanan disediakan "sebagaimana adanya" tanpa jaminan eksplisit. Karya Abadi tidak bertanggung jawab atas kerugian langsung maupun tidak langsung yang timbul dari penggunaan layanan.</p><h4>6. Perubahan Ketentuan</h4><p>Karya Abadi berhak mengubah syarat dan ketentuan ini sewaktu-waktu. Perubahan berlaku sejak dipublikasikan di halaman ini.</p>` },
             disclaimer: { title: 'Disclaimer', body: `<h4>Penyangkalan Umum</h4><p>Informasi dan layanan pada platform <b>Karya Abadi - Formulir Subang</b> disediakan untuk tujuan membantu masyarakat dalam pengisian formulir kependudukan secara digital.</p><h4>Ketepatan Data</h4><p>Kami berupaya menyediakan formulir yang sesuai dengan standar resmi. Namun, pengguna wajib memverifikasi kembali kebenaran data sebelum dokumen diserahkan kepada instansi berwenang. Karya Abadi tidak bertanggung jawab atas konsekuensi hukum akibat kesalahan pengisian data oleh pengguna.</p><h4>Bukan Instansi Resmi</h4><p>Karya Abadi <b>BUKAN</b> instansi pemerintah, Dinas Kependudukan dan Pencatatan Sipil (Disdukcapil), maupun Badan Kependudukan dan Keluarga Berencana Nasional (BKKBN). Layanan ini bersifat independen dan hanya berfungsi sebagai alat bantu digital pengisian formulir.</p><h4>Validitas Dokumen</h4><p>Dokumen yang dihasilkan melalui platform ini tetap perlu diverifikasi, ditandatangani, dan disahkan oleh pejabat berwenang agar sah secara hukum. Karya Abadi tidak menjamin diterimanya dokumen oleh pihak tertentu.</p><h4>Link Eksternal</h4><p>Platform dapat mengandung link ke situs pihak ketiga. Karya Abadi tidak bertanggung jawab atas konten atau kebijakan privasi situ eksternal tersebut.</p><h4>Paksaan Mayoret (Force Majeure)</h4><p>Karya Abadi tidak bertanggung jawab atas kegagalan layanan akibat kondisi di luar kendali, seperti bencana alam, gangguan jaringan, atau perubahan kebijakan pemerintah.</p>` },
             services: { title: 'Layanan Formulir', body: `<h4>Jenis Formulir Tersedia</h4><p>Platform Karya Abadi menyediakan pengisian digital berbagai formulir kependudukan, antara lain:</p><ul><li><b>F-1.01</b> - Formulir Biodata WNI</li><li><b>F-1.02</b> - Pendaftaran Peristiwa Kependudukan</li><li><b>F-1.03</b> - Pendaftaran Perpindahan Penduduk</li><li><b>F-1.06</b> - Surat Pernyataan Perubahan Elemen Data</li><li><b>F-1.07</b> - Surat Kuasa</li><li><b>F-1.21</b> - Permohonan KTP WNI</li><li><b>F-2.01</b> - Pelaporan Pencatatan Sipil</li><li><b>F-2.03</b> - SPTJM Kelahiran</li><li><b>F-2.04</b> - SPTJM Kebenaran Suami Istri</li><li>Surat Pernyataan Domisili Subang</li></ul><h4>Fitur Utama</h4><ul><li>Penambahan teks dengan pengaturan ukuran dan spasi huruf.</li><li>Tanda tangan digital dan materai yang dapat diunggah.</li><li>Mode tanda ceklis dan lingkaran.</li><li>Undo dan Redo untuk koreksi kesalahan.</li><li>Unduh hasil dalam format PDF.</li></ul>` },
-            guide: { title: 'Panduan Penggunaan', body: `<h4>Langkah 1 - Pilih Formulir</h4><p>Buka panel di sisi kiri, pilih formulir kependudukan yang sesuai dari dropdown "Pilih Formulir".</p><h4>Langkah 2 - Tambahkan Teks</h4><p>Klik tombol "Tambah Teks", lalu klik teks baru yang muncul di halaman PDF. Klik ikon <b>⋮</b> di samping teks dan pilih <b>Edit Teks</b> untuk mengubah isi sesuai kebutuhan.</p><h4>Langkah 3 - Geser & Atur Posisi</h4><p>Tahan dan geser objek teks atau tanda untuk memindahkan ke posisi yang diinginkan. Tarik kotak kuning di pojok kanan bawah untuk memperbesar atau memperkecil objek.</p><h4>Langkah 4 - Atur Spasi Huruf</h4><p>Untuk melebarkan huruf agar pas dengan kolom tabel, klik teks tersebut, lalu gunakan tombol <b>[+]</b> atau <b>[-]</b> di bagian "Atur Teks" pada panel kiri.</p><h4>Langkah 5 - Tanda Tangan & Materai</h4><p>Pilih mode "TTD" atau "Materai" di panel kiri, lalu unggah file gambar tanda tangan atau materai Anda. Setelah terunggah, klik di posisi yang diinginkan pada PDF untuk menempatkannya.</p><h4>Langkah 6 - Navigasi Halaman</h4><p>Gunakan tombol <b>PREV</b> dan <b>NEXT</b> untuk berpindah antar halaman formulir jika memiliki lebih dari satu halaman.</p><h4>Langkah 7 - Undo / Redo</h4><p>Gunakan tombol mengambang di pojok kanan atas untuk membatalkan (Undo) atau mengulang (Redo) aksi terakhir Anda.</p><h4>Langkah 8 - Unduh PDF</h4><p>Setelah semua data terisi, klik tombol <b>DOWNLOAD PDF</b> untuk menyimpan hasil ke perangkat Anda.</p>` }
+            guide: { title: 'Panduan Penggunaan', body: `<h4>Langkah 1 - Pilih Formulir</h4><p>Buka panel di sisi kiri, pilih formulir kependudukan yang sesuai dari dropdown "Pilih Formulir".</p><h4>Langkah 2 - Tambahkan Teks</h4><p>Klik tombol "Tambah Teks", lalu klik teks baru yang muncul di halaman PDF. Klik ikon <b>⋮</b> di samping teks dan pilih <b>Edit Teks</b> untuk mengubah isi sesuai kebutuhan.</p><h4>Langkah 3 - Geser & Atur Posisi</h4><p>Tahan dan geser objek teks atau tanda untuk memindahkan ke posisi yang diinginkan. Tarik kotak merah di pojok kanan bawah untuk memperbesar atau memperkecil objek.</p><h4>Langkah 4 - Atur Spasi Huruf</h4><p>Untuk melebarkan huruf agar pas dengan kolom tabel, klik teks tersebut, lalu gunakan tombol <b>[+]</b> atau <b>[-]</b> di bagian "Atur Teks" pada panel kiri.</p><h4>Langkah 5 - Tanda Tangan & Materai</h4><p>Pilih mode "TTD" atau "Materai" di panel kiri, lalu unggah file gambar tanda tangan atau materai Anda. Setelah terunggah, klik di posisi yang diinginkan pada PDF untuk menempatkannya.</p><h4>Langkah 6 - Navigasi Halaman</h4><p>Gunakan tombol <b>PREV</b> dan <b>NEXT</b> untuk berpindah antar halaman formulir jika memiliki lebih dari satu halaman.</p><h4>Langkah 7 - Undo / Redo</h4><p>Gunakan tombol mengambang di pojok kanan atas untuk membatalkan (Undo) atau mengulang (Redo) aksi terakhir Anda.</p><h4>Langkah 8 - Unduh PDF</h4><p>Setelah semua data terisi, klik tombol <b>DOWNLOAD PDF</b> untuk menyimpan hasil ke perangkat Anda.</p>` }
         };
 
         function openModal(key) {
@@ -486,7 +486,7 @@
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         let pdfDoc = null, pdfBytes = null, currentMode = null, annotations = [], scale = 1.5, currentPage = 1, totalPages = 1;
         let history = [], historyIndex = -1, signImgBytes = null, materaiImgBytes = null;
-        let activeAnnotId = null; // Menggunakan ID unik agar anti-bug saat array berubah
+        let activeAnnotId = null;
 
         const formSelect = document.getElementById('formSelect');
         const canvas = document.getElementById('pdfViewer');
@@ -533,7 +533,7 @@
         floatTools.addEventListener('touchstart', startFloatDrag, { passive: false });
         document.addEventListener('touchmove', moveFloatDrag, { passive: false });
         document.addEventListener('touchend', endFloatDrag);
-        function resetFloatPos() { floatTools.style.left = 'auto'; floatTools.style.top = '85px'; floatTools.style.right = '15px'; }
+        function resetFloatPos() { floatTools.style.left = 'auto'; floatTools.style.top = '165px'; floatTools.style.right = '15px'; }
 
         function saveHistory() {
             history = history.slice(0, historyIndex + 1);
@@ -645,9 +645,14 @@
                 if (a.type === 'text') {
                     div.classList.add('text-annot'); 
                     div.style.fontSize = a.size + 'px'; 
-                    div.innerText = a.text;
                     div.style.letterSpacing = a.letterSpacing + 'px';
                     div.style.lineHeight = a.lineHeight;
+                    
+                    const textSpan = document.createElement('span');
+                    textSpan.className = 'text-content';
+                    textSpan.innerText = a.text;
+                    div.appendChild(textSpan);
+                    
                     div.appendChild(createMenu(a.id, true, div));
                 } else if (a.type === 'circle') {
                     div.classList.add('circle-annot'); div.style.width = a.width + 'px'; div.style.height = a.height + 'px'; div.style.transform = 'translate(-50%, -50%)'; 
@@ -765,45 +770,38 @@
             };
             popover.appendChild(delBtn);
             
+            element.appendChild(popover); // Attach to the element directly to fix bug
+            
             trigger.onclick = (e) => {
                 e.stopPropagation();
                 const isDisplayed = popover.style.display === 'flex';
                 document.querySelectorAll('.popover-menu').forEach(m => m.style.display = 'none');
                 
                 if (!isDisplayed) {
-                    annotationLayer.appendChild(popover);
                     popover.style.display = 'flex';
                     
-                    const annotX = parseFloat(element.style.left) || 0;
-                    const annotY = parseFloat(element.style.top) || 0;
-                    const annotHeight = element.offsetHeight;
-                    const annotWidth = element.offsetWidth;
-                    
-                    let visualTop = annotY;
-                    let visualLeft = annotX;
-                    if (element.style.transform.includes('translateY(-100%)')) {
-                        visualTop = annotY - annotHeight;
-                    } else if (element.style.transform.includes('translate(-50%, -50%)')) {
-                        visualTop = annotY - annotHeight / 2;
-                        visualLeft = annotX - annotWidth / 2;
-                    }
-                    
-                    let popTop = visualTop + annotHeight + 15;
-                    let popLeft = visualLeft;
+                    let popTop = element.offsetHeight + 15;
+                    let popLeft = 0;
                     
                     const layerWidth = annotationLayer.offsetWidth;
                     const layerHeight = annotationLayer.offsetHeight;
                     const popWidth = popover.offsetWidth;
                     const popHeight = popover.offsetHeight;
+                    const annotLeft = element.offsetLeft;
+                    const annotTop = element.offsetTop;
                     
-                    if (popTop + popHeight > layerHeight - 10) {
-                        popTop = visualTop - popHeight - 15;
+                    if (annotTop + popTop + popHeight > layerHeight - 10) {
+                        popTop = -popHeight - 15;
                     }
-                    if (popLeft + popWidth > layerWidth - 10) {
-                        popLeft = layerWidth - popWidth - 10;
+                    if (annotLeft + popLeft + popWidth > layerWidth - 10) {
+                        popLeft = element.offsetWidth - popWidth;
                     }
-                    if (popLeft < 10) popLeft = 10;
-                    if (popTop < 10) popTop = 10;
+                    if (annotLeft + popLeft < 10) {
+                        popLeft = 10 - annotLeft;
+                    }
+                    if (annotTop + popTop < 10) {
+                        popTop = 10 - annotTop;
+                    }
                     
                     popover.style.left = popLeft + 'px';
                     popover.style.top = popTop + 'px';
@@ -815,22 +813,24 @@
         }
 
         function makeEditable(annot, element) {
-            element.contentEditable = "true"; element.focus();
-            const range = document.createRange(); range.selectNodeContents(element); 
+            const textSpan = element.querySelector('.text-content');
+            if (!textSpan) return;
+            textSpan.contentEditable = "true"; textSpan.focus();
+            const range = document.createRange(); range.selectNodeContents(textSpan); 
             const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
 
             const finishEdit = () => {
-                element.contentEditable = "false";
-                annot.text = element.innerText.replace(/\n$/, '');
+                textSpan.contentEditable = "false";
+                annot.text = textSpan.innerText.replace(/\n$/, '');
                 saveHistory();
             };
-            element.addEventListener('blur', finishEdit, { once: true });
-            element.addEventListener('keydown', (e) => { if (e.key === 'Escape') element.blur(); e.stopPropagation(); });
+            textSpan.addEventListener('blur', finishEdit, { once: true });
+            textSpan.addEventListener('keydown', (e) => { if (e.key === 'Escape') textSpan.blur(); e.stopPropagation(); });
         }
 
         function attachInteractions(element, annotId) {
             function startDragMove(e) {
-                if (e.target.classList.contains('menu-trigger') || e.target.closest('.popover-menu') || e.target.classList.contains('resize-handle') || element.isContentEditable) return;
+                if (e.target.classList.contains('menu-trigger') || e.target.closest('.popover-menu') || e.target.classList.contains('resize-handle') || e.target.isContentEditable) return;
                 e.preventDefault();
                 const c = getCoords(e); const startX = c.x, startY = c.y;
                 const startLeft = parseFloat(element.style.left), startTop = parseFloat(element.style.top);
@@ -911,7 +911,7 @@
                         
                         lines.forEach((line, i) => { 
                             if (line.length === 0) return; 
-                            if (a.letterSpacing && a.letterSpacing !== 0) { // Diperbaiki: Mendukung spasi negatif
+                            if (a.letterSpacing && a.letterSpacing !== 0) {
                                 let currentX = pdfX; const spacingPdf = a.letterSpacing / scale;
                                 for (let char of line) {
                                     page.drawText(char, { x: currentX, y: y_pdf - (i * lh), size: fs, font: helveticaBoldFont, color: rgb(0, 0, 0) });
