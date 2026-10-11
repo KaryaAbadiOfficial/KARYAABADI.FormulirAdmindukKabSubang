@@ -174,10 +174,10 @@
         .circle-annot { border: 2.5px solid black; border-radius: 50%; cursor: move; }
         .check-annot { overflow: visible; cursor: move; }
         
-        /* Jarak Resize Handle dan Menu Trigger diperbesar menjadi 32px agar objek full terlihat */
+        /* Tombol Resize agak dekat agar mudah disentuh di HP */
         .resize-handle {
-            position: absolute; bottom: -32px; right: -32px; 
-            width: 28px; height: 28px; 
+            position: absolute; bottom: -12px; right: -12px; 
+            width: 24px; height: 24px; 
             background: rgba(255,255,255,0.95); border: 1.5px solid var(--red); border-radius: 4px; 
             cursor: se-resize; pointer-events: auto; touch-action: none; z-index: 10; display: none;
             align-items: center; justify-content: center; color: var(--red); line-height: 0;
@@ -185,11 +185,11 @@
         .annotation-box.active .resize-handle, .annotation-box:hover .resize-handle { display: flex; }
         
         .menu-trigger {
-            position: absolute; top: -32px; right: -32px; 
+            position: absolute; top: -14px; right: -14px; 
             background: #fff; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;
-            width: 32px; height: 32px; display: none; 
+            width: 28px; height: 28px; display: none; 
             align-items: center; justify-content: center;
-            font-weight: bold; color: #333; font-size: 20px; line-height: 1; z-index: 1001; box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            font-weight: bold; color: #333; font-size: 18px; line-height: 1; z-index: 1001; box-shadow: 0 2px 4px rgba(0,0,0,0.15);
         }
         .annotation-box.active .menu-trigger, .annotation-box:hover .menu-trigger { display: flex; }
         
@@ -544,7 +544,7 @@
                     <li><a onclick="openModal('about')">Tentang Kami</a></li>
                     <li><a onclick="openModal('services')">Layanan Formulir</a></li>
                     <li><a onclick="openModal('guide')">Panduan Penggunaan</a></li>
-                </ul>
+                </uls>
             </div>
         </div>
         <div class="footer-bottom">
@@ -608,6 +608,7 @@
         let pdfDoc = null, pdfBytes = null, currentMode = null, annotations = [], scale = 1.5, currentPage = 1, totalPages = 1;
         let history = [], historyIndex = -1, signImgBytes = null, materaiImgBytes = null;
         let activeAnnotId = null;
+        let currentPdfW = 0, currentPdfH = 0;
 
         // Variabel untuk Zoom & Pan
         let cssZoom = 1, panX = 0, panY = 0;
@@ -680,7 +681,6 @@
             updateTransform();
         }
 
-        // Zoom dengan Mouse Wheel (PC)
         pdfArea.addEventListener('wheel', (e) => {
             if (!pdfDoc) return;
             e.preventDefault();
@@ -699,7 +699,6 @@
             updateTransform();
         }, { passive: false });
 
-        // Pan & Zoom Touch (Mobile)
         let touchState = { mode: null, startX: 0, startY: 0, startPanX: 0, startPanY: 0, startDist: 0, startZoom: 1 };
 
         function getDistance(touches) {
@@ -757,7 +756,6 @@
             touchState.mode = null;
         });
 
-        // Pan dengan Mouse (PC)
         let mouseState = { panning: false, startX: 0, startY: 0, startPanX: 0, startPanY: 0 };
 
         pdfArea.addEventListener('mousedown', (e) => {
@@ -824,17 +822,19 @@
             currentPage = num;
             document.getElementById('pageInfo').innerText = `Hal ${num} / ${totalPages}`;
             const page = await pdfDoc.getPage(num);
+            
+            const viewport0 = page.getViewport({ scale: 1 });
+            currentPdfW = viewport0.width;
+            currentPdfH = viewport0.height;
+
             if(window.innerWidth < 768 && annotations.length === 0) { 
                 const contWidth = pdfArea.clientWidth - 20;
-                const viewportTemp = page.getViewport({ scale: 1 });
-                scale = contWidth / viewportTemp.width;
+                scale = contWidth / currentPdfW;
             } else if (window.innerWidth >= 768) { 
                 scale = 1.5; 
             }
             
             const viewport = page.getViewport({ scale });
-            
-            // Support High DPI untuk mencegah blur saat di zoom di HP
             const outputScale = Math.max(2, window.devicePixelRatio || 1);
 
             canvas.width = Math.floor(viewport.width * outputScale);
@@ -866,7 +866,20 @@
 
         function addText() {
             if (!pdfDoc) return alert('Pilih formulir dulu!');
-            let annot = { id: Date.now() + Math.random(), page: currentPage, x: 50, y: 50, type: 'text', text: 'Teks Baru', size: 16, letterSpacing: 0, lineHeight: 1.15 };
+            const canvasW = parseFloat(canvas.style.width);
+            const canvasH = parseFloat(canvas.style.height);
+            // Simpan dalam PDF Points (0-1 normalized * pdfDim)
+            let annot = { 
+                id: Date.now() + Math.random(), 
+                page: currentPage, 
+                x: (50 / canvasW) * currentPdfW, 
+                y: (50 / canvasH) * currentPdfH, 
+                type: 'text', 
+                text: 'Teks Baru', 
+                size: (16 / canvasW) * currentPdfW, 
+                letterSpacing: 0, 
+                lineHeight: 1.15 
+            };
             annotations.push(annot); saveHistory(); renderAnnotations();
             if(window.innerWidth < 768) toggleSidebar();
             setTimeout(() => {
@@ -884,18 +897,30 @@
             if (!pdfDoc || !currentMode) return;
             const rect = canvas.getBoundingClientRect();
             const c = getCoords(e);
-            // Bagi dengan cssZoom agar posisi klik akurat meski sedang diperbesar
+            const canvasW = parseFloat(canvas.style.width);
+            const canvasH = parseFloat(canvas.style.height);
+            
             const x = (c.x - rect.left) / cssZoom;
             const y = (c.y - rect.top) / cssZoom;
-            let annot = { id: Date.now() + Math.random(), page: currentPage, x, y, type: currentMode, letterSpacing: 0 };
+
+            let annot = { 
+                id: Date.now() + Math.random(), 
+                page: currentPage, 
+                x: (x / canvasW) * currentPdfW, 
+                y: (y / canvasH) * currentPdfH, 
+                type: currentMode, 
+                letterSpacing: 0 
+            };
 
             if (currentMode === 'check' || currentMode === 'circle') {
-                annot.width = 20; annot.height = 20;
+                annot.width = (25 / canvasW) * currentPdfW; // Ukuran awal 25px
+                annot.height = (25 / canvasH) * currentPdfH;
                 annotations.push(annot); saveHistory(); renderAnnotations();
             } else if (currentMode === 'sign' || currentMode === 'materai') {
                 if (currentMode === 'sign' && !signImgBytes) return alert('Upload TTD dulu!');
                 if (currentMode === 'materai' && !materaiImgBytes) return alert('Upload Materai dulu!');
-                annot.width = currentMode === 'sign' ? 100 : 90; annot.height = currentMode === 'sign' ? 50 : 90;
+                annot.width = (100 / canvasW) * currentPdfW; 
+                annot.height = (50 / canvasH) * currentPdfH;
                 annotations.push(annot); saveHistory(); renderAnnotations();
             }
             setMode(null);
@@ -906,16 +931,22 @@
             activeAnnotId = null; 
             updateSidebarTools(null, null); 
             
+            const canvasW = parseFloat(canvas.style.width);
+            const canvasH = parseFloat(canvas.style.height);
+
             annotations.filter(a => a.page === currentPage).forEach((a) => {
                 const div = document.createElement('div');
                 div.className = 'annotation-box';
                 div.setAttribute('data-id', a.id);
-                div.style.left = a.x + 'px'; div.style.top = a.y + 'px';
+                
+                // Konversi dari PDF Points ke CSS Pixels untuk tampilan
+                div.style.left = (a.x / currentPdfW * canvasW) + 'px'; 
+                div.style.top = (a.y / currentPdfH * canvasH) + 'px';
                 
                 if (a.type === 'text') {
                     div.classList.add('text-annot'); 
-                    div.style.fontSize = a.size + 'px'; 
-                    div.style.letterSpacing = a.letterSpacing + 'px';
+                    div.style.fontSize = (a.size / currentPdfW * canvasW) + 'px'; 
+                    div.style.letterSpacing = (a.letterSpacing || 0) + 'px';
                     div.style.lineHeight = a.lineHeight;
                     
                     const textSpan = document.createElement('span');
@@ -925,10 +956,15 @@
                     
                     div.appendChild(createMenu(a.id, true, div));
                 } else if (a.type === 'circle') {
-                    div.classList.add('circle-annot'); div.style.width = a.width + 'px'; div.style.height = a.height + 'px'; div.style.transform = 'translate(-50%, -50%)'; 
+                    div.classList.add('circle-annot'); 
+                    div.style.width = (a.width / currentPdfW * canvasW) + 'px'; 
+                    div.style.height = (a.height / currentPdfH * canvasH) + 'px'; 
+                    div.style.transform = 'translate(-50%, -50%)'; 
                     div.appendChild(createMenu(a.id, false, div));
                 } else if (a.type === 'check') {
-                    div.classList.add('check-annot'); div.style.width = a.width + 'px'; div.style.height = a.height + 'px';
+                    div.classList.add('check-annot'); 
+                    div.style.width = (a.width / currentPdfW * canvasW) + 'px'; 
+                    div.style.height = (a.height / currentPdfH * canvasH) + 'px';
                     div.style.transform = 'translate(-50%, -50%)';
                     div.innerHTML = `<svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none"><polyline points="10,60 40,80 90,20" fill="none" stroke="black" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
                     div.appendChild(createMenu(a.id, false, div));
@@ -937,7 +973,9 @@
                     const bytes = a.type === 'sign' ? signImgBytes : materaiImgBytes;
                     if(!bytes) return;
                     img.src = URL.createObjectURL(new Blob([bytes]));
-                    img.style.width = a.width + 'px'; img.style.height = a.height + 'px'; img.style.opacity = 0.9;
+                    img.style.width = (a.width / currentPdfW * canvasW) + 'px'; 
+                    img.style.height = (a.height / currentPdfH * canvasH) + 'px'; 
+                    img.style.opacity = 0.9;
                     div.appendChild(img); div.style.transform = 'translateY(-100%)';
                     div.appendChild(createMenu(a.id, false, div));
                 }
@@ -1024,7 +1062,6 @@
                 popover.appendChild(editBtn);
             }
 
-            // Tombol Duplikat untuk Semua Objek (Teks, Ceklis, Lingkaran, TTD, Materai)
             const dupBtn = document.createElement('button');
             dupBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Duplikat`;
             dupBtn.onclick = (e) => { 
@@ -1034,7 +1071,7 @@
                 if (annot) {
                     let copy = { ...annot };
                     copy.id = Date.now() + Math.random();
-                    copy.x = (annot.x || 0) + 15;
+                    copy.x = (annot.x || 0) + 15; // Geser dikit di PDF points
                     copy.y = (annot.y || 0) + 15;
                     annotations.push(copy);
                     saveHistory();
@@ -1140,7 +1177,12 @@
                     let nx = startLeft + dx, ny = startTop + dy;
                     element.style.left = nx + 'px'; element.style.top = ny + 'px';
                     let annot = annotations.find(a => a.id === annotId);
-                    if (annot) { annot.x = nx; annot.y = ny; }
+                    if (annot) {
+                        const canvasW = parseFloat(canvas.style.width);
+                        const canvasH = parseFloat(canvas.style.height);
+                        annot.x = (nx / canvasW) * currentPdfW;
+                        annot.y = (ny / canvasH) * currentPdfH;
+                    }
                 }
                 function onUp() {
                     document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp);
@@ -1164,16 +1206,29 @@
                 if (!annot) return;
                 const c = getCoords(e); const startX = c.x, startY = c.y;
                 const startW = element.offsetWidth, startH = element.offsetHeight;
-                const startFontSize = annot.type === 'text' ? annot.size : 0;
+                const startFontSize = annot.type === 'text' ? parseFloat(element.style.fontSize) : 0;
 
                 function onResize(rv) {
                     rv.preventDefault(); const rc = getCoords(rv);
                     let dx = (rc.x - startX) / cssZoom;
                     let dy = (rc.y - startY) / cssZoom;
-                    let delta = (Math.abs(dx) > Math.abs(dy)) ? dx : dy;
                     
-                    if (annot.type === 'text') { let s = Math.max(8, startFontSize + delta); element.style.fontSize = s + 'px'; annot.size = s; } 
-                    else { let aspectRatio = startW / startH; let newW = Math.max(20, startW + delta); let newH = newW / aspectRatio; element.style.width = newW + 'px'; element.style.height = newH + 'px'; annot.width = newW; annot.height = newH; }
+                    const canvasW = parseFloat(canvas.style.width);
+                    const canvasH = parseFloat(canvas.style.height);
+
+                    if (annot.type === 'text') { 
+                        let s = Math.max(8, startFontSize + dx); 
+                        element.style.fontSize = s + 'px'; 
+                        annot.size = (s / canvasW) * currentPdfW; 
+                    } else { 
+                        // Resize Bebas (lebar dan tinggi terpisah)
+                        let newW = Math.max(15, startW + dx); 
+                        let newH = Math.max(15, startH + dy); 
+                        element.style.width = newW + 'px'; 
+                        element.style.height = newH + 'px'; 
+                        annot.width = (newW / canvasW) * currentPdfW; 
+                        annot.height = (newH / canvasH) * currentPdfH; 
+                    }
                 }
                 function stopResize() {
                     document.removeEventListener('mousemove', onResize); document.removeEventListener('mouseup', stopResize);
@@ -1203,28 +1258,28 @@
                 
                 for (let a of annotations) {
                     const page = pdfDocLib.getPage(a.page - 1);
-                    const { width: pdfW, height: pdfH } = page.getSize();
                     
-                    // Gunakan CSS width/height agar rasio tidak rusak akibat High-DPI rendering
-                    const canvasW = parseFloat(canvas.style.width) || canvas.width;
-                    const canvasH = parseFloat(canvas.style.height) || canvas.height;
+                    // Karena annot disimpan di PDF Points, tidak perlu konversi rumit!
+                    const pdfX = a.x;
+                    const pdfY_base = currentPdfH - a.y; 
                     
-                    const pdfX = (a.x / canvasW) * pdfW, pdfY_base = pdfH - (a.y / canvasH) * pdfH;
-
                     if (a.type === 'text') {
                         const textStr = a.text || ' '; 
-                        const fs = a.size / scale; 
+                        const fs = a.size; // Sudah dalam PDF points
                         const lines = textStr.split('\n'), lh = fs * (a.lineHeight || 1.15); 
                         
-                        const correctedX = pdfX + (2 / scale); 
-                        const pdfY_top = pdfH - (a.y / canvasH) * pdfH;
-                        const y_pdf = pdfY_top - (2 / scale) - (fs * 0.75); 
+                        // Padding 2px -> dikonversi ke points
+                        const padX = 2 / parseFloat(canvas.style.width) * currentPdfW;
+                        const padY = 2 / parseFloat(canvas.style.height) * currentPdfH;
+                        
+                        const correctedX = pdfX + padX; 
+                        const y_pdf = pdfY_base - padY - (fs * 0.75); 
                         
                         lines.forEach((line, i) => { 
                             if (line.length === 0) return; 
                             if (a.letterSpacing && a.letterSpacing !== 0) {
                                 let currentX = correctedX; 
-                                const spacingPdf = a.letterSpacing / scale;
+                                const spacingPdf = a.letterSpacing / parseFloat(canvas.style.width) * currentPdfW;
                                 for (let char of line) {
                                     page.drawText(char, { x: currentX, y: y_pdf - (i * lh), size: fs, font: helveticaBoldFont, color: rgb(0, 0, 0) });
                                     currentX += helveticaBoldFont.widthOfTextAtSize(char, fs) + spacingPdf;
@@ -1234,17 +1289,14 @@
                             }
                         });
                     } else if (a.type === 'circle') {
-                        const w = (a.width / canvasW) * pdfW, h = (a.height / canvasH) * pdfH;
-                        page.drawEllipse({ x: pdfX, y: pdfY_base, xScale: w/2, yScale: h/2, borderColor: rgb(0, 0, 0), borderWidth: 2.5 });
+                        page.drawEllipse({ x: pdfX, y: pdfY_base, xScale: a.width/2, yScale: a.height/2, borderColor: rgb(0, 0, 0), borderWidth: 2.5 });
                     } else if (a.type === 'check') {
-                        const w = (a.width / canvasW) * pdfW, h = (a.height / canvasH) * pdfH;
-                        page.drawLine({ start: { x: pdfX - w * 0.4, y: pdfY_base - h * 0.1 }, end: { x: pdfX - w * 0.1, y: pdfY_base - h * 0.3 }, thickness: w * 0.12, color: rgb(0, 0, 0) });
-                        page.drawLine({ start: { x: pdfX - w * 0.1, y: pdfY_base - h * 0.3 }, end: { x: pdfX + w * 0.4, y: pdfY_base + h * 0.3 }, thickness: w * 0.12, color: rgb(0, 0, 0) });
+                        page.drawLine({ start: { x: pdfX - a.width * 0.4, y: pdfY_base - a.height * 0.1 }, end: { x: pdfX - a.width * 0.1, y: pdfY_base - a.height * 0.3 }, thickness: a.width * 0.12, color: rgb(0, 0, 0) });
+                        page.drawLine({ start: { x: pdfX - a.width * 0.1, y: pdfY_base - a.height * 0.3 }, end: { x: pdfX + a.width * 0.4, y: pdfY_base + a.height * 0.3 }, thickness: a.width * 0.12, color: rgb(0, 0, 0) });
                     } else if (a.type === 'sign' || a.type === 'materai') {
                         const bytes = a.type === 'sign' ? signImgBytes : materaiImgBytes; if (!bytes) continue;
                         let img; try { img = await pdfDocLib.embedPng(bytes); } catch { img = await pdfDocLib.embedJpg(bytes); }
-                        const w = (a.width / canvasW) * pdfW, h = (a.height / canvasH) * pdfH;
-                        page.drawImage(img, { x: pdfX, y: pdfY_base, width: w, height: h });
+                        page.drawImage(img, { x: pdfX, y: pdfY_base, width: a.width, height: a.height });
                     }
                 }
                 const pdfOut = await pdfDocLib.save(); const blob = new Blob([pdfOut], { type: 'application/pdf' });
@@ -1259,9 +1311,14 @@
         function nextPage() { if (currentPage < totalPages) renderPage(currentPage + 1); }
         function prevPage() { if (currentPage > 1) renderPage(currentPage - 1); }
         
-        window.addEventListener('resize', () => { 
-            resetFloatPos(); 
-            if (pdfDoc) renderPage(currentPage); 
+        // Cegah render ulang saat keyboard HP muncul (tinggi berubah), hanya render jika lebar berubah
+        let prevWidth = window.innerWidth;
+        window.addEventListener('resize', () => {
+            resetFloatPos();
+            if (window.innerWidth !== prevWidth) {
+                prevWidth = window.innerWidth;
+                if (pdfDoc) renderPage(currentPage);
+            }
         });
     </script>
 </body>
