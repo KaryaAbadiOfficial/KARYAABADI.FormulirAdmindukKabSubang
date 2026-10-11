@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>SISTEM DIGITAL - Pengisian Formulir Kependudukan Kabupaten Subang</title>
     <link rel="icon" type="image/png" href="favicon.png?v=2">
     <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
@@ -102,6 +102,15 @@
         .backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 998; display: none; }
         .backdrop.active { display: block; }
 
+        .mobile-nav { display: none; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 2px solid var(--red); }
+        .mobile-nav h3 { margin-top: 0; }
+        .mobile-nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .mobile-nav-grid a {
+            background: var(--light-bg); color: var(--black); border: 1px solid #ccc;
+            padding: 10px 5px; text-align: center; border-radius: 6px; font-size: 11px; font-weight: bold;
+            text-transform: uppercase; text-decoration: none; display: flex; align-items: center; justify-content: center;
+        }
+
         select { width: 100%; padding: 12px; border: 2px solid var(--black); border-radius: 6px; font-size: 16px; cursor: pointer; background: var(--white); margin-bottom: 15px; }
         
         .btn-add-text {
@@ -141,8 +150,8 @@
         .guide-item .guide-title { font-weight: bold; color: var(--black); margin-bottom: 4px; display: block; }
         .guide-item .guide-desc { margin: 0; }
 
-        .pdf-area { flex-grow: 1; padding: 15px; overflow: auto; display: flex; justify-content: center; align-items: flex-start; background: #eef2f7; position: relative; width: 100%; }
-        #pdfContainer { position: relative; box-shadow: 0 0 15px rgba(0,0,0,0.2); background: white; touch-action: auto; }
+        .pdf-area { flex-grow: 1; padding: 15px; overflow: auto; display: flex; justify-content: center; align-items: flex-start; background: #eef2f7; position: relative; width: 100%; touch-action: auto; }
+        #pdfContainer { position: relative; box-shadow: 0 0 15px rgba(0,0,0,0.2); background: white; touch-action: auto; max-width: 100%; }
         #interactionLayer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; touch-action: pan-y pinch-zoom; }
         .annotation-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
         
@@ -183,7 +192,7 @@
         .popover-menu button:hover { background: #333; }
 
         .float-tools {
-            position: fixed; top: 120px; left: 10px; right: auto; z-index: 9999; background: white; padding: 5px;
+            position: fixed; top: 120px; left: 10px; right: auto; z-index: 997; background: white; padding: 5px;
             border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.25); display: flex; align-items: center; gap: 4px; border: 2px solid var(--black); touch-action: none;
         }
         .drag-handle { cursor: grab; padding: 0 5px; display: flex; align-items: center; color: #888; }
@@ -253,7 +262,7 @@
             .sidebar { position: relative; top: 0; height: auto; transform: translateX(0); width: 340px; overflow-y: visible; min-height: calc(100vh - 110px); padding-top: 20px; }
             .backdrop { display: none !important; }
             .pdf-area { padding: 40px; }
-            .float-tools { top: 130px; left: 360px; right: auto; padding: 8px; gap: 8px; }
+            .float-tools { top: 130px; left: 360px; right: auto; padding: 8px; gap: 8px; z-index: 9999; }
             .btn-icon-float { width: 40px; height: 40px; }
             .btn-reset-pos { width: 30px; height: 30px; }
             footer { padding: 40px 40px 20px; }
@@ -268,16 +277,38 @@
             .datetime-widget .dw-day { display: none; }
             .datetime-widget .dw-time { font-size: 11px; }
             .logo-karya-abadi-img, .logo-fallback-svg { width: 35px; height: 35px; padding: 2px; }
-            .hero-banner { padding: 30px 15px; }
-            .hero-content h1 { font-size: 22px; }
-            .hero-content p.subtitle { font-size: 13px; margin-bottom: 15px; }
-            .hero-divider { margin: 20px auto; }
-            .hero-info h2 { font-size: 15px; }
-            .hero-info span { font-size: 12px; }
-            .hero-slogan blockquote { font-size: 12px; line-height: 1.5; }
-            .slogan-tags { font-size: 11px; }
-            .slogan-tags em { margin: 0 5px; }
-            .navbar a { font-size: 11px; padding: 10px 5px; }
+            
+            /* Sembunyikan Hero Banner agar Form PDF bisa full screen di HP */
+            .hero-banner { display: none; }
+            
+            .navbar { display: none; }
+            .mobile-nav { display: block; }
+            .float-tools { top: 70px; left: 10px; }
+            
+            /* Layout Khusus Mobile: Form di atas, Panel di bawah */
+            .main-layout { display: block; height: calc(100vh - 65px); overflow: hidden; }
+            .pdf-area { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: auto; padding: 10px; touch-action: auto; }
+            
+            .sidebar { 
+                position: fixed; 
+                bottom: 0; left: 0; width: 100%; 
+                height: 55%; top: auto; 
+                transform: translateY(100%); 
+                transition: transform 0.3s ease; 
+                z-index: 1001; 
+                border-radius: 15px 15px 0 0; 
+                border-right: none; border-top: 4px solid var(--red); 
+                padding-top: 20px;
+                box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
+            }
+            .sidebar.active { transform: translateY(0); }
+            
+            .backdrop { top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.2); }
+            
+            /* Handle visual untuk bottom sheet */
+            .sidebar::before {
+                content: ''; display: block; width: 40px; height: 5px; background: #ccc; border-radius: 10px; margin: -15px auto 15px;
+            }
         }
     </style>
 </head>
@@ -339,6 +370,20 @@
 
     <div class="main-layout">
         <div class="sidebar" id="sidebar">
+            <div class="mobile-nav">
+                <h3>Navigasi</h3>
+                <div class="mobile-nav-grid">
+                    <a href="https://subang.go.id/profil/sejarah" target="_blank">Sejarah</a>
+                    <a href="https://subang.go.id/profil/arti-lambang" target="_blank">Arti Lambang</a>
+                    <a href="https://subang.go.id/profil/visi-dan-misi" target="_blank">Visi Misi</a>
+                    <a href="https://subang.go.id/pemerintahan/profil-pejabat-daerah" target="_blank">Bupati & Wabup</a>
+                    <a href="https://subang.go.id/pemerintahan/struktur-pemerintahan" target="_blank">Struktur</a>
+                    <a href="https://subang.go.id/pemerintahan/dinas/dinas-kependudukan-dan-pencatatan-sipil" target="_blank">Dukcapil</a>
+                    <a href="https://subang.go.id/berita" target="_blank">Berita</a>
+                    <a href="https://subang.go.id/pengumuman" target="_blank">Pengumuman</a>
+                </div>
+            </div>
+
             <h3>1. Pilih Formulir</h3>
             <select id="formSelect">
                 <option value="">-- Pilih Formulir --</option>
@@ -408,7 +453,7 @@
                 </div>
                 <div class="guide-item">
                     <span class="guide-title">2. Geser & Perbesar</span>
-                    <p class="guide-desc">Tahan dan geser objek. Tarik kotak panah merah di pojok kanan bawah untuk memperbesar.</p>
+                    <p class="guide-desc">Tahan dan geser objek. Tarik kotak panah merah di pojok kanan bawah untuk memperbesar. Gunakan tombol zoom (+) & (-) untuk memperbesar halaman PDF.</p>
                 </div>
                 <div class="guide-item">
                     <span class="guide-title">3. Spasi & Jarak Baris</span>
@@ -431,6 +476,12 @@
                 </button>
                 <button class="btn-icon-float" id="redoBtn" onclick="redo()" title="Redo">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                </button>
+                <button class="btn-icon-float" id="zoomOutBtn" onclick="zoomOut()" title="Zoom Out">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                </button>
+                <button class="btn-icon-float" id="zoomInBtn" onclick="zoomIn()" title="Zoom In">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 </button>
                 <button class="btn-reset-pos" onclick="resetFloatPos()" title="Reset Posisi">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
@@ -592,11 +643,46 @@
             floatTools.style.right = 'auto';
             if (window.innerWidth < 768) {
                 floatTools.style.left = '10px';
-                floatTools.style.top = '120px';
+                floatTools.style.top = '75px';
             } else {
                 floatTools.style.left = '360px';
                 floatTools.style.top = '130px';
             }
+        }
+
+        // Fungsi Zoom In / Zoom Out yang menyesuaikan anotasi
+        function zoomIn() {
+            if (!pdfDoc) return;
+            let oldScale = scale;
+            let newScale = Math.min(3.0, oldScale + 0.25);
+            let ratio = newScale / oldScale;
+            
+            annotations.forEach(a => {
+                a.x *= ratio; a.y *= ratio;
+                if (a.size) a.size *= ratio;
+                if (a.width) a.width *= ratio;
+                if (a.height) a.height *= ratio;
+            });
+            
+            scale = newScale;
+            renderPage(currentPage);
+        }
+
+        function zoomOut() {
+            if (!pdfDoc) return;
+            let oldScale = scale;
+            let newScale = Math.max(0.5, oldScale - 0.25);
+            let ratio = newScale / oldScale;
+            
+            annotations.forEach(a => {
+                a.x *= ratio; a.y *= ratio;
+                if (a.size) a.size *= ratio;
+                if (a.width) a.width *= ratio;
+                if (a.height) a.height *= ratio;
+            });
+            
+            scale = newScale;
+            renderPage(currentPage);
         }
 
         function saveHistory() {
@@ -637,11 +723,15 @@
             currentPage = num;
             document.getElementById('pageInfo').innerText = `Hal ${num} / ${totalPages}`;
             const page = await pdfDoc.getPage(num);
-            if(window.innerWidth < 768) {
+            // Reset scale ke default jika mobile saat render awal agar tidak terlalu besar
+            if(window.innerWidth < 768 && !pdfBytes) { // Hanya auto-fit saat awal load
                 const contWidth = pdfArea.clientWidth - 30;
                 const viewportTemp = page.getViewport({ scale: 1 });
                 scale = contWidth / viewportTemp.width;
-            } else { scale = 1.5; }
+            } else if (window.innerWidth >= 768) { 
+                scale = 1.5; 
+            }
+            
             const viewport = page.getViewport({ scale });
             canvas.height = viewport.height; canvas.width = viewport.width;
             interactionLayer.style.width = viewport.width + 'px'; interactionLayer.style.height = viewport.height + 'px';
@@ -832,7 +922,6 @@
                         saveHistory();
                         renderAnnotations();
                         
-                        // Select the newly duplicated text
                         activeAnnotId = copy.id;
                         let divs = document.querySelectorAll('.annotation-box');
                         let newDiv = Array.from(divs).find(d => parseFloat(d.style.left) === copy.x && parseFloat(d.style.top) === copy.y);
@@ -922,7 +1011,6 @@
 
         function attachInteractions(element, annotId) {
             function startDragMove(e) {
-                // PERBAIKAN BUG: Mengecek e.target.isContentEditable agar teks bisa diseleksi saat edit
                 if (e.target.classList.contains('menu-trigger') || e.target.closest('.popover-menu') || e.target.classList.contains('resize-handle') || e.target.isContentEditable) return;
                 e.preventDefault();
                 const c = getCoords(e); const startX = c.x, startY = c.y;
