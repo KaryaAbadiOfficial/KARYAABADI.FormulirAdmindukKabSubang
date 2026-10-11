@@ -1196,19 +1196,25 @@
                         const textStr = a.text || ' '; 
                         const fs = a.size / scale; 
                         const lines = textStr.split('\n'), lh = fs * (a.lineHeight || 1.15); 
-                        const y_offset = (fs * 0.075) + (fs * 0.729) + (2 / scale); 
-                        const y_pdf = pdfY_base - y_offset; 
+                        
+                        // PERBAIKAN MATEMATIKA KOORDINAT (X & Y)
+                        // Tambahkan padding kiri (2px) ke koordinat X
+                        const correctedX = pdfX + (2 / scale); 
+                        // Kurangi padding atas (2px) dan tinggi ascent (0.75 * fs) dari koordinat Y atas
+                        const pdfY_top = pdfH - (a.y / canvasH) * pdfH;
+                        const y_pdf = pdfY_top - (2 / scale) - (fs * 0.75); 
                         
                         lines.forEach((line, i) => { 
                             if (line.length === 0) return; 
                             if (a.letterSpacing && a.letterSpacing !== 0) {
-                                let currentX = pdfX; const spacingPdf = a.letterSpacing / scale;
+                                let currentX = correctedX; 
+                                const spacingPdf = a.letterSpacing / scale;
                                 for (let char of line) {
                                     page.drawText(char, { x: currentX, y: y_pdf - (i * lh), size: fs, font: helveticaBoldFont, color: rgb(0, 0, 0) });
                                     currentX += helveticaBoldFont.widthOfTextAtSize(char, fs) + spacingPdf;
                                 }
                             } else {
-                                page.drawText(line, { x: pdfX, y: y_pdf - (i * lh), size: fs, font: helveticaBoldFont, color: rgb(0, 0, 0) });
+                                page.drawText(line, { x: correctedX, y: y_pdf - (i * lh), size: fs, font: helveticaBoldFont, color: rgb(0, 0, 0) });
                             }
                         });
                     } else if (a.type === 'circle') {
