@@ -150,7 +150,6 @@
         .guide-item .guide-title { font-weight: bold; color: var(--black); margin-bottom: 4px; display: block; }
         .guide-item .guide-desc { margin: 0; }
 
-        /* CSS untuk Area PDF (Geser & Zoom Bebas) */
         .pdf-area { 
             flex-grow: 1; padding: 15px; overflow: hidden; 
             display: flex; justify-content: center; align-items: flex-start; 
@@ -174,10 +173,10 @@
         .circle-annot { border: 2.5px solid black; border-radius: 50%; cursor: move; }
         .check-annot { overflow: visible; cursor: move; }
         
-        /* Tombol Resize agak dekat agar mudah disentuh di HP */
+        /* Jarak 35px agar tidak menutupi objek sama sekali */
         .resize-handle {
-            position: absolute; bottom: -12px; right: -12px; 
-            width: 24px; height: 24px; 
+            position: absolute; bottom: -35px; right: -35px; 
+            width: 28px; height: 28px; 
             background: rgba(255,255,255,0.95); border: 1.5px solid var(--red); border-radius: 4px; 
             cursor: se-resize; pointer-events: auto; touch-action: none; z-index: 10; display: none;
             align-items: center; justify-content: center; color: var(--red); line-height: 0;
@@ -185,11 +184,11 @@
         .annotation-box.active .resize-handle, .annotation-box:hover .resize-handle { display: flex; }
         
         .menu-trigger {
-            position: absolute; top: -14px; right: -14px; 
+            position: absolute; top: -35px; right: -35px; 
             background: #fff; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;
-            width: 28px; height: 28px; display: none; 
+            width: 32px; height: 32px; display: none; 
             align-items: center; justify-content: center;
-            font-weight: bold; color: #333; font-size: 18px; line-height: 1; z-index: 1001; box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            font-weight: bold; color: #333; font-size: 20px; line-height: 1; z-index: 1001; box-shadow: 0 2px 4px rgba(0,0,0,0.15);
         }
         .annotation-box.active .menu-trigger, .annotation-box:hover .menu-trigger { display: flex; }
         
@@ -544,7 +543,7 @@
                     <li><a onclick="openModal('about')">Tentang Kami</a></li>
                     <li><a onclick="openModal('services')">Layanan Formulir</a></li>
                     <li><a onclick="openModal('guide')">Panduan Penggunaan</a></li>
-                </uls>
+                </ul>
             </div>
         </div>
         <div class="footer-bottom">
@@ -868,7 +867,6 @@
             if (!pdfDoc) return alert('Pilih formulir dulu!');
             const canvasW = parseFloat(canvas.style.width);
             const canvasH = parseFloat(canvas.style.height);
-            // Simpan dalam PDF Points (0-1 normalized * pdfDim)
             let annot = { 
                 id: Date.now() + Math.random(), 
                 page: currentPage, 
@@ -913,8 +911,8 @@
             };
 
             if (currentMode === 'check' || currentMode === 'circle') {
-                annot.width = (25 / canvasW) * currentPdfW; // Ukuran awal 25px
-                annot.height = (25 / canvasH) * currentPdfH;
+                annot.width = (20 / canvasW) * currentPdfW; // Ukuran awal lebih kecil agar mudah diatur
+                annot.height = (20 / canvasH) * currentPdfH;
                 annotations.push(annot); saveHistory(); renderAnnotations();
             } else if (currentMode === 'sign' || currentMode === 'materai') {
                 if (currentMode === 'sign' && !signImgBytes) return alert('Upload TTD dulu!');
@@ -939,7 +937,6 @@
                 div.className = 'annotation-box';
                 div.setAttribute('data-id', a.id);
                 
-                // Konversi dari PDF Points ke CSS Pixels untuk tampilan
                 div.style.left = (a.x / currentPdfW * canvasW) + 'px'; 
                 div.style.top = (a.y / currentPdfH * canvasH) + 'px';
                 
@@ -1071,7 +1068,7 @@
                 if (annot) {
                     let copy = { ...annot };
                     copy.id = Date.now() + Math.random();
-                    copy.x = (annot.x || 0) + 15; // Geser dikit di PDF points
+                    copy.x = (annot.x || 0) + 15; 
                     copy.y = (annot.y || 0) + 15;
                     annotations.push(copy);
                     saveHistory();
@@ -1114,7 +1111,8 @@
                 if (!isDisplayed) {
                     popover.style.display = 'flex';
                     
-                    let popTop = element.offsetHeight + 25; 
+                    // Posisi pop-up disesuaikan agar tidak menutupi objek
+                    let popTop = element.offsetHeight + 45; 
                     let popLeft = 0;
                     
                     const layerWidth = annotationLayer.offsetWidth;
@@ -1125,7 +1123,7 @@
                     const annotTop = element.offsetTop;
                     
                     if (annotTop + popTop + popHeight > layerHeight - 10) {
-                        popTop = -popHeight - 25;
+                        popTop = -popHeight - 45;
                     }
                     if (annotLeft + popLeft + popWidth > layerWidth - 10) {
                         popLeft = element.offsetWidth - popWidth;
@@ -1217,13 +1215,14 @@
                     const canvasH = parseFloat(canvas.style.height);
 
                     if (annot.type === 'text') { 
-                        let s = Math.max(8, startFontSize + dx); 
+                        // Minimal 1px, tanpa batas maksimal
+                        let s = Math.max(1, startFontSize + dx); 
                         element.style.fontSize = s + 'px'; 
                         annot.size = (s / canvasW) * currentPdfW; 
                     } else { 
-                        // Resize Bebas (lebar dan tinggi terpisah)
-                        let newW = Math.max(15, startW + dx); 
-                        let newH = Math.max(15, startH + dy); 
+                        // Minimal 5px, resize bebas lebar & tinggi
+                        let newW = Math.max(5, startW + dx); 
+                        let newH = Math.max(5, startH + dy); 
                         element.style.width = newW + 'px'; 
                         element.style.height = newH + 'px'; 
                         annot.width = (newW / canvasW) * currentPdfW; 
@@ -1259,16 +1258,14 @@
                 for (let a of annotations) {
                     const page = pdfDocLib.getPage(a.page - 1);
                     
-                    // Karena annot disimpan di PDF Points, tidak perlu konversi rumit!
                     const pdfX = a.x;
                     const pdfY_base = currentPdfH - a.y; 
                     
                     if (a.type === 'text') {
                         const textStr = a.text || ' '; 
-                        const fs = a.size; // Sudah dalam PDF points
+                        const fs = a.size; 
                         const lines = textStr.split('\n'), lh = fs * (a.lineHeight || 1.15); 
                         
-                        // Padding 2px -> dikonversi ke points
                         const padX = 2 / parseFloat(canvas.style.width) * currentPdfW;
                         const padY = 2 / parseFloat(canvas.style.height) * currentPdfH;
                         
@@ -1311,7 +1308,6 @@
         function nextPage() { if (currentPage < totalPages) renderPage(currentPage + 1); }
         function prevPage() { if (currentPage > 1) renderPage(currentPage - 1); }
         
-        // Cegah render ulang saat keyboard HP muncul (tinggi berubah), hanya render jika lebar berubah
         let prevWidth = window.innerWidth;
         window.addEventListener('resize', () => {
             resetFloatPos();
