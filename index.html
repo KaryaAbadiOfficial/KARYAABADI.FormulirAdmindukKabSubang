@@ -173,7 +173,6 @@
         .circle-annot { border: 2.5px solid black; border-radius: 50%; cursor: move; }
         .check-annot { overflow: visible; cursor: move; }
         
-        /* Jarak 35px agar tidak menutupi objek sama sekali */
         .resize-handle {
             position: absolute; bottom: -35px; right: -35px; 
             width: 28px; height: 28px; 
@@ -818,8 +817,12 @@
                 scale = 1.5; 
             }
             
+            // Update scale for all annotations on this page to ensure accurate PDF mapping
+            annotations.filter(a => a.page === currentPage).forEach(a => {
+                a.scale = scale;
+            });
+
             const viewport = page.getViewport({ scale });
-            // High-DPI Rendering untuk mencegah blur (3x lipat resolusi atau mengikuti devicePixelRatio)
             const outputScale = Math.max(3, window.devicePixelRatio || 1);
 
             canvas.width = Math.floor(viewport.width * outputScale);
@@ -861,7 +864,8 @@
                 text: 'Teks Baru', 
                 size: (16 / canvasW) * currentPdfW, 
                 letterSpacing: 0, 
-                lineHeight: 1.15 
+                lineHeight: 1.15,
+                scale: scale // Simpan scale saat dibuat
             };
             annotations.push(annot); saveHistory(); renderAnnotations();
             if(window.innerWidth < 768) toggleSidebar();
@@ -891,7 +895,8 @@
                 x: (x / canvasW) * currentPdfW, 
                 y: (y / canvasH) * currentPdfH, 
                 type: currentMode, 
-                letterSpacing: 0 
+                letterSpacing: 0,
+                scale: scale // Simpan scale saat dibuat
             };
 
             if (currentMode === 'check' || currentMode === 'circle') {
@@ -1138,6 +1143,7 @@
                         const canvasH = parseFloat(canvas.style.height);
                         annot.x = (nx / canvasW) * currentPdfW;
                         annot.y = (ny / canvasH) * currentPdfH;
+                        annot.scale = scale; // Update scale
                     }
                 }
                 function onUp() {
@@ -1176,7 +1182,6 @@
                         element.style.fontSize = s + 'px'; 
                         annot.size = (s / canvasW) * currentPdfW; 
                     } else { 
-                        // Resize bebas hingga 1px
                         let newW = Math.max(1, startW + dx); 
                         let newH = Math.max(1, startH + dy); 
                         element.style.width = newW + 'px'; 
@@ -1184,6 +1189,7 @@
                         annot.width = (newW / canvasW) * currentPdfW; 
                         annot.height = (newH / canvasH) * currentPdfH; 
                     }
+                    annot.scale = scale; // Update scale
                 }
                 function stopResize() {
                     document.removeEventListener('mousemove', onResize); document.removeEventListener('mouseup', stopResize);
@@ -1212,21 +1218,25 @@
                 const helveticaBoldFont = await pdfDocLib.embedFont(PDFLib.StandardFonts.HelveticaBold);
                 for (let a of annotations) {
                     const page = pdfDocLib.getPage(a.page - 1);
+                    const { width: pageW, height: pageH } = page.getSize(); // Ambil ukuran tiap halaman secara spesifik
+                    
                     const pdfX = a.x;
-                    const pdfY_base = currentPdfH - a.y; 
+                    const pdfY_base = pageH - a.y; 
+                    const annotScale = a.scale || scale; // Gunakan scale yang tersimpan, fallback ke global scale
+
                     if (a.type === 'text') {
                         const textStr = a.text || ' '; 
                         const fs = a.size; 
                         const lines = textStr.split('\n'), lh = fs * (a.lineHeight || 1.15); 
-                        const padX = 2 / parseFloat(canvas.style.width) * currentPdfW;
-                        const padY = 2 / parseFloat(canvas.style.height) * currentPdfH;
+                        const padX = 2 / annotScale; // Konversi 2px ke PDF points
+                        const padY = 2 / annotScale;
                         const correctedX = pdfX + padX; 
                         const y_pdf = pdfY_base - padY - (fs * 0.75); 
                         lines.forEach((line, i) => { 
                             if (line.length === 0) return; 
                             if (a.letterSpacing && a.letterSpacing !== 0) {
                                 let currentX = correctedX; 
-                                const spacingPdf = a.letterSpacing / parseFloat(canvas.style.width) * currentPdfW;
+                                const spacingPdf = a.letterSpacing / annotScale; // Konversi spasi huruf ke PDF points
                                 for (let char of line) {
                                     page.drawText(char, { x: currentX, y: y_pdf - (i * lh), size: fs, font: helveticaBoldFont, color: rgb(0, 0, 0) });
                                     currentX += helveticaBoldFont.widthOfTextAtSize(char, fs) + spacingPdf;
