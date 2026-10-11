@@ -9,7 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
         :root {
-            --black: #1a1a1a; --red: #c0392b; --white: #ffffff;
+            --black: #1a1a1a; --red: #e74c3c; --white: #ffffff;
             --light-bg: #f4f6f5; --light-gray: #e0e0e0; --gray-text: #555;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -75,7 +75,8 @@
         }
         .hero-content { max-width: 800px; margin: 0 auto; }
         .hero-content h1 { font-size: 32px; margin: 0 0 10px 0; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; color: var(--white); }
-        .hero-content p.subtitle { font-size: 16px; margin: 0 0 20px 0; color: #ccc; font-weight: 500; letter-spacing: 0.5px; }
+        /* Subjudul diubah menjadi merah cerah */
+        .hero-content p.subtitle { font-size: 16px; margin: 0 0 20px 0; color: var(--red); font-weight: 600; letter-spacing: 0.5px; }
         
         .hero-divider { width: 60px; height: 3px; background: var(--red); margin: 25px auto; border-radius: 2px; }
         
@@ -141,7 +142,7 @@
         .btn-download {
             background: var(--red); color: var(--white); border: none; padding: 15px;
             width: 100%; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold;
-            display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 6px rgba(192, 57, 43, 0.4);
+            display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 6px rgba(231, 76, 60, 0.4);
         }
 
         .guide-box { background: #f9f9f9; padding: 15px; border-radius: 8px; font-size: 13px; line-height: 1.5; color: #555; border: 1px solid #eee; margin-top: 20px; margin-bottom: 30px; }
@@ -173,7 +174,6 @@
         .circle-annot { border: 2.5px solid black; border-radius: 50%; cursor: move; }
         .check-annot { overflow: visible; cursor: move; }
         
-        /* Jarak 35px agar tidak menutupi objek sama sekali */
         .resize-handle {
             position: absolute; bottom: -35px; right: -35px; 
             width: 28px; height: 28px; 
@@ -476,8 +476,8 @@
                     <p class="guide-desc">Klik teks yang ingin diatur, lalu gunakan tombol <b>[+]</b> dan <b>[-]</b> di panel kiri pada bagian "Atur Teks".</p>
                 </div>
                 <div class="guide-item">
-                    <span class="guide-title">5. Undo/Redo</span>
-                    <p class="guide-desc">Tombol mengambang di kiri atas layar untuk membatalkan/mengulang aksi.</p>
+                    <span class="guide-title">5. Resize Bebas</span>
+                    <p class="guide-desc">Tarik kotak panah merah di pojok kanan bawah objek (Ceklis, Lingkaran, TTD, Materai) untuk mengubah ukuran secara bebas sesuai kebutuhan.</p>
                 </div>
             </div>
         </div>
@@ -609,7 +609,6 @@
         let activeAnnotId = null;
         let currentPdfW = 0, currentPdfH = 0;
 
-        // Variabel untuk Zoom & Pan
         let cssZoom = 1, panX = 0, panY = 0;
 
         const formSelect = document.getElementById('formSelect');
@@ -670,7 +669,6 @@
             }
         }
 
-        // --- LOGIKA PAN & ZOOM (GESER & ZOOM BEBAS) ---
         function updateTransform() {
             pdfContainer.style.transform = `translate(${panX}px, ${panY}px) scale(${cssZoom})`;
         }
@@ -686,20 +684,16 @@
             const rect = pdfArea.getBoundingClientRect();
             const fx = e.clientX - rect.left;
             const fy = e.clientY - rect.top;
-            
             let delta = e.deltaY > 0 ? 0.9 : 1.1;
             let newZoom = Math.max(0.5, Math.min(5.0, cssZoom * delta));
             let ratio = newZoom / cssZoom;
-            
             panX = fx - (fx - panX) * ratio;
             panY = fy - (fy - panY) * ratio;
             cssZoom = newZoom;
-            
             updateTransform();
         }, { passive: false });
 
         let touchState = { mode: null, startX: 0, startY: 0, startPanX: 0, startPanY: 0, startDist: 0, startZoom: 1 };
-
         function getDistance(touches) {
             const dx = touches[0].clientX - touches[1].clientX;
             const dy = touches[0].clientY - touches[1].clientY;
@@ -708,7 +702,6 @@
 
         pdfArea.addEventListener('touchstart', (e) => {
             if (e.target.closest('.annotation-box') || e.target.closest('.popover-menu') || e.target.closest('.float-tools') || e.target.isContentEditable) return;
-            
             if (e.touches.length === 1) {
                 touchState.mode = 'pan';
                 touchState.startX = e.touches[0].clientX;
@@ -735,28 +728,21 @@
                 const currentDist = getDistance(e.touches);
                 let newZoom = touchState.startZoom * (currentDist / touchState.startDist);
                 newZoom = Math.max(0.5, Math.min(5.0, newZoom));
-                
                 const rect = pdfArea.getBoundingClientRect();
                 const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
                 const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
-                
                 const canvasX = (midX - panX) / cssZoom;
                 const canvasY = (midY - panY) / cssZoom;
-                
                 cssZoom = newZoom;
                 panX = midX - canvasX * cssZoom;
                 panY = midY - canvasY * cssZoom;
-                
                 updateTransform();
             }
         }, { passive: false });
 
-        pdfArea.addEventListener('touchend', () => {
-            touchState.mode = null;
-        });
+        pdfArea.addEventListener('touchend', () => { touchState.mode = null; });
 
         let mouseState = { panning: false, startX: 0, startY: 0, startPanX: 0, startPanY: 0 };
-
         pdfArea.addEventListener('mousedown', (e) => {
             if (e.target.closest('.annotation-box') || e.target.closest('.popover-menu') || e.target.closest('.float-tools') || e.target.isContentEditable) return;
             mouseState.panning = true;
@@ -821,7 +807,6 @@
             currentPage = num;
             document.getElementById('pageInfo').innerText = `Hal ${num} / ${totalPages}`;
             const page = await pdfDoc.getPage(num);
-            
             const viewport0 = page.getViewport({ scale: 1 });
             currentPdfW = viewport0.width;
             currentPdfH = viewport0.height;
@@ -848,7 +833,6 @@
 
             const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
             const renderContext = { canvasContext: ctx, viewport, transform };
-            
             await page.render(renderContext).promise;
             renderAnnotations();
         }
@@ -897,7 +881,6 @@
             const c = getCoords(e);
             const canvasW = parseFloat(canvas.style.width);
             const canvasH = parseFloat(canvas.style.height);
-            
             const x = (c.x - rect.left) / cssZoom;
             const y = (c.y - rect.top) / cssZoom;
 
@@ -911,7 +894,7 @@
             };
 
             if (currentMode === 'check' || currentMode === 'circle') {
-                annot.width = (20 / canvasW) * currentPdfW; // Ukuran awal lebih kecil agar mudah diatur
+                annot.width = (20 / canvasW) * currentPdfW; 
                 annot.height = (20 / canvasH) * currentPdfH;
                 annotations.push(annot); saveHistory(); renderAnnotations();
             } else if (currentMode === 'sign' || currentMode === 'materai') {
@@ -936,7 +919,6 @@
                 const div = document.createElement('div');
                 div.className = 'annotation-box';
                 div.setAttribute('data-id', a.id);
-                
                 div.style.left = (a.x / currentPdfW * canvasW) + 'px'; 
                 div.style.top = (a.y / currentPdfH * canvasH) + 'px';
                 
@@ -945,12 +927,10 @@
                     div.style.fontSize = (a.size / currentPdfW * canvasW) + 'px'; 
                     div.style.letterSpacing = (a.letterSpacing || 0) + 'px';
                     div.style.lineHeight = a.lineHeight;
-                    
                     const textSpan = document.createElement('span');
                     textSpan.className = 'text-content';
                     textSpan.innerText = a.text;
                     div.appendChild(textSpan);
-                    
                     div.appendChild(createMenu(a.id, true, div));
                 } else if (a.type === 'circle') {
                     div.classList.add('circle-annot'); 
@@ -1001,7 +981,6 @@
             document.getElementById('sbPlusLetter').disabled = !isText;
             document.getElementById('sbMinusLine').disabled = !isText;
             document.getElementById('sbPlusLine').disabled = !isText;
-            
             if (isText) {
                 document.getElementById('sbValLetter').innerText = (annot.letterSpacing || 0);
                 document.getElementById('sbValLine').innerText = parseFloat(annot.lineHeight || 1.15).toFixed(2);
@@ -1015,10 +994,8 @@
             if (!activeAnnotId) return;
             let annot = annotations.find(a => a.id === activeAnnotId);
             if (!annot || annot.type !== 'text') return;
-            
             let activeDiv = document.querySelector('.annotation-box.active');
             if (!activeDiv) return;
-
             if (type === 'letter') {
                 annot.letterSpacing = (annot.letterSpacing || 0) + delta;
                 activeDiv.style.letterSpacing = annot.letterSpacing + 'px';
@@ -1046,7 +1023,6 @@
             trigger.className = 'menu-trigger'; trigger.innerHTML = '⋮';
             const popover = document.createElement('div'); 
             popover.className = 'popover-menu';
-            
             if (isText) {
                 const editBtn = document.createElement('button');
                 editBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit Teks`;
@@ -1073,7 +1049,6 @@
                     annotations.push(copy);
                     saveHistory();
                     renderAnnotations();
-                    
                     activeAnnotId = copy.id;
                     let newDiv = document.querySelector(`.annotation-box[data-id='${copy.id}']`);
                     if (newDiv) {
@@ -1100,47 +1075,31 @@
                 }
             };
             popover.appendChild(delBtn);
-            
             element.appendChild(popover); 
             
             trigger.onclick = (e) => {
                 e.stopPropagation();
                 const isDisplayed = popover.style.display === 'flex';
                 document.querySelectorAll('.popover-menu').forEach(m => m.style.display = 'none');
-                
                 if (!isDisplayed) {
                     popover.style.display = 'flex';
-                    
-                    // Posisi pop-up disesuaikan agar tidak menutupi objek
                     let popTop = element.offsetHeight + 45; 
                     let popLeft = 0;
-                    
                     const layerWidth = annotationLayer.offsetWidth;
                     const layerHeight = annotationLayer.offsetHeight;
                     const popWidth = popover.offsetWidth;
                     const popHeight = popover.offsetHeight;
                     const annotLeft = element.offsetLeft;
                     const annotTop = element.offsetTop;
-                    
-                    if (annotTop + popTop + popHeight > layerHeight - 10) {
-                        popTop = -popHeight - 45;
-                    }
-                    if (annotLeft + popLeft + popWidth > layerWidth - 10) {
-                        popLeft = element.offsetWidth - popWidth;
-                    }
-                    if (annotLeft + popLeft < 10) {
-                        popLeft = 10 - annotLeft;
-                    }
-                    if (annotTop + popTop < 10) {
-                        popTop = 10 - annotTop;
-                    }
-                    
+                    if (annotTop + popTop + popHeight > layerHeight - 10) popTop = -popHeight - 45;
+                    if (annotLeft + popLeft + popWidth > layerWidth - 10) popLeft = element.offsetWidth - popWidth;
+                    if (annotLeft + popLeft < 10) popLeft = 10 - annotLeft;
+                    if (annotTop + popTop < 10) popTop = 10 - annotTop;
                     popover.style.left = popLeft + 'px';
                     popover.style.top = popTop + 'px';
                     popover.style.zIndex = 1005;
                 }
             };
-            
             return trigger;
         }
 
@@ -1150,7 +1109,6 @@
             textSpan.contentEditable = "true"; textSpan.focus();
             const range = document.createRange(); range.selectNodeContents(textSpan); 
             const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
-
             const finishEdit = () => {
                 textSpan.contentEditable = "false";
                 annot.text = textSpan.innerText.replace(/\n$/, '');
@@ -1167,7 +1125,6 @@
                 e.stopPropagation(); 
                 const c = getCoords(e); const startX = c.x, startY = c.y;
                 const startLeft = parseFloat(element.style.left), startTop = parseFloat(element.style.top);
-
                 function onMove(mv) {
                     mv.preventDefault(); const mc = getCoords(mv);
                     let dx = (mc.x - startX) / cssZoom;
@@ -1210,19 +1167,16 @@
                     rv.preventDefault(); const rc = getCoords(rv);
                     let dx = (rc.x - startX) / cssZoom;
                     let dy = (rc.y - startY) / cssZoom;
-                    
                     const canvasW = parseFloat(canvas.style.width);
                     const canvasH = parseFloat(canvas.style.height);
 
                     if (annot.type === 'text') { 
-                        // Minimal 1px, tanpa batas maksimal
-                        let s = Math.max(1, startFontSize + dx); 
+                        let s = Math.max(8, startFontSize + dx); 
                         element.style.fontSize = s + 'px'; 
                         annot.size = (s / canvasW) * currentPdfW; 
                     } else { 
-                        // Minimal 5px, resize bebas lebar & tinggi
-                        let newW = Math.max(5, startW + dx); 
-                        let newH = Math.max(5, startH + dy); 
+                        let newW = Math.max(10, startW + dx); 
+                        let newH = Math.max(10, startH + dy); 
                         element.style.width = newW + 'px'; 
                         element.style.height = newH + 'px'; 
                         annot.width = (newW / canvasW) * currentPdfW; 
@@ -1254,24 +1208,18 @@
                 const { PDFDocument, rgb } = PDFLib;
                 const pdfDocLib = await PDFDocument.load(pdfBytes);
                 const helveticaBoldFont = await pdfDocLib.embedFont(PDFLib.StandardFonts.HelveticaBold);
-                
                 for (let a of annotations) {
                     const page = pdfDocLib.getPage(a.page - 1);
-                    
                     const pdfX = a.x;
                     const pdfY_base = currentPdfH - a.y; 
-                    
                     if (a.type === 'text') {
                         const textStr = a.text || ' '; 
                         const fs = a.size; 
                         const lines = textStr.split('\n'), lh = fs * (a.lineHeight || 1.15); 
-                        
                         const padX = 2 / parseFloat(canvas.style.width) * currentPdfW;
                         const padY = 2 / parseFloat(canvas.style.height) * currentPdfH;
-                        
                         const correctedX = pdfX + padX; 
                         const y_pdf = pdfY_base - padY - (fs * 0.75); 
-                        
                         lines.forEach((line, i) => { 
                             if (line.length === 0) return; 
                             if (a.letterSpacing && a.letterSpacing !== 0) {
