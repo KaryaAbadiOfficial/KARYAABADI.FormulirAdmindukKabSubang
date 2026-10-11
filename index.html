@@ -152,8 +152,16 @@
         .text-content:focus { border: 1px dashed var(--red); cursor: text; background: rgba(255,255,255,0.8); outline: none; }
         .circle-annot { border: 2.5px solid black; border-radius: 50%; cursor: move; }
         .check-annot { overflow: visible; cursor: move; }
-        .resize-handle { position: absolute; bottom: -12px; right: -12px; width: 24px; height: 24px; background: var(--red); border: 2px solid var(--black); border-radius: 50%; cursor: se-resize; pointer-events: auto; touch-action: none; z-index: 10; display: none; }
-        .annotation-box.active .resize-handle, .annotation-box:hover .resize-handle { display: block; }
+        
+        /* CSS untuk Resize Handle (Ikon Panah) */
+        .resize-handle {
+            position: absolute; bottom: -10px; right: -10px; 
+            width: 20px; height: 20px; 
+            background: rgba(255,255,255,0.95); border: 1.5px solid var(--red); border-radius: 4px; 
+            cursor: se-resize; pointer-events: auto; touch-action: none; z-index: 10; display: none;
+            align-items: center; justify-content: center; color: var(--red); line-height: 0;
+        }
+        .annotation-box.active .resize-handle, .annotation-box:hover .resize-handle { display: flex; }
         
         .menu-trigger {
             position: absolute; top: -14px; right: -14px; 
@@ -168,7 +176,7 @@
             position: absolute; top: 0; left: 0; 
             background: var(--black); color: var(--white); border-radius: 8px; padding: 8px; display: none;
             flex-direction: column; gap: 4px; z-index: 1005; box-shadow: 0 8px 16px rgba(0,0,0,0.4); 
-            width: 150px; box-sizing: border-box;
+            width: 160px; box-sizing: border-box;
         }
         .popover-menu button {
             background: none; border: none; color: var(--white); text-align: left; padding: 8px 10px; cursor: pointer;
@@ -398,11 +406,11 @@
             <div class="guide-box">
                 <div class="guide-item">
                     <span class="guide-title">1. Tambah & Edit Teks</span>
-                    <p class="guide-desc">Klik "Tambah Teks", lalu klik teks tersebut. Klik ikon <b>⋮</b> di pojok kanan atas teks dan pilih <b>Edit Teks</b>.</p>
+                    <p class="guide-desc">Klik "Tambah Teks", lalu klik teks tersebut. Klik ikon <b>⋮</b> di pojok kanan atas teks dan pilih <b>Edit Teks</b> atau <b>Duplikat Teks</b>.</p>
                 </div>
                 <div class="guide-item">
                     <span class="guide-title">2. Geser & Perbesar</span>
-                    <p class="guide-desc">Tahan dan geser objek. Tarik kotak merah di pojok kanan bawah untuk memperbesar.</p>
+                    <p class="guide-desc">Tahan dan geser objek. Tarik kotak panah merah di pojok kanan bawah untuk memperbesar.</p>
                 </div>
                 <div class="guide-item">
                     <span class="guide-title">3. Spasi & Jarak Baris</span>
@@ -514,7 +522,7 @@
             terms: { title: 'Syarat dan Ketentuan', body: `<h4>1. Penerimaan Ketentuan</h4><p>Dengan menggunakan layanan Sistem Digital Pengisian Formulir Kependudukan Kabupaten Subang yang disediakan oleh <b>Karya Abadi</b>, pengguna dianggap telah membaca, memahami, dan menyetujui seluruh syarat dan ketentuan berikut.</p><h4>2. Penggunaan Layanan</h4><ul><li>Layanan ini disediakan untuk membantu masyarakat mengisi formulir kependudukan secara digital.</li><li>Pengguna wajib memberikan data yang benar, akurat, dan sah.</li><li>Pengguna dilarang menggunakan layanan untuk tujuan melanggar hukum atau peraturan yang berlaku.</li></ul><h4>3. Tanggung Jawab Pengguna</h4><p>Pengguna bertanggung jawab penuh atas kebenaran data yang dimasukkan ke dalam formulir. Karya Abadi tidak bertanggung jawab atas kesalahan pengisian yang dilakukan oleh pengguna.</p><h4>4. Hak Kekayaan Intelektual</h4><p>Seluruh konten, desain, logo, dan kode aplikasi merupakan milik Karya Abadi dan dilindungi oleh hukum hak cipta. Dilarang menyalin, memodifikasi, atau mendistribusikan tanpa izin tertulis.</p><h4>5. Batasan Tanggung Jawab</h4><p>Layanan disediakan "sebagaimana adanya" tanpa jaminan eksplisit. Karya Abadi tidak bertanggung jawab atas kerugian langsung maupun tidak langsung yang timbul dari penggunaan layanan.</p><h4>6. Perubahan Ketentuan</h4><p>Karya Abadi berhak mengubah syarat dan ketentuan ini sewaktu-waktu. Perubahan berlaku sejak dipublikasikan di halaman ini.</p>` },
             disclaimer: { title: 'Disclaimer', body: `<h4>Penyangkalan Umum</h4><p>Informasi dan layanan pada platform <b>Karya Abadi - Formulir Subang</b> disediakan untuk tujuan membantu masyarakat dalam pengisian formulir kependudukan secara digital.</p><h4>Ketepatan Data</h4><p>Kami berupaya menyediakan formulir yang sesuai dengan standar resmi. Namun, pengguna wajib memverifikasi kembali kebenaran data sebelum dokumen diserahkan kepada instansi berwenang. Karya Abadi tidak bertanggung jawab atas konsekuensi hukum akibat kesalahan pengisian data oleh pengguna.</p><h4>Bukan Instansi Resmi</h4><p>Karya Abadi <b>BUKAN</b> instansi pemerintah, Dinas Kependudukan dan Pencatatan Sipil (Disdukcapil), maupun Badan Kependudukan dan Keluarga Berencana Nasional (BKKBN). Layanan ini bersifat independen dan hanya berfungsi sebagai alat bantu digital pengisian formulir.</p><h4>Validitas Dokumen</h4><p>Dokumen yang dihasilkan melalui platform ini tetap perlu diverifikasi, ditandatangani, dan disahkan oleh pejabat berwenang agar sah secara hukum. Karya Abadi tidak menjamin diterimanya dokumen oleh pihak tertentu.</p><h4>Link Eksternal</h4><p>Platform dapat mengandung link ke situs pihak ketiga. Karya Abadi tidak bertanggung jawab atas konten atau kebijakan privasi situ eksternal tersebut.</p><h4>Paksaan Mayoret (Force Majeure)</h4><p>Karya Abadi tidak bertanggung jawab atas kegagalan layanan akibat kondisi di luar kendali, seperti bencana alam, gangguan jaringan, atau perubahan kebijakan pemerintah.</p>` },
             services: { title: 'Layanan Formulir', body: `<h4>Jenis Formulir Tersedia</h4><p>Platform Karya Abadi menyediakan pengisian digital berbagai formulir kependudukan, antara lain:</p><ul><li><b>F-1.01</b> - Formulir Biodata WNI</li><li><b>F-1.02</b> - Pendaftaran Peristiwa Kependudukan</li><li><b>F-1.03</b> - Pendaftaran Perpindahan Penduduk</li><li><b>F-1.06</b> - Surat Pernyataan Perubahan Elemen Data</li><li><b>F-1.07</b> - Surat Kuasa</li><li><b>F-1.21</b> - Permohonan KTP WNI</li><li><b>F-2.01</b> - Pelaporan Pencatatan Sipil</li><li><b>F-2.03</b> - SPTJM Kelahiran</li><li><b>F-2.04</b> - SPTJM Kebenaran Suami Istri</li><li>Surat Pernyataan Domisili Subang</li></ul><h4>Fitur Utama</h4><ul><li>Penambahan teks dengan pengaturan ukuran dan spasi huruf.</li><li>Tanda tangan digital dan materai yang dapat diunggah.</li><li>Mode tanda ceklis dan lingkaran.</li><li>Undo dan Redo untuk koreksi kesalahan.</li><li>Unduh hasil dalam format PDF.</li></ul>` },
-            guide: { title: 'Panduan Penggunaan', body: `<h4>Langkah 1 - Pilih Formulir</h4><p>Buka panel di sisi kiri, pilih formulir kependudukan yang sesuai dari dropdown "Pilih Formulir".</p><h4>Langkah 2 - Tambahkan Teks</h4><p>Klik tombol "Tambah Teks", lalu klik teks baru yang muncul di halaman PDF. Klik ikon <b>⋮</b> di samping teks dan pilih <b>Edit Teks</b> untuk mengubah isi sesuai kebutuhan.</p><h4>Langkah 3 - Geser & Atur Posisi</h4><p>Tahan dan geser objek teks atau tanda untuk memindahkan ke posisi yang diinginkan. Tarik kotak merah di pojok kanan bawah untuk memperbesar atau memperkecil objek.</p><h4>Langkah 4 - Atur Spasi Huruf</h4><p>Untuk melebarkan huruf agar pas dengan kolom tabel, klik teks tersebut, lalu gunakan tombol <b>[+]</b> atau <b>[-]</b> di bagian "Atur Teks" pada panel kiri.</p><h4>Langkah 5 - Tanda Tangan & Materai</h4><p>Pilih mode "TTD" atau "Materai" di panel kiri, lalu unggah file gambar tanda tangan atau materai Anda. Setelah terunggah, klik di posisi yang diinginkan pada PDF untuk menempatkannya.</p><h4>Langkah 6 - Navigasi Halaman</h4><p>Gunakan tombol <b>PREV</b> dan <b>NEXT</b> untuk berpindah antar halaman formulir jika memiliki lebih dari satu halaman.</p><h4>Langkah 7 - Undo / Redo</h4><p>Gunakan tombol mengambang di pojok kanan atas untuk membatalkan (Undo) atau mengulang (Redo) aksi terakhir Anda.</p><h4>Langkah 8 - Unduh PDF</h4><p>Setelah semua data terisi, klik tombol <b>DOWNLOAD PDF</b> untuk menyimpan hasil ke perangkat Anda.</p>` }
+            guide: { title: 'Panduan Penggunaan', body: `<h4>Langkah 1 - Pilih Formulir</h4><p>Buka panel di sisi kiri, pilih formulir kependudukan yang sesuai dari dropdown "Pilih Formulir".</p><h4>Langkah 2 - Tambahkan Teks</h4><p>Klik tombol "Tambah Teks", lalu klik teks baru yang muncul di halaman PDF. Klik ikon <b>⋮</b> di samping teks dan pilih <b>Edit Teks</b> untuk mengubah isi sesuai kebutuhan.</p><h4>Langkah 3 - Geser & Atur Posisi</h4><p>Tahan dan geser objek teks atau tanda untuk memindahkan ke posisi yang diinginkan. Tarik ikon panah merah di pojok kanan bawah untuk memperbesar atau memperkecil objek.</p><h4>Langkah 4 - Atur Spasi Huruf</h4><p>Untuk melebarkan huruf agar pas dengan kolom tabel, klik teks tersebut, lalu gunakan tombol <b>[+]</b> atau <b>[-]</b> di bagian "Atur Teks" pada panel kiri.</p><h4>Langkah 5 - Tanda Tangan & Materai</h4><p>Pilih mode "TTD" atau "Materai" di panel kiri, lalu unggah file gambar tanda tangan atau materai Anda. Setelah terunggah, klik di posisi yang diinginkan pada PDF untuk menempatkannya.</p><h4>Langkah 6 - Navigasi Halaman</h4><p>Gunakan tombol <b>PREV</b> dan <b>NEXT</b> untuk berpindah antar halaman formulir jika memiliki lebih dari satu halaman.</p><h4>Langkah 7 - Undo / Redo</h4><p>Gunakan tombol mengambang di pojok kanan atas untuk membatalkan (Undo) atau mengulang (Redo) aksi terakhir Anda.</p><h4>Langkah 8 - Unduh PDF</h4><p>Setelah semua data terisi, klik tombol <b>DOWNLOAD PDF</b> untuk menyimpan hasil ke perangkat Anda.</p>` }
         };
 
         function openModal(key) {
@@ -800,6 +808,25 @@
                     if (annot) makeEditable(annot, element); 
                 };
                 popover.appendChild(editBtn);
+
+                // Tombol Duplikat Teks
+                const dupBtn = document.createElement('button');
+                dupBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Duplikat Teks`;
+                dupBtn.onclick = (e) => { 
+                    e.stopPropagation(); 
+                    popover.style.display = 'none'; 
+                    let annot = annotations.find(a => a.id === annotId);
+                    if (annot) {
+                        let copy = { ...annot };
+                        copy.id = Date.now() + Math.random();
+                        copy.x = (annot.x || 0) + 15;
+                        copy.y = (annot.y || 0) + 15;
+                        annotations.push(copy);
+                        saveHistory();
+                        renderAnnotations();
+                    }
+                };
+                popover.appendChild(dupBtn);
             }
             
             const delBtn = document.createElement('button');
@@ -878,7 +905,7 @@
 
         function attachInteractions(element, annotId) {
             function startDragMove(e) {
-                if (e.target.classList.contains('menu-trigger') || e.target.closest('.popover-menu') || e.target.classList.contains('resize-handle') || e.target.isContentEditable) return;
+                if (e.target.classList.contains('menu-trigger') || e.target.closest('.popover-menu') || e.target.classList.contains('resize-handle') || element.isContentEditable) return;
                 e.preventDefault();
                 const c = getCoords(e); const startX = c.x, startY = c.y;
                 const startLeft = parseFloat(element.style.left), startTop = parseFloat(element.style.top);
@@ -901,7 +928,12 @@
             element.addEventListener('mousedown', startDragMove);
             element.addEventListener('touchstart', startDragMove, { passive: false });
 
-            const handle = document.createElement('div'); handle.className = 'resize-handle'; element.appendChild(handle);
+            const handle = document.createElement('div'); 
+            handle.className = 'resize-handle'; 
+            // Ikon panah ke kanan bawah
+            handle.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="4" y1="4" x2="20" y2="20"/><polyline points="14 20 20 20 20 14"/></svg>';
+            element.appendChild(handle);
+            
             function startDragResize(e) {
                 e.stopPropagation(); e.preventDefault();
                 let annot = annotations.find(a => a.id === annotId);
