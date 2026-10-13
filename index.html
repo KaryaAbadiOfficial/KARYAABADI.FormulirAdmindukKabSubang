@@ -138,8 +138,11 @@
             background: #fdecea; border: 1px solid #f5c6cb; color: #821a1a;
             padding: 12px; border-radius: 8px; font-size: 12px; margin-bottom: 20px; line-height: 1.6;
         }
-        .upload-guide-box strong { display: block; margin-bottom: 5px; font-size: 13px; }
-        .upload-guide-box a { color: var(--red); text-decoration: underline; cursor: pointer; font-weight: bold; }
+        .upload-guide-box strong { display: block; margin-bottom: 5px; font-size: 13px; margin-top: 10px; }
+        .upload-guide-box strong:first-child { margin-top: 0; }
+        .upload-guide-box ol { margin: 5px 0 5px 18px; padding: 0; }
+        .upload-guide-box li { margin-bottom: 3px; }
+        .upload-guide-box a { color: var(--red); text-decoration: underline; cursor: pointer; font-weight: bold; display: block; margin-top: 10px; font-style: italic; }
 
         .row-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; margin-bottom: 20px; }
         .btn-nav { background: var(--black); color: var(--white); border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; }
@@ -152,10 +155,10 @@
         }
 
         .guide-box { background: #f9f9f9; padding: 15px; border-radius: 8px; font-size: 13px; line-height: 1.5; color: #555; border: 1px solid #eee; margin-top: 20px; margin-bottom: 30px; }
-        .guide-item { margin-bottom: 15px; }
+        .guide-item { margin-bottom: 12px; }
         .guide-item:last-child { margin-bottom: 0; }
-        .guide-item .guide-title { font-weight: bold; color: var(--black); margin-bottom: 4px; display: block; }
-        .guide-item .guide-desc { margin: 0; }
+        .guide-item .guide-title { font-weight: bold; color: var(--black); margin-bottom: 2px; display: block; }
+        .guide-item .guide-desc { margin: 0; font-size: 12px; }
 
         .pdf-area { 
             flex-grow: 1; padding: 15px; overflow: hidden; 
@@ -451,18 +454,20 @@
             </div>
 
             <div class="upload-guide-box">
-                <strong>Panduan TTD & Materai (Via Online):</strong>
-                1. Pembuatan TTD / siapkan materai (asli, penggunaan 1 kali pemakaian perdokumen), kemudian di foto.<br>
-                2. Hapus background, pastikan rapi.<br>
-                3. Upload file gambar pada tombol TTD / Materai di atas.<br>
-                <br>
-                <strong>Panduan TTD & Materai (Via Offline/Langsung):</strong>
-                1. Cetak/Print terlebih dahulu formulir yang telah diisi.<br>
-                2. Lakukan pengisian TTD (bubuhkan tanda tangan asli).<br>
-                3. Pembubuhan materai asli pada dokumen.<br>
-                <div style="margin-top:8px; font-style: italic;">
-                    <a onclick="openModal('terms')">* Syarat dan Ketentuan berlaku.</a>
-                </div>
+                <strong>Panduan TTD & Materai (Via Online)</strong>
+                <ol>
+                    <li>Buat TTD / siapkan materai asli (1x pakai/dokumen), lalu foto.</li>
+                    <li>Hapus background gambar hingga rapi (transparan).</li>
+                    <li>Upload file pada tombol TTD / Materai di atas.</li>
+                </ol>
+                
+                <strong>Panduan TTD & Materai (Via Offline/Langsung)</strong>
+                <ol>
+                    <li>Cetak (print) terlebih dahulu formulir yang telah diisi.</li>
+                    <li>Pembubuhan TTD (tanda tangan asli) pada dokumen.</li>
+                    <li>Pembubuhan materai asli pada dokumen.</li>
+                </ol>
+                <a onclick="openModal('terms')">* Syarat dan Ketentuan berlaku.</a>
             </div>
 
             <h3>5. Halaman</h3>
@@ -481,23 +486,23 @@
             <div class="guide-box">
                 <div class="guide-item">
                     <span class="guide-title">1. Tambah & Edit Teks</span>
-                    <p class="guide-desc">Klik "Tambah Teks", lalu klik teks tersebut. Klik ikon <b>⋮</b> di pojok kanan atas teks dan pilih <b>Edit Teks</b> atau <b>Duplikat Teks</b>.</p>
+                    <p class="guide-desc">Klik "Tambah Teks", lalu klik ikon <b>⋮</b> untuk <b>Edit</b> atau <b>Duplikat</b> teks.</p>
                 </div>
                 <div class="guide-item">
-                    <span class="guide-title">2. Geser & Perbesar Formulir</span>
-                    <p class="guide-desc"><b>PC:</b> Scroll mouse wheel untuk zoom, klik tahan area kosong untuk menggeser formulir.<br><b>HP:</b> Cubit dengan 2 jari untuk memperbesar, geser dengan 1 jari untuk memindahkan halaman.</p>
+                    <span class="guide-title">2. Geser & Zoom Formulir</span>
+                    <p class="guide-desc"><b>PC:</b> Scroll mouse untuk zoom, klik tahan area kosong untuk geser.<br><b>HP:</b> Cubit (2 jari) untuk zoom, geser (1 jari) untuk pindah.</p>
                 </div>
                 <div class="guide-item">
                     <span class="guide-title">3. Reset Tampilan</span>
-                    <p class="guide-desc">Jika formulir sudah terlalu diperbesar atau bergeser jauh, klik tombol <b>Reset Tampilan</b> (ikon kotak) di menu mengambang untuk mengembalikan seperti semula.</p>
+                    <p class="guide-desc">Klik ikon kotak (↔) di menu mengambang untuk memulihkan tampilan yang terlalu besar/geser.</p>
                 </div>
                 <div class="guide-item">
                     <span class="guide-title">4. Spasi & Jarak Baris</span>
-                    <p class="guide-desc">Klik teks yang ingin diatur, lalu gunakan tombol <b>[+]</b> dan <b>[-]</b> di panel kiri pada bagian "Atur Teks".</p>
+                    <p class="guide-desc">Pilih teks, gunakan tombol <b>[+]</b> / <b>[-]</b> di panel kiri (Atur Teks).</p>
                 </div>
                 <div class="guide-item">
                     <span class="guide-title">5. Resize Bebas</span>
-                    <p class="guide-desc">Tarik kotak panah merah di pojok kanan bawah objek (Ceklis, Lingkaran, TTD, Materai) untuk mengubah ukuran secara bebas (bisa hingga 1 pixel) sesuai kebutuhan.</p>
+                    <p class="guide-desc">Tarik kotak panah merah di pojok kanan bawah objek untuk ubah ukuran bebas (min. 1px).</p>
                 </div>
             </div>
         </div>
