@@ -1240,6 +1240,7 @@
                         element.style.fontSize = s + 'px'; 
                         annot.size = (s / canvasW) * currentPdfW; 
                     } else { 
+                        // Logika resize bebas (lebar dan tinggi dipisah)
                         let newW = Math.max(1, startW + dx); 
                         let newH = Math.max(1, startH + dy); 
                         element.style.width = newW + 'px'; 
