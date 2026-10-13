@@ -9,7 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
         :root {
-            --black: #1a1a1a; --red: #e74c3c; --white: #ffffff;
+            --black: #1a1a1a; --red: #e74c3c; --white: #ffffff; --green: #27ae60;
             --light-bg: #f4f6f5; --light-gray: #e0e0e0; --gray-text: #555;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -111,7 +111,7 @@
             text-transform: uppercase; text-decoration: none; display: flex; align-items: center; justify-content: center;
         }
 
-        select { width: 100%; padding: 12px; border: 2px solid var(--black); border-radius: 6px; font-size: 16px; cursor: pointer; background: var(--white); margin-bottom: 15px; }
+        select { width: 100%; padding: 12px; border: 2px solid var(--black); border-radius: 6px; font-size: 13px; cursor: pointer; background: var(--white); margin-bottom: 15px; }
         
         .btn-add-text {
             background: var(--red); color: var(--white); border: none; width: 100%; padding: 15px;
@@ -255,7 +255,6 @@
         .modal-close:hover { background: var(--white); color: var(--black); transform: rotate(90deg); }
         .modal-body { padding: 25px; overflow-y: auto; color: #333; font-size: 14px; line-height: 1.7; }
         .modal-body h4 { color: var(--black); margin: 18px 0 8px 0; font-size: 15px; border-bottom: 1px solid var(--red); padding-bottom: 4px; }
-        .modal-body h4:first-child { margin-top: 0; }
         .modal-body p { margin: 0 0 10px 0; text-align: justify; }
         .modal-body ul { margin: 0 0 10px 18px; padding: 0; }
         .modal-body li { margin-bottom: 6px; }
@@ -398,16 +397,16 @@
             <h3>1. Pilih Formulir</h3>
             <select id="formSelect">
                 <option value="">-- Pilih Formulir --</option>
-                <option value="F 1.02 FORMULIR PENDAFTARAN PERISTIWA KEPENDUDUKAN.pdf">F 1.02 Pendaftaran Peristiwa</option>
-                <option value="F 1.06 SURAT PERNYATAAN PERUBAHAN ELEMEN DATA KEPENDUDUKAN.pdf">F 1.06 Perubahan Elemen Data</option>
-                <option value="F-1.01 FORMULIR BIODATA WNI.pdf">F-1.01 Biodata WNI</option>
-                <option value="F-1.03 FORMULIR PENDAFTARAN PERPINDAHAN PENDUDUK.pdf">F-1.03 Perpindahan Penduduk</option>
-                <option value="F-1.07 SURAT KUASA.pdf">F-1.07 Surat Kuasa</option>
-                <option value="F-1.21-FORMULIR-PERMOHONAN-KTP-WNI.pdf">F-1.21 Permohonan KTP</option>
-                <option value="F-2.01 FORMULIR PELAPORAN PENCATATAN SIPIL DI DALAM WILAYAH NKRI.pdf">F-2.01 Pelaporan Capil</option>
-                <option value="F-2.03 SPTJM KELAHIRAN.pdf">F-2.03 SPTJM Kelahiran</option>
-                <option value="F-2.04 SPTJM KEBENARAN SUAMI ISTRI.pdf">F-2.04 SPTJM Suami Istri</option>
-                <option value="SURAT PERNYATAAN DOMISILI SUBANG.pdf">Surat Pernyataan Domisili</option>
+                <option value="F-1.01 FORMULIR BIODATA WNI.pdf">F-1.01 FORMULIR BIODATA WNI.pdf</option>
+                <option value="F 1.02 FORMULIR PENDAFTARAN PERISTIWA KEPENDUDUKAN.pdf">F 1.02 FORMULIR PENDAFTARAN PERISTIWA KEPENDUDUKAN.pdf</option>
+                <option value="F-1.03 FORMULIR PENDAFTARAN PERPINDAHAN PENDUDUK.pdf">F-1.03 FORMULIR PENDAFTARAN PERPINDAHAN PENDUDUK.pdf</option>
+                <option value="F 1.06 SURAT PERNYATAAN PERUBAHAN ELEMEN DATA KEPENDUDUKAN.pdf">F 1.06 SURAT PERNYATAAN PERUBAHAN ELEMEN DATA KEPENDUDUKAN.pdf</option>
+                <option value="F-1.07 SURAT KUASA.pdf">F-1.07 SURAT KUASA.pdf</option>
+                <option value="F-1.21-FORMULIR-PERMOHONAN-KTP-WNI.pdf">F-1.21-FORMULIR-PERMOHONAN-KTP-WNI.pdf</option>
+                <option value="F-2.01 FORMULIR PELAPORAN PENCATATAN SIPIL DI DALAM WILAYAH NKRI.pdf">F-2.01 FORMULIR PELAPORAN PENCATATAN SIPIL DI DALAM WILAYAH NKRI.pdf</option>
+                <option value="F-2.03 SPTJM KELAHIRAN.pdf">F-2.03 SPTJM KELAHIRAN.pdf</option>
+                <option value="F-2.04 SPTJM KEBENARAN SUAMI ISTRI.pdf">F-2.04 SPTJM KEBENARAN SUAMI ISTRI.pdf</option>
+                <option value="SURAT PERNYATAAN DOMISILI SUBANG.pdf">SURAT PERNYATAAN DOMISILI SUBANG.pdf</option>
             </select>
 
             <h3>2. Masukkan Teks</h3>
@@ -550,6 +549,7 @@
         </div>
     </footer>
 
+    <!-- Modal untuk Informasi (Privacy, Terms, dll) -->
     <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) closeModal()">
         <div class="modal-content">
             <div class="modal-header">
@@ -557,6 +557,27 @@
                 <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- Modal untuk Notifikasi Download Selesai -->
+    <div class="modal-overlay" id="downloadModal" onclick="if(event.target===this) closeDownloadModal()">
+        <div class="modal-content" style="max-width: 400px; border-color: var(--green);">
+            <div class="modal-header" style="background: var(--green); border-bottom-color: var(--green);">
+                <h3 style="display: flex; align-items: center; gap: 10px;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    Download Selesai
+                </h3>
+                <button class="modal-close" onclick="closeDownloadModal()" style="background: white; color: var(--green);">&times;</button>
+            </div>
+            <div class="modal-body" style="text-align: center; padding: 30px 25px;">
+                <p style="font-size: 15px; margin-bottom: 5px; font-weight: bold;">File PDF berhasil disimpan di perangkat Anda.</p>
+                <p style="font-size: 13px; color: #666; margin-bottom: 25px;">Nama File: <br><b style="color: var(--black); word-break: break-all;">Formulir_Subang_Terisi.pdf</b></p>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <button id="openFileBtn" style="background: var(--green); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px;">Buka File</button>
+                    <button onclick="alert('Silakan buka aplikasi File Manager atau folder Unduhan/Downloads di perangkat Anda untuk menemukan file ini.')" style="background: #f1f1f1; color: #333; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px;">Buka di Folder</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -582,7 +603,7 @@
         const modalContents = {
             about: { title: 'Tentang Kami', body: `<h4>Profil Karya Abadi</h4><p><b>Karya Abadi</b> merupakan penyedia layanan digital yang berfokus pada sistem pengisian formulir kependudukan secara online untuk wilayah Kabupaten Subang, Jawa Barat.</p><h4>Visi</h4><p>Menjadi mitra terpercaya masyarakat dan pemerintah dalam digitalisasi layanan administrasi kependudukan yang cepat, akurat, dan mudah diakses oleh seluruh lapisan masyarakat.</p><h4>Misi</h4><ul><li>Menyediakan platform digital yang ramah pengguna untuk pengisian formulir kependudukan.</li><li>Mendukung efisiensi pelayanan publik di Kabupaten Subang melalui teknologi.</li><li>Memberikan kemudahan akses tanpa biaya tambahan untuk dokumen administrasi dasar.</li><li>Menjaga kerahasiaan dan keamanan data pengguna sesuai standar yang berlaku.</li></ul><h4>Lokasi Layanan</h4><p>Rawameneng, Blanakan, Subang, Jawa Barat, Indonesia - Kode Pos 41259.</p>` },
             privacy: { title: 'Kebijakan Privasi', body: `<h4>Pendahuluan</h4><p>Selamat datang di Sistem Digital Pengisian Formulir Kependudukan Kabupaten Subang yang dikelola oleh <b>Karya Abadi</b>. Privasi dan keamanan data Anda adalah prioritas utama kami. Kebijakan ini menjelaskan praktik privasi platform kami yang berfungsi murni sebagai alat bantu digital.</p><h4>Tidak Ada Pengumpulan & Penyimpanan Data</h4><p>Platform ini dirancang sebagai <b>alat bantu interaktif (tools)</b> untuk memudahkan pengguna mengisi formulir secara digital. <b>Kami TIDAK mengumpulkan, menyimpan, memantau, atau memproses data pribadi Anda</b> di server kami. Seluruh proses input data (seperti NIK, nama, alamat), unggahan tanda tangan, maupun materai, diproses sepenuhnya secara lokal di dalam peramban (browser) perangkat Anda.</p><h4>Keamanan Data Lokal</h4><p>Karena seluruh aktivitas pengisian formulir dilakukan pada perangkat Anda dan tidak dikirimkan ke mana pun, keamanan data berada di bawah kendali penuh perangkat Anda. File PDF yang dihasilkan dari proses pengunduhan juga menjadi tanggung jawab pengguna untuk menjaga kerahasiaannya.</p><h4>Tautan Eksternal</h4><p>Platform ini mungkin menyediakan tautan ke situs web resmi pemerintah (seperti subang.go.id) untuk informasi berita atau pengumuman. Kami tidak bertanggung jawab atas kebijakan privasi atau praktik pengumpulan data dari situs pihak ketiga tersebut. Pengguna disarankan untuk membaca kebijakan privasi situs tujuan secara mandiri.</p><h4>Perubahan Kebijakan</h4><p>Sebagai platform independen, kami berhak memperbarui Kebijakan Privasi ini sewaktu-waktu jika diperlukan untuk penyesuaian fitur. Setiap perubahan akan dipublikasikan langsung pada halaman ini.</p>` },
-            terms: { title: 'Syarat dan Ketentuan', body: `<h4>1. Penerimaan Ketentuan</h4><p>Dengan menggunakan layanan Sistem Digital Pengisian Formulir Kependudukan Kabupaten Subang yang disediakan oleh <b>Karya Abadi</b>, pengguna dianggap telah membaca, memahami, dan menyetujai seluruh syarat dan ketentuan berikut.</p><h4>2. Penggunaan Layanan</h4><ul><li>Layanan ini disediakan untuk membantu masyarakat mengisi formulir kependudukan secara digital.</li><li>Pengguna wajib memberikan data yang benar, akurat, dan sah.</li><li>Pengguna dilarang menggunakan layanan untuk tujuan melanggar hukum atau peraturan yang berlaku.</li></ul><h4>3. Tanggung Jawab Pengguna</h4><p>Pengguna bertanggung jawab penuh atas kebenaran data yang dimasukkan ke dalam formulir. Karya Abadi tidak bertanggung jawab atas kesalahan pengisian yang dilakukan oleh pengguna.</p><h4>4. Hak Kekayaan Intelektual</h4><p>Seluruh konten, desain, logo, dan kode aplikasi merupakan milik Karya Abadi ektif.</p>` },
+            terms: { title: 'Syarat dan Ketentuan', body: `<h4>1. Penerimaan Ketentuan</h4><p>Dengan menggunakan layanan Sistem Digital Pengisian Formulir Kependudukan Kabupaten Subang yang disediakan oleh <b>Karya Abadi</b>, pengguna dianggap telah membaca, memahami, dan menyetujai seluruh syarat dan ketentuan berikut.</p><h4>2. Penggunaan Layanan</h4><ul><li>Layanan ini disediakan untuk membantu masyarakat mengisi formulir kependudukan secara digital.</li><li>Pengguna wajib memberikan data yang benar, akurat, dan sah.</li><li>Pengguna dilarang menggunakan layanan untuk tujuan melanggar hukum atau peraturan yang berlaku.</li></ul><h4>3. Tanggung Jawab Pengguna</h4><p>Pengguna bertanggung jawab penuh atas kebenaran data yang dimasukkan ke dalam formulir. Karya Abadi tidak bertanggung jawab atas kesalahan pengisian yang dilakukan oleh pengguna.</p><h4>4. Hak Kekayaan Intelektual</h4><p>Seluruh konten, desain, logo, dan kode aplikasi merupakan milik Karya Abadi dan dilindungi oleh hukum hak cipta. Dilarang menyalin, memodifikasi, atau mendistribusikan tanpa izin tertulis.</p><h4>5. Batasan Tanggung Jawab</h4><p>Layanan disediakan "sebagaimana adanya" tanpa jaminan eksplisit. Karya Abadi tidak bertanggung jawab atas kerugian langsung maupun tidak langsung yang timbul dari penggunaan layanan.</p><h4>6. Perubahan Ketentuan</h4><p>Karya Abadi berhak mengubah syarat dan ketentuan ini sewaktu-waktu. Perubahan berlaku sejak dipublikasikan di halaman ini.</p>` },
             disclaimer: { title: 'Disclaimer', body: `<h4>Penyangkalan Umum</h4><p>Informasi dan layanan pada platform <b>Karya Abadi - Formulir Subang</b> disediakan untuk tujuan membantu masyarakat dalam pengisian formulir kependudukan secara digital.</p><h4>Ketepatan Data</h4><p>Kami berupaya menyediakan formulir yang sesuai dengan standar resmi. Namun, pengguna wajib memverifikasi kembali kebenaran data sebelum dokumen diserahkan kepada instansi berwenang. Karya Abadi tidak bertanggung jawab atas konsekuensi hukun akibat kesalahan pengisian data oleh pengguna.</p><h4>Bukan Instansi Resmi</h4><p>Karya Abadi <b>BUKAN</b> instansi pemerintah, Dinas Kependudukan dan Pencatatan Sipil (Disdukcapil), maupun Badan Kependudukan dan Keluarga Berencana Nasional (BKKBN). Layanan ini bersifat independen dan hanya berfungsi sebagai alat bantu digital pengisian formulir.</p><h4>Validitas Dokumen</h4><p>Dokumen yang dihasilkan melalui platform ini tetap perlu diverifikasi, ditandatangani, dan disahkan oleh pejabat berwenang agar sah secara hukum. Karya Abadi tidak menjamin diterimanya dokumen oleh pihak tertentu.</p><h4>Link Eksternal</h4><p>Platform dapat mengandung link ke situs pihak ketiga. Karya Abadi tidak bertanggung jawab atas konten atau kebijakan privasi situ eksternal tersebut.</p><h4>Paksaan Mayoret (Force Majeure)</h4><p>Karya Abadi tidak bertanggung jawab atas kegagalan layanan akibat kondisi di luar kendali, seperti bencana alam, gangguan jaringan, atau perubahan kebijakan pemerintah.</p>` },
             services: { title: 'Layanan Formulir', body: `<h4>Jenis Formulir Tersedia</h4><p>Platform Karya Abadi menyediakan pengisian digital berbagai formulir kependudukan, antara lain:</p><ul><li><b>F-1.01</b> - Formulir Biodata WNI</li><li><b>F-1.02</b> - Pendaftaran Peristiwa Kependudukan</li><li><b>F-1.03</b> - Pendaftaran Perpindahan Penduduk</li><li><b>F-1.06</b> - Surat Pernyataan Perubahan Elemen Data</li><li><b>F-1.07</b> - Surat Kuasa</li><li><b>F-1.21</b> - Permohonan KTP WNI</li><li><b>F-2.01</b> - Pelaporan Pencatatan Sipil</li><li><b>F-2.03</b> - SPTJM Kelahiran</li><li><b>F-2.04</b> - SPTJM Kebenaran Suami Istri</li><li>Surat Pernyataan Domisili Subang</li></ul><h4>Fitur Utama</h4><ul><li>Penambahan teks dengan pengaturan ukuran dan spasi huruf.</li><li>Tanda tangan digital dan materai yang dapat diunggah.</li><li>Mode tanda ceklis dan lingkaran.</li><li>Undo dan Redo untuk koreksi kesalahan.</li><li>Unduh hasil dalam format PDF.</li></ul>` },
             guide: { title: 'Panduan Penggunaan', body: `<h4>Langkah 1 - Pilih Formulir</h4><p>Buka panel di sisi kiri, pilih formulir kependudukan yang sesuai dari dropdown "Pilih Formulir".</p><h4>Langkah 2 - Tambahkan Teks</h4><p>Klik tombol "Tambah Teks", lalu klik teks baru yang muncul di halaman PDF. Klik ikon <b>⋮</b> di samping teks dan pilih <b>Edit Teks</b> untuk mengubah isi sesuai kebutuhan.</p><h4>Langkah 3 - Geser & Atur Posisi</h4><p>Tahan dan geser objek teks atau tanda untuk memindahkan ke posisi yang diinginkan. Gunakan 2 jari (cubitan) pada layar HP atau scroll mouse pada PC untuk memperbesar halaman PDF.</p><h4>Langkah 4 - Atur Spasi Huruf</h4><p>Untuk melebarkan huruf agar pas dengan kolom tabel, klik teks tersebut, lalu gunakan tombol <b>[+]</b> atau <b>[-]</b> di bagian "Atur Teks" pada panel kiri.</p><h4>Langkah 5 - Tanda Tangan & Materai</h4><p>Pilih mode "TTD" atau "Materai" di panel kiri, lalu unggah file gambar tanda tangan atau materai Anda. Setelah terunggah, klik di posisi yang diinginkan pada PDF untuk menempatkannya.</p><h4>Langkah 6 - Navigasi Halaman</h4><p>Gunakan tombol <b>PREV</b> dan <b>NEXT</b> untuk berpindah antar halaman formulir jika memiliki lebih dari satu halaman.</p><h4>Langkah 7 - Undo / Redo</h4><p>Gunakan tombol mengambang di pojok kiri atas layar untuk membatalkan (Undo) atau mengulang (Redo) aksi terakhir Anda.</p><h4>Langkah 8 - Unduh PDF</h4><p>Setelah semua data terisi, klik tombol <b>DOWNLOAD PDF</b> untuk menyimpan hasil ke perangkat Anda.</p>` }
@@ -600,7 +621,17 @@
             document.getElementById('modalOverlay').classList.remove('active');
             document.body.style.overflow = '';
         }
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+        
+        function closeDownloadModal() {
+            document.getElementById('downloadModal').classList.remove('active');
+        }
+
+        document.addEventListener('keydown', (e) => { 
+            if (e.key === 'Escape') {
+                closeModal();
+                closeDownloadModal();
+            } 
+        });
 
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         let pdfDoc = null, pdfBytes = null, currentMode = null, annotations = [], scale = 1.5, currentPage = 1, totalPages = 1;
@@ -817,7 +848,6 @@
                 scale = 1.5; 
             }
             
-            // Update scale for all annotations on this page to ensure accurate PDF mapping
             annotations.filter(a => a.page === currentPage).forEach(a => {
                 a.scale = scale;
             });
@@ -865,7 +895,7 @@
                 size: (16 / canvasW) * currentPdfW, 
                 letterSpacing: 0, 
                 lineHeight: 1.15,
-                scale: scale // Simpan scale saat dibuat
+                scale: scale 
             };
             annotations.push(annot); saveHistory(); renderAnnotations();
             if(window.innerWidth < 768) toggleSidebar();
@@ -896,7 +926,7 @@
                 y: (y / canvasH) * currentPdfH, 
                 type: currentMode, 
                 letterSpacing: 0,
-                scale: scale // Simpan scale saat dibuat
+                scale: scale 
             };
 
             if (currentMode === 'check' || currentMode === 'circle') {
@@ -1143,7 +1173,7 @@
                         const canvasH = parseFloat(canvas.style.height);
                         annot.x = (nx / canvasW) * currentPdfW;
                         annot.y = (ny / canvasH) * currentPdfH;
-                        annot.scale = scale; // Update scale
+                        annot.scale = scale;
                     }
                 }
                 function onUp() {
@@ -1189,7 +1219,7 @@
                         annot.width = (newW / canvasW) * currentPdfW; 
                         annot.height = (newH / canvasH) * currentPdfH; 
                     }
-                    annot.scale = scale; // Update scale
+                    annot.scale = scale;
                 }
                 function stopResize() {
                     document.removeEventListener('mousemove', onResize); document.removeEventListener('mouseup', stopResize);
@@ -1234,7 +1264,6 @@
                         const padY = 2 / annotScale;
                         const correctedX = pdfX + padX; 
                         
-                        // Perbaikan presisi baseline (0.8 adalah ascent standar Helvetica/Arial + leading)
                         const baselineOffset = fs * (0.8 + (lineHeightFactor - 1) / 2);
                         const y_pdf = pdfY_base - padY - baselineOffset; 
                         
@@ -1262,15 +1291,35 @@
                         page.drawImage(img, { x: pdfX, y: pdfY_base, width: a.width, height: a.height });
                     }
                 }
-                const pdfOut = await pdfDocLib.save(); const blob = new Blob([pdfOut], { type: 'application/pdf' });
-                const link = document.createElement('a'); link.href = URL.createObjectURL(blob);
-                link.download = "Formulir_Subang_Terisi.pdf"; link.click();
+                const pdfOut = await pdfDocLib.save(); 
+                const blob = new Blob([pdfOut], { type: 'application/pdf' });
+                const blobUrl = URL.createObjectURL(blob);
+                
+                const link = document.createElement('a'); 
+                link.href = blobUrl;
+                link.download = "Formulir_Subang_Terisi.pdf"; 
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Tampilkan Notifikasi Download Selesai
+                const downloadModal = document.getElementById('downloadModal');
+                const openFileBtn = document.getElementById('openFileBtn');
+                
+                openFileBtn.onclick = () => {
+                    window.open(blobUrl, '_blank');
+                };
+                
+                downloadModal.classList.add('active');
+                
             } catch (err) { 
                 alert("Gagal download PDF. Error: " + err.message); console.error(err); 
             } finally { 
-                downloadBtn.disabled = false; downloadBtn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width: 20px; height: 20px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="11" x2="12" y2="17"/><polyline points="9 14 12 17 15 14"/></svg> DOWNLOAD PDF`; 
+                downloadBtn.disabled = false; 
+                downloadBtn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width: 20px; height: 20px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="11" x2="12" y2="17"/><polyline points="9 14 12 17 15 14"/></svg> DOWNLOAD PDF`; 
             }
         }
+        
         function nextPage() { if (currentPage < totalPages) renderPage(currentPage + 1); }
         function prevPage() { if (currentPage > 1) renderPage(currentPage - 1); }
         
