@@ -1240,11 +1240,20 @@
                         element.style.fontSize = s + 'px'; 
                         annot.size = (s / canvasW) * currentPdfW; 
                     } else { 
-                        // Logika resize bebas (lebar dan tinggi dipisah)
-                        let newW = Math.max(1, startW + dx); 
-                        let newH = Math.max(1, startH + dy); 
+                        let newW = Math.max(10, startW + dx); 
+                        let newH = Math.max(10, startH + dy); 
                         element.style.width = newW + 'px'; 
                         element.style.height = newH + 'px'; 
+                        
+                        // Perbaikan: Update ukuran gambar di dalam div
+                        if (annot.type === 'sign' || annot.type === 'materai') {
+                            const imgEl = element.querySelector('img');
+                            if (imgEl) {
+                                imgEl.style.width = newW + 'px';
+                                imgEl.style.height = newH + 'px';
+                            }
+                        }
+                        
                         annot.width = (newW / canvasW) * currentPdfW; 
                         annot.height = (newH / canvasH) * currentPdfH; 
                     }
