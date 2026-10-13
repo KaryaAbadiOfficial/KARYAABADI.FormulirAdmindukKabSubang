@@ -589,19 +589,15 @@
     <div class="modal-overlay" id="downloadModal" onclick="if(event.target===this) closeDownloadModal()">
         <div class="modal-content" style="max-width: 400px; border-color: var(--green);">
             <div class="modal-header" style="background: var(--green); border-bottom-color: var(--green);">
-                <h3 style="display: flex; align-items: center; gap: 10px;">
+                <h3 style="display: flex; align-items: center; gap: 10px; font-size: 18px;">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                    Download Selesai
+                    Unduhan Selesai
                 </h3>
                 <button class="modal-close" onclick="closeDownloadModal()" style="background: white; color: var(--green);">&times;</button>
             </div>
             <div class="modal-body" style="text-align: center; padding: 30px 25px;">
                 <p style="font-size: 15px; margin-bottom: 5px; font-weight: bold;">File PDF berhasil disimpan di perangkat Anda.</p>
-                <p style="font-size: 13px; color: #666; margin-bottom: 25px;">Nama File: <br><b id="downloadFileName" style="color: var(--black); word-break: break-all;">Formulir_Subang_Terisi.pdf</b></p>
-                <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <button id="openFileBtn" style="background: var(--green); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px;">Buka File</button>
-                    <button onclick="alert('Silakan buka aplikasi File Manager atau folder Unduhan/Downloads di perangkat Anda untuk menemukan file ini.')" style="background: #f1f1f1; color: #333; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px;">Buka di Folder</button>
-                </div>
+                <p style="font-size: 13px; color: #666; margin-bottom: 0;">Nama File: <br><b id="downloadFileName" style="color: var(--black); word-break: break-all;">Formulir_Subang_Terisi.pdf</b></p>
             </div>
         </div>
     </div>
@@ -1245,7 +1241,7 @@
                         element.style.width = newW + 'px'; 
                         element.style.height = newH + 'px'; 
                         
-                        // Perbaikan: Update ukuran gambar di dalam div
+                        // Perbaikan: Update ukuran gambar di dalam div TTD/Materai saat resize
                         if (annot.type === 'sign' || annot.type === 'materai') {
                             const imgEl = element.querySelector('img');
                             if (imgEl) {
@@ -1352,15 +1348,16 @@
                 document.body.removeChild(link);
                 
                 const downloadModal = document.getElementById('downloadModal');
-                const openFileBtn = document.getElementById('openFileBtn');
                 const downloadFileNameEl = document.getElementById('downloadFileName');
                 
                 downloadFileNameEl.innerText = downloadName;
-                openFileBtn.onclick = () => {
-                    window.open(blobUrl, '_blank');
-                };
                 
                 downloadModal.classList.add('active');
+                
+                // Auto close modal setelah 3 detik
+                setTimeout(() => {
+                    closeDownloadModal();
+                }, 3000);
                 
             } catch (err) { 
                 alert("Gagal download PDF. Error: " + err.message); console.error(err); 
