@@ -570,7 +570,7 @@
             </div>
             <div class="modal-body" style="text-align: center; padding: 30px 25px;">
                 <p style="font-size: 15px; margin-bottom: 5px; font-weight: bold;">File PDF berhasil disimpan di perangkat Anda.</p>
-                <p style="font-size: 13px; color: #666; margin-bottom: 25px;">Nama File: <br><b style="color: var(--black); word-break: break-all;">Formulir_Subang_Terisi.pdf</b></p>
+                <p style="font-size: 13px; color: #666; margin-bottom: 25px;">Nama File: <br><b id="downloadFileName" style="color: var(--black); word-break: break-all;">Formulir_Subang_Terisi.pdf</b></p>
                 <div style="display: flex; flex-direction: column; gap: 10px;">
                     <button id="openFileBtn" style="background: var(--green); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px;">Buka File</button>
                     <button onclick="alert('Silakan buka aplikasi File Manager atau folder Unduhan/Downloads di perangkat Anda untuk menemukan file ini.')" style="background: #f1f1f1; color: #333; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px;">Buka di Folder</button>
@@ -1296,16 +1296,31 @@
                 const blob = new Blob([pdfOut], { type: 'application/pdf' });
                 const blobUrl = URL.createObjectURL(blob);
                 
+                // Logika penamaan file sesuai kode/nama formulir
+                const selectedFile = formSelect.value;
+                let downloadName = "Formulir_Subang_Terisi.pdf";
+                if (selectedFile) {
+                    if (selectedFile.toUpperCase().startsWith("SURAT")) {
+                        downloadName = selectedFile; // Tetap pakai nama panjangnya
+                    } else {
+                        // Ambil kata pertama sebelum spasi (misal: F-1.01)
+                        let firstPart = selectedFile.split(' ')[0];
+                        downloadName = firstPart.endsWith('.pdf') ? firstPart : firstPart + ".pdf";
+                    }
+                }
+
                 const link = document.createElement('a'); 
                 link.href = blobUrl;
-                link.download = "Formulir_Subang_Terisi.pdf"; 
+                link.download = downloadName; 
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
                 
                 const downloadModal = document.getElementById('downloadModal');
                 const openFileBtn = document.getElementById('openFileBtn');
+                const downloadFileNameEl = document.getElementById('downloadFileName');
                 
+                downloadFileNameEl.innerText = downloadName;
                 openFileBtn.onclick = () => {
                     window.open(blobUrl, '_blank');
                 };
