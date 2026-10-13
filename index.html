@@ -125,7 +125,7 @@
         .sidebar-spacing .spacing-btn:disabled { background: #f0f0f0; color: #aaa; cursor: not-allowed; border-color: #ddd; }
         .sidebar-spacing .spacing-val { color: #333; font-size: 14px; width: 50px; }
 
-        .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .btn-mode {
             background: var(--white); color: var(--black); border: 2px solid var(--black);
             padding: 15px 5px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;
@@ -133,7 +133,14 @@
         }
         .btn-mode.active { background: var(--black); color: var(--white); border-color: var(--black); box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); }
         .btn-upload { display: flex; width: 100%; justify-content: center; box-sizing: border-box; cursor: pointer; }
-        
+
+        .upload-guide-box {
+            background: #fdecea; border: 1px solid #f5c6cb; color: #821a1a;
+            padding: 12px; border-radius: 8px; font-size: 12px; margin-bottom: 20px; line-height: 1.6;
+        }
+        .upload-guide-box strong { display: block; margin-bottom: 5px; font-size: 13px; }
+        .upload-guide-box a { color: var(--red); text-decoration: underline; cursor: pointer; font-weight: bold; }
+
         .row-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; margin-bottom: 20px; }
         .btn-nav { background: var(--black); color: var(--white); border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; }
         .page-info { font-weight: bold; color: var(--black); font-size: 14px; }
@@ -441,6 +448,16 @@
                 <button class="btn-mode" data-mode="circle" onclick="setMode('circle')"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/></svg> Lingkaran</button>
                 <label class="btn-mode btn-upload" data-mode="sign"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg> TTD<input type="file" id="signUpload" accept="image/*"></label>
                 <label class="btn-mode btn-upload" data-mode="materai"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 12h16M4 20h16M6 16h12M9 8a3 3 0 1 1 6 0c0 1.5-.5 2-1 3H10c-.5-1-1-1.5-1-3z"/></svg> Materai<input type="file" id="materaiUpload" accept="image/*"></label>
+            </div>
+
+            <div class="upload-guide-box">
+                <strong>Panduan Upload TTD & Materai:</strong>
+                1. Pembuatan TTD / siapkan materai (asli, penggunaan 1 kali pemakaian perdokumen), kemudian di foto.<br>
+                2. Hapus background, pastikan rapi.<br>
+                3. Upload file gambar pada tombol TTD / Materai di atas.<br>
+                <div style="margin-top:8px; font-style: italic;">
+                    <a onclick="openModal('terms')">* Syarat dan Ketentuan berlaku.</a>
+                </div>
             </div>
 
             <h3>5. Halaman</h3>
@@ -1296,14 +1313,12 @@
                 const blob = new Blob([pdfOut], { type: 'application/pdf' });
                 const blobUrl = URL.createObjectURL(blob);
                 
-                // Logika penamaan file sesuai kode/nama formulir
                 const selectedFile = formSelect.value;
                 let downloadName = "Formulir_Subang_Terisi.pdf";
                 if (selectedFile) {
                     if (selectedFile.toUpperCase().startsWith("SURAT")) {
-                        downloadName = selectedFile; // Tetap pakai nama panjangnya
+                        downloadName = selectedFile;
                     } else {
-                        // Ambil kata pertama sebelum spasi (misal: F-1.01)
                         let firstPart = selectedFile.split(' ')[0];
                         downloadName = firstPart.endsWith('.pdf') ? firstPart : firstPart + ".pdf";
                     }
