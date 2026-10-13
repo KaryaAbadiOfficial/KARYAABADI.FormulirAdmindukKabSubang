@@ -398,11 +398,11 @@
             <select id="formSelect">
                 <option value="">-- Pilih Formulir --</option>
                 <option value="F-1.01 FORMULIR BIODATA WNI.pdf">F-1.01 FORMULIR BIODATA WNI.pdf</option>
-                <option value="F 1.02 FORMULIR PENDAFTARAN PERISTIWA KEPENDUDUKAN.pdf">F 1.02 FORMULIR PENDAFTARAN PERISTIWA KEPENDUDUKAN.pdf</option>
+                <option value="F-1.02 FORMULIR PENDAFTARAN PERISTIWA KEPENDUDUKAN.pdf">F-1.02 FORMULIR PENDAFTARAN PERISTIWA KEPENDUDUKAN.pdf</option>
                 <option value="F-1.03 FORMULIR PENDAFTARAN PERPINDAHAN PENDUDUK.pdf">F-1.03 FORMULIR PENDAFTARAN PERPINDAHAN PENDUDUK.pdf</option>
-                <option value="F 1.06 SURAT PERNYATAAN PERUBAHAN ELEMEN DATA KEPENDUDUKAN.pdf">F 1.06 SURAT PERNYATAAN PERUBAHAN ELEMEN DATA KEPENDUDUKAN.pdf</option>
+                <option value="F-1.06 SURAT PERNYATAAN PERUBAHAN ELEMEN DATA KEPENDUDUKAN.pdf">F-1.06 SURAT PERNYATAAN PERUBAHAN ELEMEN DATA KEPENDUDUKAN.pdf</option>
                 <option value="F-1.07 SURAT KUASA.pdf">F-1.07 SURAT KUASA.pdf</option>
-                <option value="F-1.21-FORMULIR-PERMOHONAN-KTP-WNI.pdf">F-1.21-FORMULIR-PERMOHONAN-KTP-WNI.pdf</option>
+                <option value="F-1.21 FORMULIR PERMOHONAN KTP WNI.pdf">F-1.21 FORMULIR PERMOHONAN KTP WNI.pdf</option>
                 <option value="F-2.01 FORMULIR PELAPORAN PENCATATAN SIPIL DI DALAM WILAYAH NKRI.pdf">F-2.01 FORMULIR PELAPORAN PENCATATAN SIPIL DI DALAM WILAYAH NKRI.pdf</option>
                 <option value="F-2.03 SPTJM KELAHIRAN.pdf">F-2.03 SPTJM KELAHIRAN.pdf</option>
                 <option value="F-2.04 SPTJM KEBENARAN SUAMI ISTRI.pdf">F-2.04 SPTJM KEBENARAN SUAMI ISTRI.pdf</option>
@@ -549,7 +549,6 @@
         </div>
     </footer>
 
-    <!-- Modal untuk Informasi (Privacy, Terms, dll) -->
     <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) closeModal()">
         <div class="modal-content">
             <div class="modal-header">
@@ -560,7 +559,6 @@
         </div>
     </div>
 
-    <!-- Modal untuk Notifikasi Download Selesai -->
     <div class="modal-overlay" id="downloadModal" onclick="if(event.target===this) closeDownloadModal()">
         <div class="modal-content" style="max-width: 400px; border-color: var(--green);">
             <div class="modal-header" style="background: var(--green); border-bottom-color: var(--green);">
@@ -818,15 +816,18 @@
             if (!fileName) return;
             if(window.innerWidth < 768) toggleSidebar();
             try {
-                const response = await fetch(encodeURIComponent(fileName));
-                if (!response.ok) throw new Error("File PDF tidak ditemukan");
+                const response = await fetch(fileName);
+                if (!response.ok) throw new Error(`File tidak ditemukan! Pastikan file '${fileName}' sudah ter-upload di folder yang sama dengan file HTML.`);
                 const arrayBuffer = await response.arrayBuffer();
                 pdfBytes = new Uint8Array(arrayBuffer.slice(0)); 
                 const viewerBuffer = arrayBuffer.slice(0); 
                 pdfDoc = await pdfjsLib.getDocument({ data: viewerBuffer }).promise;
                 totalPages = pdfDoc.numPages; currentPage = 1; annotations = [];
                 saveHistory(); renderPage(1);
-            } catch (err) { alert("Gagal memuat PDF! Pastikan file sudah ter-upload."); console.error(err); }
+            } catch (err) { 
+                alert("Gagal memuat PDF!\n\nPastikan file '" + fileName + "' sudah ter-upload di folder hosting yang sama persis dengan file HTML ini.");
+                console.error(err); 
+            }
         });
 
         document.getElementById('signUpload').addEventListener('change', async (e) => { if(e.target.files[0]) { signImgBytes = await e.target.files[0].arrayBuffer(); setMode('sign'); alert('TTD siap! Klik di PDF.'); } });
@@ -1302,7 +1303,6 @@
                 link.click();
                 document.body.removeChild(link);
                 
-                // Tampilkan Notifikasi Download Selesai
                 const downloadModal = document.getElementById('downloadModal');
                 const openFileBtn = document.getElementById('openFileBtn');
                 
