@@ -155,10 +155,10 @@
         }
 
         .guide-box { background: #f9f9f9; padding: 15px; border-radius: 8px; font-size: 13px; line-height: 1.5; color: #555; border: 1px solid #eee; margin-top: 20px; margin-bottom: 30px; }
-        .guide-item { margin-bottom: 12px; }
-        .guide-item:last-child { margin-bottom: 0; }
-        .guide-item .guide-title { font-weight: bold; color: var(--black); margin-bottom: 2px; display: block; }
-        .guide-item .guide-desc { margin: 0; font-size: 12px; }
+        .guide-box ol { margin: 0; padding-left: 20px; }
+        .guide-box li { margin-bottom: 12px; line-height: 1.5; }
+        .guide-box li:last-child { margin-bottom: 0; }
+        .guide-box li b { color: var(--black); }
 
         .pdf-area { 
             flex-grow: 1; padding: 15px; overflow: hidden; 
@@ -454,14 +454,14 @@
             </div>
 
             <div class="upload-guide-box">
-                <strong>Panduan TTD & Materai (Via Online)</strong>
+                <strong>Panduan TTD & Materai (Via Online):</strong>
                 <ol>
                     <li>Buat TTD / siapkan materai asli, lalu foto.<br><span style="font-size:11px; color:#a52a2a;">(Penggunaan 1 kali pemakaian per dokumen)</span></li>
                     <li>Hapus background gambar hingga rapi.<br><span style="font-size:11px; color:#a52a2a;">(Pastikan transparan)</span></li>
                     <li>Upload file pada tombol TTD / Materai di atas.</li>
                 </ol>
                 
-                <strong>Panduan TTD & Materai (Via Offline/Langsung)</strong>
+                <strong>Panduan TTD & Materai (Via Offline/Langsung):</strong>
                 <ol>
                     <li>Cetak / print terlebih dahulu formulir yang telah diisi.</li>
                     <li>Pembubuhan TTD pada dokumen.<br><span style="font-size:11px; color:#a52a2a;">(Tanda tangan asli)</span></li>
@@ -482,28 +482,15 @@
                 DOWNLOAD PDF
             </button>
 
-            <h3>6. Panduan Tool</h3>
+            <h3>6. PANDUAN TOOL</h3>
             <div class="guide-box">
-                <div class="guide-item">
-                    <span class="guide-title">1. Tambah & Edit Teks</span>
-                    <p class="guide-desc">Klik "Tambah Teks", lalu klik ikon <b>⋮</b> untuk <b>Edit</b> atau <b>Duplikat</b> teks.</p>
-                </div>
-                <div class="guide-item">
-                    <span class="guide-title">2. Geser & Zoom Formulir</span>
-                    <p class="guide-desc"><b>PC:</b> Scroll mouse untuk zoom, klik tahan area kosong untuk geser.<br><b>HP:</b> Cubit (2 jari) untuk zoom, geser (1 jari) untuk pindah.</p>
-                </div>
-                <div class="guide-item">
-                    <span class="guide-title">3. Reset Tampilan</span>
-                    <p class="guide-desc">Klik ikon kotak (↔) di menu mengambang untuk memulihkan tampilan yang terlalu besar/geser.</p>
-                </div>
-                <div class="guide-item">
-                    <span class="guide-title">4. Spasi & Jarak Baris</span>
-                    <p class="guide-desc">Pilih teks, gunakan tombol <b>[+]</b> / <b>[-]</b> di panel kiri (Atur Teks).</p>
-                </div>
-                <div class="guide-item">
-                    <span class="guide-title">5. Resize Bebas</span>
-                    <p class="guide-desc">Tarik kotak panah merah di pojok kanan bawah objek untuk ubah ukuran bebas (min. 1px).</p>
-                </div>
+                <ol>
+                    <li><b>Tambah & Edit Teks</b><br>Klik "Tambah Teks", lalu klik ikon <b>⋮</b> untuk <b>Edit</b> atau <b>Duplikat</b> teks.</li>
+                    <li><b>Geser & Zoom Formulir</b><br><b>PC:</b> Scroll mouse untuk zoom, klik tahan area kosong untuk geser.<br><b>HP:</b> Cubit (2 jari) untuk zoom, geser (1 jari) untuk pindah.</li>
+                    <li><b>Reset Tampilan</b><br>Klik ikon kotak (↔) di menu mengambang untuk memulihkan tampilan yang terlalu besar/geser.</li>
+                    <li><b>Spasi & Jarak Baris</b><br>Pilih teks, gunakan tombol <b>[+]</b> / <b>[-]</b> di panel kiri (Atur Teks).</li>
+                    <li><b>Resize Bebas</b><br>Tarik kotak panah merah di pojok kanan bawah objek untuk ubah ukuran bebas (min. 1px).</li>
+                </ol>
             </div>
         </div>
 
@@ -1241,7 +1228,6 @@
                         element.style.width = newW + 'px'; 
                         element.style.height = newH + 'px'; 
                         
-                        // Perbaikan: Update ukuran gambar di dalam div TTD/Materai saat resize
                         if (annot.type === 'sign' || annot.type === 'materai') {
                             const imgEl = element.querySelector('img');
                             if (imgEl) {
@@ -1354,7 +1340,6 @@
                 
                 downloadModal.classList.add('active');
                 
-                // Auto close modal setelah 3 detik
                 setTimeout(() => {
                     closeDownloadModal();
                 }, 3000);
