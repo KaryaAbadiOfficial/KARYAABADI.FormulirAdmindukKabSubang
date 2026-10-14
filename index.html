@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KARYA ABADI</title>
+    <title>SISTEM DIGITAL - Pengisian Formulir Kependudukan Kabupaten Subang</title>
     <link rel="icon" type="image/png" href="favicon.png?v=2">
     <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -133,6 +133,7 @@
         }
         .btn-mode.active { background: var(--black); color: var(--white); border-color: var(--black); box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); }
         .btn-upload { display: flex; width: 100%; justify-content: center; box-sizing: border-box; cursor: pointer; }
+        .btn-upload.disabled-mode { opacity: 0.5; pointer-events: none; cursor: not-allowed; background: #f0f0f0; color: #aaa; border-color: #ddd; }
 
         .upload-guide-box {
             background: #fdecea; border: 1px solid #f5c6cb; color: #821a1a;
@@ -345,7 +346,7 @@
             </svg>
             <div class="header-title">
                 <h1>KARYA ABADI</h1>
-                <p>Formulir Administrasi Kependudukan (Adminduk) Kab. Subang</p>
+                <p>FORMULIR SUBANG</p>
             </div>
         </div>
         <div class="datetime-widget" id="datetimeWidget">
@@ -420,13 +421,19 @@
                 <option value="SURAT PERNYATAAN DOMISILI SUBANG.pdf">SURAT PERNYATAAN DOMISILI SUBANG.pdf</option>
             </select>
 
-            <h3>2. Masukkan Teks</h3>
+            <h3>2. Mode Pengajuan</h3>
+            <select id="modePengajuan">
+                <option value="online">Online</option>
+                <option value="offline">Offline / Langsung</option>
+            </select>
+
+            <h3>3. Masukkan Teks</h3>
             <button class="btn-add-text" onclick="addText()">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 Tambah Teks
             </button>
 
-            <h3>3. Atur Teks</h3>
+            <h3>4. Atur Teks</h3>
             <div class="sidebar-spacing">
                 <div class="spacing-row">
                     <span>Spasi Huruf</span>
@@ -446,12 +453,12 @@
                 </div>
             </div>
 
-            <h3>4. Pilih Mode Tanda</h3>
+            <h3>5. Pilih Mode Tanda</h3>
             <div class="mode-grid">
                 <button class="btn-mode" data-mode="check" onclick="setMode('check')"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg> Ceklis</button>
                 <button class="btn-mode" data-mode="circle" onclick="setMode('circle')"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/></svg> Lingkaran</button>
-                <label class="btn-mode btn-upload" data-mode="sign"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg> TTD<input type="file" id="signUpload" accept="image/*"></label>
-                <label class="btn-mode btn-upload" data-mode="materai"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 12h16M4 20h16M6 16h12M9 8a3 3 0 1 1 6 0c0 1.5-.5 2-1 3H10c-.5-1-1-1.5-1-3z"/></svg> Materai<input type="file" id="materaiUpload" accept="image/*"></label>
+                <label class="btn-mode btn-upload" id="lblSign" data-mode="sign"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg> TTD<input type="file" id="signUpload" accept="image/*"></label>
+                <label class="btn-mode btn-upload" id="lblMaterai" data-mode="materai"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 12h16M4 20h16M6 16h12M9 8a3 3 0 1 1 6 0c0 1.5-.5 2-1 3H10c-.5-1-1-1.5-1-3z"/></svg> Materai<input type="file" id="materaiUpload" accept="image/*"></label>
             </div>
 
             <div class="upload-guide-box">
@@ -459,7 +466,7 @@
                 <ol>
                     <li>Buat TTD / siapkan materai asli, lalu foto.<br><span style="font-size:11px; color:#a52a2a;">(Penggunaan 1 kali pemakaian per dokumen)</span></li>
                     <li>Hapus background gambar hingga rapi.<br><span style="font-size:11px; color:#a52a2a;">(Pastikan transparan)</span></li>
-                    <li>Upload file pada tombol TTD / Materai di atas.</li>
+                    <li>Upload file pada tombol TTD / Materai di atas.<br><span style="font-size:11px; color:#a52a2a;">(Kesempatan upload hanya 1 kali)</span></li>
                 </ol>
                 
                 <strong>Panduan TTD & Materai<br><span style="font-weight: bold;">(Via Offline/Langsung):</span></strong>
@@ -471,7 +478,7 @@
                 <a onclick="openModal('terms')">* Syarat dan Ketentuan berlaku.</a>
             </div>
 
-            <h3>5. Halaman</h3>
+            <h3>6. Halaman</h3>
             <div class="row-nav">
                 <button class="btn-nav" onclick="prevPage()">◀ PREV</button>
                 <span class="page-info" id="pageInfo">Hal 0 / 0</span>
@@ -483,7 +490,7 @@
                 DOWNLOAD PDF
             </button>
 
-            <h3>6. PANDUAN TOOL</h3>
+            <h3>7. PANDUAN TOOL</h3>
             <div class="guide-box">
                 <ol>
                     <li><b>Tambah & Edit Teks</b><br>Klik "Tambah Teks", lalu klik ikon <b>⋮</b> untuk <b>Edit</b> atau <b>Duplikat</b> teks.</li>
@@ -651,6 +658,9 @@
         let cssZoom = 1, panX = 0, panY = 0;
 
         const formSelect = document.getElementById('formSelect');
+        const modePengajuan = document.getElementById('modePengajuan');
+        const signLabel = document.getElementById('lblSign');
+        const materaiLabel = document.getElementById('lblMaterai');
         const canvas = document.getElementById('pdfViewer');
         const ctx = canvas.getContext('2d');
         const interactionLayer = document.getElementById('interactionLayer');
@@ -665,6 +675,58 @@
             sidebar.classList.toggle('active');
             backdrop.classList.toggle('active');
         }
+
+        // Logika Mode Pengajuan
+        modePengajuan.addEventListener('change', (e) => {
+            if (e.target.value === 'offline') {
+                signLabel.classList.add('disabled-mode');
+                materaiLabel.classList.add('disabled-mode');
+                signImgBytes = null;
+                materaiImgBytes = null;
+                setMode(null);
+                alert('Mode Offline/Langsung dipilih. Fitur upload TTD & Materai dinonaktifkan. Anda dapat mencetak formulir terlebih dahulu, lalu membubuhkan TTD dan Materai secara langsung.');
+            } else {
+                signLabel.classList.remove('disabled-mode');
+                materaiLabel.classList.remove('disabled-mode');
+            }
+        });
+
+        // Logika Upload TTD (1 Kali)
+        document.getElementById('signUpload').addEventListener('change', async (e) => { 
+            if(e.target.files[0]) { 
+                signImgBytes = await e.target.files[0].arrayBuffer(); 
+                setMode('sign'); 
+                e.target.disabled = true; // Kunci kesempatan upload
+                signLabel.style.background = '#d4edda'; signLabel.style.color = '#155724'; signLabel.style.borderColor = '#28a745';
+                alert('TTD berhasil diunggah. Kesempatan upload hanya 1 kali.'); 
+            } 
+        });
+
+        // Logika Upload Materai (1 Kali & Deteksi Penggunaan Ganda)
+        document.getElementById('materaiUpload').addEventListener('change', async (e) => { 
+            if(e.target.files[0]) { 
+                const file = e.target.files[0];
+                // Buat fingerprint sederhana untuk mendeteksi pemakaian ganda di perangkat yang sama (LocalStorage)
+                const fingerprint = `${file.name}_${file.size}_${file.lastModified}`;
+                
+                let usedMaterai = JSON.parse(localStorage.getItem('usedMateraiList') || '[]');
+                if (usedMaterai.includes(fingerprint)) {
+                    alert('AKSES DITOLAK!\nMaterai yang sama terdeteksi sudah pernah digunakan di perangkat ini.');
+                    e.target.value = ''; 
+                    return;
+                }
+                
+                materaiImgBytes = await file.arrayBuffer(); 
+                setMode('materai'); 
+                e.target.disabled = true; // Kunci kesempatan upload
+                materaiLabel.style.background = '#d4edda'; materaiLabel.style.color = '#155724'; materaiLabel.style.borderColor = '#28a745';
+                
+                // Catat ke LocalStorage agar tidak bisa dipakai ulang di perangkat ini
+                usedMaterai.push(fingerprint);
+                localStorage.setItem('usedMateraiList', JSON.stringify(usedMaterai));
+                alert('Materai berhasil diunggah. Kesempatan upload hanya 1 kali.'); 
+            } 
+        });
 
         function getCoords(e) {
             if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
@@ -840,9 +902,6 @@
                 console.error(err); 
             }
         });
-
-        document.getElementById('signUpload').addEventListener('change', async (e) => { if(e.target.files[0]) { signImgBytes = await e.target.files[0].arrayBuffer(); setMode('sign'); alert('TTD siap! Klik di PDF.'); } });
-        document.getElementById('materaiUpload').addEventListener('change', async (e) => { if(e.target.files[0]) { materaiImgBytes = await e.target.files[0].arrayBuffer(); setMode('materai'); alert('Materai siap! Klik di PDF.'); } });
 
         async function renderPage(num) {
             if (!pdfDoc) return;
