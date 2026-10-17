@@ -123,7 +123,12 @@
         .sidebar-spacing .spacing-btn { background: var(--light-bg); color: var(--black); border: 1px solid #ccc; width: 32px; height: 32px; font-size: 18px; border-radius: 6px; }
         .sidebar-spacing .spacing-btn:not(:disabled):hover { background: var(--red); color: var(--white); border-color: var(--red); }
         .sidebar-spacing .spacing-btn:disabled { background: #f0f0f0; color: #aaa; cursor: not-allowed; border-color: #ddd; }
-        .sidebar-spacing .spacing-val { color: #333; font-size: 14px; width: 50px; }
+        .sidebar-spacing .spacing-val { color: #333; font-size: 14px; width: 64px; padding: 4px 2px; text-align: center; border: 1px solid #ccc; border-radius: 6px; background: #fff; font-family: inherit; }
+        .sidebar-spacing .spacing-val:focus { outline: none; border-color: var(--red); box-shadow: 0 0 0 2px rgba(231,76,60,0.15); }
+        .sidebar-spacing .spacing-val:disabled { background: #f0f0f0; color: #aaa; border-color: #ddd; }
+        .sidebar-spacing .spacing-val::-webkit-outer-spin-button,
+        .sidebar-spacing .spacing-val::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .sidebar-spacing .spacing-val { -moz-appearance: textfield; }
 
         .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .btn-mode {
@@ -439,7 +444,7 @@
                     <span>Spasi Huruf</span>
                     <div class="spacing-controls">
                         <button id="sbMinusLetter" class="spacing-btn" onclick="changeSpacing('letter', -0.01)" disabled>-</button>
-                        <span id="sbValLetter" class="spacing-val">0.00</span>
+                        <input type="number" id="sbValLetter" class="spacing-val" step="0.01" min="0" value="0.00" disabled>
                         <button id="sbPlusLetter" class="spacing-btn" onclick="changeSpacing('letter', 0.01)" disabled>+</button>
                     </div>
                 </div>
@@ -447,7 +452,7 @@
                     <span>Jarak Baris</span>
                     <div class="spacing-controls">
                         <button id="sbMinusLine" class="spacing-btn" onclick="changeSpacing('line', -0.01)" disabled>-</button>
-                        <span id="sbValLine" class="spacing-val">1.15</span>
+                        <input type="number" id="sbValLine" class="spacing-val" step="0.01" min="0.8" value="1.15" disabled>
                         <button id="sbPlusLine" class="spacing-btn" onclick="changeSpacing('line', 0.01)" disabled>+</button>
                     </div>
                 </div>
@@ -956,46 +961,66 @@
             }
         });
 
+        let isRendering = false;
+        let pendingRenderNum = null;
         async function renderPage(num) {
-            if (!pdfDoc) return;
-            currentPage = num;
-            document.getElementById('pageInfo').innerText = `Hal ${num} / ${totalPages}`;
-            const page = await pdfDoc.getPage(num);
-            const viewport0 = page.getViewport({ scale: 1 });
-            currentPdfW = viewport0.width;
-            currentPdfH = viewport0.height;
-
-            if(window.innerWidth < 768 && annotations.length === 0) { 
-                const contWidth = pdfArea.clientWidth - 20;
-                scale = contWidth / currentPdfW;
-            } else if (window.innerWidth >= 768) { 
-                scale = 1.5; 
+            // Cegah render paralel: bila sedang render, simpan nomor halaman pending.
+            // Setelah render selesai, render terakhir yg pending dijalankan.
+            if (isRendering) {
+                pendingRenderNum = num;
+                return;
             }
-            
-            annotations.filter(a => a.page === currentPage).forEach(a => {
-                a.scale = scale;
-            });
+            isRendering = true;
+            try {
+                if (!pdfDoc) return;
+                currentPage = num;
+                document.getElementById('pageInfo').innerText = `Hal ${num} / ${totalPages}`;
+                const page = await pdfDoc.getPage(num);
+                const viewport0 = page.getViewport({ scale: 1 });
+                currentPdfW = viewport0.width;
+                currentPdfH = viewport0.height;
 
-            const viewport = page.getViewport({ scale });
-            // Render canvas dengan resolusi tinggi berdasarkan cssZoom saat ini,
-            // supaya saat pindah halaman (prev/next) data tidak blur akibat zoom.
-            const dpr = window.devicePixelRatio || 1;
-            const outputScale = Math.min(8, Math.max(3, Math.ceil(dpr * Math.max(1, cssZoom))));
+                if(window.innerWidth < 768 && annotations.length === 0) { 
+                    const contWidth = pdfArea.clientWidth - 20;
+                    scale = contWidth / currentPdfW;
+                } else if (window.innerWidth >= 768) { 
+                    scale = 1.5; 
+                }
+                
+                annotations.filter(a => a.page === currentPage).forEach(a => {
+                    a.scale = scale;
+                });
 
-            canvas.width = Math.floor(viewport.width * outputScale);
-            canvas.height = Math.floor(viewport.height * outputScale);
-            canvas.style.width = Math.floor(viewport.width) + 'px';
-            canvas.style.height = Math.floor(viewport.height) + 'px';
+                const viewport = page.getViewport({ scale });
+                // Render canvas dengan resolusi tinggi berdasarkan cssZoom saat ini,
+                // supaya saat pindah halaman (prev/next) data tidak blur akibat zoom.
+                const dpr = window.devicePixelRatio || 1;
+                const outputScale = Math.min(8, Math.max(3, Math.ceil(dpr * Math.max(1, cssZoom))));
 
-            interactionLayer.style.width = Math.floor(viewport.width) + 'px'; 
-            interactionLayer.style.height = Math.floor(viewport.height) + 'px';
-            annotationLayer.style.width = Math.floor(viewport.width) + 'px'; 
-            annotationLayer.style.height = Math.floor(viewport.height) + 'px';
+                canvas.width = Math.floor(viewport.width * outputScale);
+                canvas.height = Math.floor(viewport.height * outputScale);
+                canvas.style.width = Math.floor(viewport.width) + 'px';
+                canvas.style.height = Math.floor(viewport.height) + 'px';
 
-            const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
-            const renderContext = { canvasContext: ctx, viewport, transform };
-            await page.render(renderContext).promise;
-            renderAnnotations();
+                interactionLayer.style.width = Math.floor(viewport.width) + 'px'; 
+                interactionLayer.style.height = Math.floor(viewport.height) + 'px';
+                annotationLayer.style.width = Math.floor(viewport.width) + 'px'; 
+                annotationLayer.style.height = Math.floor(viewport.height) + 'px';
+
+                const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
+                const renderContext = { canvasContext: ctx, viewport, transform };
+                await page.render(renderContext).promise;
+                renderAnnotations();
+            } finally {
+                isRendering = false;
+                // Jika ada render pending (mis. user pindah halaman saat lagi render),
+                // jalankan render terakhir untuk memastikan halaman tampil benar.
+                if (pendingRenderNum !== null) {
+                    const nextNum = pendingRenderNum;
+                    pendingRenderNum = null;
+                    renderPage(nextNum);
+                }
+            }
         }
 
         function setMode(mode) {
@@ -1155,11 +1180,11 @@
             document.getElementById('sbMinusLine').disabled = !isText;
             document.getElementById('sbPlusLine').disabled = !isText;
             if (isText) {
-                document.getElementById('sbValLetter').innerText = parseFloat(annot.letterSpacing || 0).toFixed(2);
-                document.getElementById('sbValLine').innerText = parseFloat(annot.lineHeight || 1.15).toFixed(2);
+                document.getElementById('sbValLetter').value = parseFloat(annot.letterSpacing || 0).toFixed(2);
+                document.getElementById('sbValLine').value = parseFloat(annot.lineHeight || 1.15).toFixed(2);
             } else {
-                document.getElementById('sbValLetter').innerText = '-';
-                document.getElementById('sbValLine').innerText = '-';
+                document.getElementById('sbValLetter').value = '';
+                document.getElementById('sbValLine').value = '';
             }
         }
 
@@ -1177,7 +1202,7 @@
                 curr = Math.round((curr + delta) * 100) / 100;
                 annot.letterSpacing = curr;
                 activeDiv.style.letterSpacing = curr + 'px';
-                document.getElementById('sbValLetter').innerText = curr.toFixed(2);
+                document.getElementById('sbValLetter').value = curr.toFixed(2);
             } else if (type === 'line') {
                 // Jarak baris pakai step 0.01 (paling halus) supaya peningkatan
                 // bisa 1.01 -> 1.02 -> ... -> 1.99 -> 2.00 dst.
@@ -1185,10 +1210,74 @@
                 curr = Math.max(0.8, Math.round((curr + delta) * 100) / 100);
                 annot.lineHeight = curr;
                 activeDiv.style.lineHeight = curr;
-                document.getElementById('sbValLine').innerText = curr.toFixed(2);
+                document.getElementById('sbValLine').value = curr.toFixed(2);
             }
             saveHistory();
         }
+
+        // === Input manual untuk Spasi Huruf & Jarak Baris (fungsi ke-2) ===
+        // User bisa langsung ketik nilai pada input field, selain pakai tombol +/-.
+        let manualSpacingTimer = null;
+        // Apply nilai ke annotation. Jika formatInput=true, format input.value rapi.
+        // Saat mengetik (input event) formatInput=false supaya cursor tidak melompat.
+        function applyManualSpacing(type, formatInput) {
+            if (!activeAnnotId) return;
+            const annot = annotations.find(a => a.id === activeAnnotId);
+            if (!annot || annot.type !== 'text') return;
+            const activeDiv = document.querySelector('.annotation-box.active');
+            if (!activeDiv) return;
+            const inputId = type === 'letter' ? 'sbValLetter' : 'sbValLine';
+            const input = document.getElementById(inputId);
+            let raw = input.value;
+            let val = parseFloat(raw);
+            if (isNaN(val)) return; // biarkan saja jika kosong / tidak valid
+            val = Math.round(val * 100) / 100; // bulatkan ke 2 desimal
+            if (type === 'letter') {
+                if (val < 0) val = 0;
+                annot.letterSpacing = val;
+                activeDiv.style.letterSpacing = val + 'px';
+            } else if (type === 'line') {
+                if (val < 0.8) val = 0.8;
+                annot.lineHeight = val;
+                activeDiv.style.lineHeight = val;
+            }
+            // Hanya format input.value saat blur (selesai ngetik).
+            // Saat mengetik, JANGAN sentuh input.value supaya cursor position stabil.
+            if (formatInput) input.value = val.toFixed(2);
+        }
+        function onManualSpacingInput(type) {
+            // Update langsung saat mengetik (real-time preview), tapi
+            // simpan history di-debounce agar tidak menumpuk terlalu banyak entry.
+            applyManualSpacing(type, false);
+            if (manualSpacingTimer) clearTimeout(manualSpacingTimer);
+            manualSpacingTimer = setTimeout(() => {
+                saveHistory();
+                manualSpacingTimer = null;
+            }, 600);
+        }
+        document.getElementById('sbValLetter').addEventListener('input', () => onManualSpacingInput('letter'));
+        document.getElementById('sbValLine').addEventListener('input', () => onManualSpacingInput('line'));
+        // Saat input kehilangan fokus, format nilai rapi & simpan history
+        document.getElementById('sbValLetter').addEventListener('blur', () => {
+            applyManualSpacing('letter', true);
+            if (manualSpacingTimer) { clearTimeout(manualSpacingTimer); manualSpacingTimer = null; }
+            saveHistory();
+        });
+        document.getElementById('sbValLine').addEventListener('blur', () => {
+            applyManualSpacing('line', true);
+            if (manualSpacingTimer) { clearTimeout(manualSpacingTimer); manualSpacingTimer = null; }
+            saveHistory();
+        });
+        // Cegah event leak ke sidebar/document saat user ngetik di input.
+        // Enter = blur (konfirmasi), Escape = blur (batal perubahan cursor).
+        document.getElementById('sbValLetter').addEventListener('keydown', (e) => { 
+            if (e.key === 'Enter' || e.key === 'Escape') { e.target.blur(); e.preventDefault(); }
+            e.stopPropagation();
+        });
+        document.getElementById('sbValLine').addEventListener('keydown', (e) => { 
+            if (e.key === 'Enter' || e.key === 'Escape') { e.target.blur(); e.preventDefault(); }
+            e.stopPropagation();
+        });
 
         document.addEventListener('mousedown', (e) => {
             if (!e.target.closest('.annotation-box') && !e.target.closest('.popover-menu') && !e.target.closest('.sidebar') && !e.target.closest('.float-tools')) {
@@ -1286,16 +1375,25 @@
         function makeEditable(annot, element) {
             const textSpan = element.querySelector('.text-content');
             if (!textSpan) return;
+            // Cegah makeEditable dipanggil 2x pada textSpan yang sama
+            if (textSpan.contentEditable === 'true') return;
             textSpan.contentEditable = "true"; textSpan.focus();
             const range = document.createRange(); range.selectNodeContents(textSpan); 
             const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+            const keyHandler = (e) => { 
+                if (e.key === 'Escape') { e.preventDefault(); textSpan.blur(); }
+                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); textSpan.blur(); }
+                e.stopPropagation(); 
+            };
             const finishEdit = () => {
                 textSpan.contentEditable = "false";
+                textSpan.removeEventListener('keydown', keyHandler);
+                textSpan.removeEventListener('blur', finishEdit);
                 annot.text = textSpan.innerText.replace(/\n$/, '');
                 saveHistory();
             };
-            textSpan.addEventListener('blur', finishEdit, { once: true });
-            textSpan.addEventListener('keydown', (e) => { if (e.key === 'Escape') textSpan.blur(); e.stopPropagation(); });
+            textSpan.addEventListener('blur', finishEdit);
+            textSpan.addEventListener('keydown', keyHandler);
         }
 
         function attachInteractions(element, annotId) {
@@ -1340,6 +1438,12 @@
                 e.stopPropagation(); e.preventDefault();
                 let annot = annotations.find(a => a.id === annotId);
                 if (!annot) return;
+                // Aktifkan annotation yg di-resize juga, supaya tombol sidebar (mis. +/-)
+                // bisa dipakai langsung tanpa harus klik annotation dulu.
+                document.querySelectorAll('.annotation-box').forEach(b => b.classList.remove('active'));
+                element.classList.add('active');
+                activeAnnotId = annot.id;
+                updateSidebarTools(element, annot);
                 const c = getCoords(e); const startX = c.x, startY = c.y;
                 const startW = element.offsetWidth, startH = element.offsetHeight;
                 const startFontSize = annot.type === 'text' ? parseFloat(element.style.fontSize) : 0;
