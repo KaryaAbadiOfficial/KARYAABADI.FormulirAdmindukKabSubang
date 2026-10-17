@@ -1179,6 +1179,9 @@
             document.getElementById('sbPlusLetter').disabled = !isText;
             document.getElementById('sbMinusLine').disabled = !isText;
             document.getElementById('sbPlusLine').disabled = !isText;
+            // Enable/disable input fields JUGA, bukan hanya tombol +/-.
+            document.getElementById('sbValLetter').disabled = !isText;
+            document.getElementById('sbValLine').disabled = !isText;
             if (isText) {
                 document.getElementById('sbValLetter').value = parseFloat(annot.letterSpacing || 0).toFixed(2);
                 document.getElementById('sbValLine').value = parseFloat(annot.lineHeight || 1.15).toFixed(2);
