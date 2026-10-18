@@ -426,7 +426,7 @@
                 <option value="SURAT PERNYATAAN DOMISILI SUBANG.pdf">SURAT PERNYATAAN DOMISILI SUBANG.pdf</option>
             </select>
 
-            <h3>2. Mode Pengajuan</h3>
+            <h3>2. Pilih Pengajuan</h3>
             <select id="modePengajuan">
                 <option value="online">Online</option>
                 <option value="offline">Offline / Langsung</option>
@@ -688,18 +688,33 @@
             backdrop.classList.toggle('active');
         }
 
-        // Logika Mode Pengajuan
+        // Logika Pilih Pengajuan (Online / Offline)
+        // Backup bytes TTD & Materai saat switch ke Offline, lalu restore saat balik ke Online.
+        // Ini mencegah bug: TTD/Materai yang sudah ditempatkan hilang dari canvas & PDF
+        // setelah user switch Online -> Offline -> Online.
+        let signImgBytesBackup = null, materaiImgBytesBackup = null;
         modePengajuan.addEventListener('change', (e) => {
             if (e.target.value === 'offline') {
                 signLabel.classList.add('disabled-mode');
                 materaiLabel.classList.add('disabled-mode');
+                // Backup bytes sebelum di-null agar bisa direstore saat kembali ke Online.
+                signImgBytesBackup = signImgBytes;
+                materaiImgBytesBackup = materaiImgBytes;
                 signImgBytes = null;
                 materaiImgBytes = null;
                 setMode(null);
-                alert('Mode Offline/Langsung dipilih. Fitur upload TTD & Materai dinonaktifkan. Anda dapat mencetak formulir terlebih dahulu, lalu membubuhkan TTD dan Materai secara langsung.');
+                // Render ulang supaya TTD/Materai yang sudah ditempatkan ikut disembunyikan
+                // dari canvas (karena renderAnnotations skip jika bytes === null).
+                renderAnnotations();
+                alert('Mode Offline/Langsung dipilih. Fitur upload TTD & Materai dinonaktifkan. TTD & Materai yang sudah ditempatkan akan disembunyikan sementara. Anda dapat mencetak formulir terlebih dahulu, lalu membubuhkan TTD dan Materai secara langsung.');
             } else {
                 signLabel.classList.remove('disabled-mode');
                 materaiLabel.classList.remove('disabled-mode');
+                // Restore bytes dari backup jika sebelumnya pernah di-null saat switch ke Offline.
+                if (signImgBytesBackup) { signImgBytes = signImgBytesBackup; signImgBytesBackup = null; }
+                if (materaiImgBytesBackup) { materaiImgBytes = materaiImgBytesBackup; materaiImgBytesBackup = null; }
+                // Render ulang supaya TTD/Materai yang sebelumnya tersembunyi muncul kembali di canvas.
+                renderAnnotations();
             }
         });
 
