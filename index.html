@@ -116,14 +116,6 @@
             color: var(--white); line-height: 1.7; padding: 0 20px;
             max-width: 640px; text-align: center;
         }
-        .hero-slide-content .slogan-tags {
-            font-size: 13px; color: var(--red); font-weight: bold;
-            margin-top: 10px; text-align: center;
-        }
-        .hero-slide-content .slogan-tags em {
-            font-style: italic; margin: 0 6px; display: inline-block;
-            padding: 4px 10px; background: rgba(231,76,60,0.15); border-radius: 12px;
-        }
         .hero-slide-content .btn-cta {
             display: inline-block; background: var(--red); color: var(--white);
             padding: 12px 28px; border-radius: 6px; font-weight: bold; font-size: 14px;
@@ -785,7 +777,6 @@
             const progressBar = document.getElementById('heroProgress');
             const totalSlides = slides.length;
             let currentSlide = 0;
-            let autoTimer = null;
             let progressTimer = null;
             const SLIDE_DURATION = 6000; // 6 detik per slide
             const TICK = 50; // update progress setiap 50ms
@@ -851,11 +842,12 @@
             carousel.addEventListener('touchend', (e) => {
                 touchEndX = e.changedTouches[0].screenX;
                 const diff = touchStartX - touchEndX;
+                // Selalu reset isPaused di akhir swipe, terlepas berhasil atau tidak.
+                // Kalau swipe berhasil, nextSlide sudah ganti slide; startAuto akan restart timer.
+                isPaused = false;
                 if (Math.abs(diff) > 50) {
                     if (diff > 0) nextSlide(); else prevSlide();
                     startAuto();
-                } else {
-                    isPaused = false;
                 }
             }, { passive: true });
 
