@@ -68,24 +68,109 @@
         }
         .navbar a:hover { background: var(--black); border-color: var(--black); color: var(--white); }
 
-        .hero-banner {
-            background: linear-gradient(135deg, var(--black) 0%, #2c3e50 100%);
-            color: var(--white); padding: 50px 20px; text-align: center;
-            border-bottom: 4px solid var(--red); position: relative;
+        /* ===== HERO CAROUSEL (seperti subang.go.id) ===== */
+        .hero-carousel {
+            position: relative; width: 100%; height: 440px; overflow: hidden;
+            background: var(--black); border-bottom: 4px solid var(--red);
         }
-        .hero-content { max-width: 800px; margin: 0 auto; }
-        .hero-content h1 { font-size: 32px; margin: 0 0 10px 0; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; color: var(--white); }
-        .hero-content p.subtitle { font-size: 16px; margin: 0 0 20px 0; color: var(--red); font-weight: 600; letter-spacing: 0.5px; }
-        
-        .hero-divider { width: 60px; height: 3px; background: var(--red); margin: 25px auto; border-radius: 2px; }
-        
-        .hero-info { margin-bottom: 25px; }
-        .hero-info h2 { font-size: 18px; margin: 0 0 5px 0; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: var(--white); }
-        .hero-info span { font-size: 14px; color: var(--red); font-weight: 500; }
-        
-        .hero-slogan blockquote { margin: 0 0 15px 0; font-size: 15px; font-style: italic; color: var(--white); line-height: 1.6; padding: 0 10px; }
-        .slogan-tags { font-size: 14px; color: var(--red); font-weight: bold; }
-        .slogan-tags em { font-style: italic; margin: 0 8px; display: inline-block; }
+        .hero-slide {
+            position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.8s ease-in-out;
+            padding: 40px 20px; pointer-events: none;
+        }
+        .hero-slide.active { opacity: 1; pointer-events: auto; z-index: 2; }
+        /* Background berbeda untuk tiap slide (gradien + pattern SVG biar tidak broken) */
+        .hero-slide[data-slide="0"] { background: linear-gradient(135deg, #1a1a1a 0%, #2c3e50 100%); }
+        .hero-slide[data-slide="1"] { background: linear-gradient(135deg, #2c3e50 0%, #c0392b 100%); }
+        .hero-slide[data-slide="2"] { background: linear-gradient(135deg, #1a1a1a 0%, #7a1f1f 100%); }
+        .hero-slide[data-slide="3"] { background: linear-gradient(135deg, #2c3e50 0%, #1a1a1a 100%); }
+        /* Overlay pattern subtle agar gradien tidak terlihat kosong */
+        .hero-slide::before {
+            content: ''; position: absolute; inset: 0;
+            background-image: radial-gradient(circle at 20% 30%, rgba(231,76,60,0.15) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 70%, rgba(255,255,255,0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        .hero-slide-content { position: relative; z-index: 2; max-width: 800px; text-align: center; color: var(--white); }
+        .hero-slide-content .badge {
+            display: inline-block; background: var(--red); color: var(--white);
+            padding: 6px 16px; border-radius: 20px; font-size: 11px; font-weight: bold;
+            letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 15px;
+            box-shadow: 0 4px 12px rgba(231,76,60,0.4);
+        }
+        .hero-slide-content h1 {
+            font-size: 34px; margin: 0 0 12px 0; font-weight: bold;
+            text-transform: uppercase; letter-spacing: 2px; color: var(--white);
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5); line-height: 1.2;
+        }
+        .hero-slide-content p.subtitle {
+            font-size: 16px; margin: 0 0 20px 0; color: var(--red);
+            font-weight: 600; letter-spacing: 0.5px;
+        }
+        .hero-slide-content p.desc {
+            font-size: 15px; color: #e0e0e0; line-height: 1.7; margin: 0 0 25px 0;
+            max-width: 620px; margin-left: auto; margin-right: auto;
+        }
+        .hero-slide-content blockquote {
+            margin: 0 auto 20px auto; font-size: 17px; font-style: italic;
+            color: var(--white); line-height: 1.7; padding: 0 20px;
+            max-width: 640px; text-align: center;
+        }
+        .hero-slide-content .slogan-tags {
+            font-size: 13px; color: var(--red); font-weight: bold;
+            margin-top: 10px; text-align: center;
+        }
+        .hero-slide-content .slogan-tags em {
+            font-style: italic; margin: 0 6px; display: inline-block;
+            padding: 4px 10px; background: rgba(231,76,60,0.15); border-radius: 12px;
+        }
+        .hero-slide-content .btn-cta {
+            display: inline-block; background: var(--red); color: var(--white);
+            padding: 12px 28px; border-radius: 6px; font-weight: bold; font-size: 14px;
+            text-decoration: none; text-transform: uppercase; letter-spacing: 1px;
+            transition: all 0.2s; box-shadow: 0 4px 12px rgba(231,76,60,0.4);
+            cursor: pointer; border: 2px solid var(--red);
+        }
+        .hero-slide-content .btn-cta:hover {
+            background: transparent; color: var(--white); border-color: var(--white);
+            transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+        }
+        .hero-divider {
+            width: 60px; height: 3px; background: var(--red);
+            margin: 20px auto; border-radius: 2px;
+        }
+        /* Panah navigasi prev/next */
+        .hero-arrow {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: rgba(0,0,0,0.5); color: var(--white); border: 2px solid rgba(255,255,255,0.3);
+            width: 44px; height: 44px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 5; transition: all 0.2s;
+            backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+        }
+        .hero-arrow:hover { background: var(--red); border-color: var(--red); }
+        .hero-arrow.prev { left: 20px; }
+        .hero-arrow.next { right: 20px; }
+        /* Indikator dots */
+        .hero-dots {
+            position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 10px; z-index: 5;
+        }
+        .hero-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: rgba(255,255,255,0.4); cursor: pointer; transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        .hero-dot.active {
+            background: var(--red); width: 28px; border-radius: 5px;
+            box-shadow: 0 0 8px rgba(231,76,60,0.6);
+        }
+        /* Progress bar di atas carousel (mirip subang.go.id) */
+        .hero-progress {
+            position: absolute; bottom: 0; left: 0; height: 3px;
+            background: var(--red); width: 0%; z-index: 6;
+            transition: width 0.1s linear;
+        }
 
         .main-layout { display: flex; min-height: 800px; align-items: flex-start; }
         .sidebar {
@@ -306,13 +391,26 @@
             .datetime-widget .dw-time { font-size: 11px; }
             .logo-karya-abadi-img, .logo-fallback-svg { width: 35px; height: 35px; padding: 2px; }
             
-            .hero-banner { display: none; }
-            
+            .hero-carousel { height: 300px; }
+            .hero-slide-content h1 { font-size: 20px; letter-spacing: 1px; }
+            .hero-slide-content p.subtitle { font-size: 12px; }
+            .hero-slide-content p.desc { font-size: 12px; -webkit-line-clamp: 3; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+            .hero-slide-content blockquote { font-size: 12px; padding: 0 10px; }
+            .hero-slide-content .badge { font-size: 9px; padding: 4px 12px; }
+            .hero-slide-content .btn-cta { padding: 10px 18px; font-size: 11px; }
+            .hero-divider { margin: 10px auto; }
+            .hero-arrow { width: 34px; height: 34px; }
+            .hero-arrow.prev { left: 8px; }
+            .hero-arrow.next { right: 8px; }
+            .hero-dots { bottom: 12px; gap: 6px; }
+            .hero-dot { width: 7px; height: 7px; }
+            .hero-dot.active { width: 20px; }
+
             .navbar { display: none; }
             .mobile-nav { display: block; }
             .float-tools { bottom: 20px; left: 10px; top: auto; }
-            
-            .main-layout { display: flex; flex-direction: column; height: calc(100dvh - 65px); overflow: hidden; }
+
+            .main-layout { display: flex; flex-direction: column; height: calc(100dvh - 65px - 300px); min-height: 280px; overflow: hidden; }
             .pdf-area { position: relative; flex: 1; width: 100%; height: 100%; overflow: hidden; padding: 10px; touch-action: none; }
             
             .sidebar { 
@@ -374,25 +472,71 @@
 
     <div class="backdrop" id="backdrop" onclick="toggleSidebar()"></div>
 
-    <section class="hero-banner">
-        <div class="hero-content">
-            <h1>SISTEM DIGITAL</h1>
-            <p class="subtitle">Pengisian Formulir Kependudukan Kabupaten Subang</p>
-            
-            <div class="hero-divider"></div>
-            
-            <div class="hero-info">
-                <h2>AKSES INFORMASI</h2>
-                <span>Sesuai dengan data resmi Kabupaten Subang</span>
-            </div>
-            
-            <div class="hero-slogan">
-                <blockquote>“Karya Nyata Subang Ngabret: Mewujudkan Subang Unggul, Maju, Kompetitif, Sejahtera, dan Religius”</blockquote>
-                <div class="slogan-tags">
-                    <em>#KangRey (Bupati Subang)</em> <em>#NGABRET</em>
-                </div>
+    <section class="hero-carousel" id="heroCarousel">
+        <!-- Slide 1: Sistem Digital -->
+        <div class="hero-slide active" data-slide="0">
+            <div class="hero-slide-content">
+                <span class="badge">Layanan Digital</span>
+                <h1>SISTEM DIGITAL</h1>
+                <p class="subtitle">Pengisian Formulir Kependudukan Kabupaten Subang</p>
+                <div class="hero-divider"></div>
+                <p class="desc">Platform digital untuk memudahkan masyarakat Kabupaten Subang mengisi formulir administrasi kependudukan secara cepat, akurat, dan mudah diakses tanpa biaya tambahan.</p>
+                <a class="btn-cta" onclick="document.getElementById('formSelect').scrollIntoView({behavior:'smooth', block:'center'})">Mulai Sekarang</a>
             </div>
         </div>
+
+        <!-- Slide 2: Visi Pembangunan -->
+        <div class="hero-slide" data-slide="1">
+            <div class="hero-slide-content">
+                <span class="badge">Visi Pembangunan</span>
+                <blockquote>“Karya Nyata Subang Ngabret: Mewujudkan Subang Unggul, Maju, Kompetitif, Sejahtera, dan Religius”</blockquote>
+                <div class="hero-divider"></div>
+                <a class="btn-cta" href="https://subang.go.id/profil/visi-dan-misi" target="_blank">Visi & Misi</a>
+            </div>
+        </div>
+
+        <!-- Slide 3: Akses Informasi -->
+        <div class="hero-slide" data-slide="2">
+            <div class="hero-slide-content">
+                <span class="badge">Akses Informasi</span>
+                <h1>DATA RESMI</h1>
+                <p class="subtitle">Sesuai dengan data resmi Kabupaten Subang</p>
+                <div class="hero-divider"></div>
+                <p class="desc">Akses informasi terkini seputar berita, pengumuman, dan layanan publik dari Pemerintah Kabupaten Subang secara langsung melalui portal resmi.</p>
+                <a class="btn-cta" href="https://subang.go.id/berita" target="_blank">Lihat Berita</a>
+            </div>
+        </div>
+
+        <!-- Slide 4: Layanan Formulir -->
+        <div class="hero-slide" data-slide="3">
+            <div class="hero-slide-content">
+                <span class="badge">10+ Jenis Formulir</span>
+                <h1>LAYANAN FORMULIR</h1>
+                <p class="subtitle">F-1.01, F-1.02, F-2.01, SPTJM, Domisili, dan lainnya</p>
+                <div class="hero-divider"></div>
+                <p class="desc">Tersedia beragam formulir kependudukan resmi yang dapat diisi secara digital lengkap dengan fitur tanda tangan, materai, ceklis, dan undo/redo.</p>
+                <a class="btn-cta" onclick="document.getElementById('formSelect').scrollIntoView({behavior:'smooth', block:'center'})">Pilih Formulir</a>
+            </div>
+        </div>
+
+        <!-- Panah navigasi -->
+        <button class="hero-arrow prev" id="heroPrev" aria-label="Slide sebelumnya">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="hero-arrow next" id="heroNext" aria-label="Slide berikutnya">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+
+        <!-- Indikator dots -->
+        <div class="hero-dots" id="heroDots">
+            <span class="hero-dot active" data-dot="0"></span>
+            <span class="hero-dot" data-dot="1"></span>
+            <span class="hero-dot" data-dot="2"></span>
+            <span class="hero-dot" data-dot="3"></span>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="hero-progress" id="heroProgress"></div>
     </section>
 
     <div class="main-layout">
@@ -627,6 +771,103 @@
         }
         updateDateTime();
         setInterval(updateDateTime, 1000);
+
+        // ===== HERO CAROUSEL (mirip subang.go.id) =====
+        // Fitur: auto-rotate 6 detik/slide, fade transition, dots indicator,
+        // panah prev/next, pause on hover, swipe gesture di mobile, progress bar.
+        (function initHeroCarousel() {
+            const carousel = document.getElementById('heroCarousel');
+            if (!carousel) return;
+            const slides = carousel.querySelectorAll('.hero-slide');
+            const dots = carousel.querySelectorAll('.hero-dot');
+            const prevBtn = document.getElementById('heroPrev');
+            const nextBtn = document.getElementById('heroNext');
+            const progressBar = document.getElementById('heroProgress');
+            const totalSlides = slides.length;
+            let currentSlide = 0;
+            let autoTimer = null;
+            let progressTimer = null;
+            const SLIDE_DURATION = 6000; // 6 detik per slide
+            const TICK = 50; // update progress setiap 50ms
+            let elapsed = 0;
+            let isPaused = false;
+
+            function goToSlide(idx) {
+                if (idx < 0) idx = totalSlides - 1;
+                if (idx >= totalSlides) idx = 0;
+                slides[currentSlide].classList.remove('active');
+                dots[currentSlide].classList.remove('active');
+                currentSlide = idx;
+                slides[currentSlide].classList.add('active');
+                dots[currentSlide].classList.add('active');
+                // Reset progress bar tiap pindah slide
+                elapsed = 0;
+                if (progressBar) progressBar.style.width = '0%';
+            }
+            function nextSlide() { goToSlide(currentSlide + 1); }
+            function prevSlide() { goToSlide(currentSlide - 1); }
+
+            function startAuto() {
+                stopAuto();
+                if (progressBar) progressBar.style.width = '0%';
+                elapsed = 0;
+                progressTimer = setInterval(() => {
+                    if (isPaused) return;
+                    elapsed += TICK;
+                    if (progressBar) {
+                        const pct = Math.min(100, (elapsed / SLIDE_DURATION) * 100);
+                        progressBar.style.width = pct + '%';
+                    }
+                    if (elapsed >= SLIDE_DURATION) {
+                        nextSlide();
+                    }
+                }, TICK);
+            }
+            function stopAuto() {
+                if (progressTimer) { clearInterval(progressTimer); progressTimer = null; }
+            }
+
+            // Event panah & dots
+            if (prevBtn) prevBtn.addEventListener('click', () => { prevSlide(); startAuto(); });
+            if (nextBtn) nextBtn.addEventListener('click', () => { nextSlide(); startAuto(); });
+            dots.forEach(dot => {
+                dot.addEventListener('click', () => {
+                    const idx = parseInt(dot.getAttribute('data-dot'), 10);
+                    goToSlide(idx);
+                    startAuto();
+                });
+            });
+
+            // Pause on hover (desktop)
+            carousel.addEventListener('mouseenter', () => { isPaused = true; });
+            carousel.addEventListener('mouseleave', () => { isPaused = false; });
+
+            // Swipe gesture (mobile & desktop touch)
+            let touchStartX = 0, touchEndX = 0;
+            carousel.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+                isPaused = true;
+            }, { passive: true });
+            carousel.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                const diff = touchStartX - touchEndX;
+                if (Math.abs(diff) > 50) {
+                    if (diff > 0) nextSlide(); else prevSlide();
+                    startAuto();
+                } else {
+                    isPaused = false;
+                }
+            }, { passive: true });
+
+            // Mulai auto-rotate
+            startAuto();
+
+            // Aksesibilitas: pause saat tab tidak terlihat (hemat resource)
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) { isPaused = true; }
+                else { isPaused = false; }
+            });
+        })();
 
         const modalContents = {
             about: { title: 'Tentang Kami', body: `<h4>Profil Karya Abadi</h4><p><b>Karya Abadi</b> merupakan penyedia layanan digital yang berfokus pada sistem pengisian formulir kependudukan secara online untuk wilayah Kabupaten Subang, Jawa Barat.</p><h4>Visi</h4><p>Menjadi mitra terpercaya masyarakat dan pemerintah dalam digitalisasi layanan administrasi kependudukan yang cepat, akurat, dan mudah diakses oleh seluruh lapisan masyarakat.</p><h4>Misi</h4><ul><li>Menyediakan platform digital yang ramah pengguna untuk pengisian formulir kependudukan.</li><li>Mendukung efisiensi pelayanan publik di Kabupaten Subang melalui teknologi.</li><li>Memberikan kemudahan akses tanpa biaya tambahan untuk dokumen administrasi dasar.</li><li>Menjaga kerahasiaan dan keamanan data pengguna sesuai standar yang berlaku.</li></ul><h4>Lokasi Layanan</h4><p>Rawameneng, Blanakan, Subang, Jawa Barat, Indonesia - Kode Pos 41259.</p>` },
