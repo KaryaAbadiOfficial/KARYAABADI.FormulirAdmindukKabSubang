@@ -219,10 +219,10 @@
             touch-action: manipulation;
         }
         
-        .sidebar-spacing .spacing-row { color: #333; border-top: none; padding: 8px 0; font-size: 14px; font-weight: 600; justify-content: space-between; }
-        .sidebar-spacing .spacing-controls { gap: 8px; }
-        .sidebar-spacing .spacing-btn { background: var(--light-bg); color: var(--black); border: 1px solid #ccc; width: 36px; height: 36px; font-size: 20px; border-radius: 6px; touch-action: manipulation; flex-shrink: 0; cursor: pointer; }
-        .sidebar-spacing .spacing-btn:not(:disabled):hover { background: var(--red); color: var(--white); border-color: var(--red); }
+        .sidebar-spacing .spacing-row { color: #333; border-top: none; padding: 8px 0; font-size: 14px; font-weight: 600; justify-content: space-between; display: flex; align-items: center; }
+        .sidebar-spacing .spacing-controls { gap: 8px; display: flex; align-items: center; }
+        .sidebar-spacing .spacing-btn { background: var(--light-bg); color: var(--black); border: 1px solid #ccc; width: 40px; height: 40px; font-size: 22px; border-radius: 8px; touch-action: manipulation; flex-shrink: 0; cursor: pointer; -webkit-appearance: none; appearance: none; user-select: none; -webkit-user-select: none; line-height: 1; padding: 0; }
+        .sidebar-spacing .spacing-btn:not(:disabled):hover, .sidebar-spacing .spacing-btn:not(:disabled):active { background: var(--red); color: var(--white); border-color: var(--red); }
         .sidebar-spacing .spacing-btn:disabled { background: #f0f0f0; color: #aaa; cursor: not-allowed; border-color: #ddd; }
         .sidebar-spacing .spacing-val { color: #333; font-size: 14px; width: 64px; padding: 4px 2px; text-align: center; border: 1px solid #ccc; border-radius: 6px; background: #fff; font-family: inherit; }
         .sidebar-spacing .spacing-val:focus { outline: none; border-color: var(--red); box-shadow: 0 0 0 2px rgba(231,76,60,0.15); }
@@ -293,7 +293,7 @@
         .text-content { touch-action: manipulation; user-select: none; -webkit-user-select: none; }
         .text-content[contenteditable="true"] { user-select: text; -webkit-user-select: text; cursor: text; touch-action: text; }
         .text-content:focus { border: 1px dashed var(--red); cursor: text; background: rgba(255,255,255,0.8); outline: none; }
-        .circle-annot { border: 2.5px solid black; border-radius: 50%; cursor: move; }
+        .circle-annot { border: 1.5px solid black; border-radius: 50%; cursor: move; box-sizing: border-box; }
         .check-annot { overflow: visible; cursor: move; }
         
         .resize-handle {
@@ -501,6 +501,8 @@
             .guide-box li { margin-bottom: 8px; }
             .mobile-nav-grid { gap: 6px; }
             .mobile-nav-grid a { padding: 8px 4px; font-size: 10px; }
+            .sidebar-spacing .spacing-btn { width: 38px; height: 38px; font-size: 20px; }
+            .sidebar-spacing .spacing-val { width: 56px; font-size: 13px; padding: 6px 2px; }
             
             .modal-content { max-width: calc(100vw - 24px); max-height: 92vh; }
             .modal-header { padding: 12px 16px; }
@@ -554,6 +556,8 @@
             .mobile-nav-grid a { padding: 6px 3px; font-size: 9px; }
             .upload-guide-box { font-size: 10px; padding: 8px; }
             .guide-box { font-size: 11px; padding: 10px; }
+            .sidebar-spacing .spacing-btn { width: 34px; height: 34px; font-size: 18px; }
+            .sidebar-spacing .spacing-val { width: 48px; font-size: 12px; padding: 4px 2px; }
         }
 
         /* Landscape mobile — short height fix */
@@ -1553,9 +1557,15 @@
                     div.appendChild(createMenu(a.id, true, div));
                 } else if (a.type === 'circle') {
                     div.classList.add('circle-annot'); 
-                    div.style.width = (a.width / currentPdfW * canvasW) + 'px'; 
-                    div.style.height = (a.height / currentPdfH * canvasH) + 'px'; 
+                    const cw = (a.width / currentPdfW * canvasW);
+                    const ch = (a.height / currentPdfH * canvasH);
+                    div.style.width = cw + 'px'; 
+                    div.style.height = ch + 'px'; 
                     div.style.transform = 'translate(-50%, -50%)'; 
+                    // Border width proporsional dengan ukuran lingkaran (2% rata-rata dimensi,
+                    // min 1px). Ini memastikan render canvas cocok dengan render PDF (yang juga
+                    // proporsional), dan lingkaran kecil tidak terlihat "terlalu tebal" di HP.
+                    div.style.borderWidth = Math.max(1, (cw + ch) / 2 * 0.02) + 'px';
                     div.appendChild(createMenu(a.id, false, div));
                 } else if (a.type === 'check') {
                     div.classList.add('check-annot'); 
@@ -1612,11 +1622,27 @@
             }
         }
 
+        function getActiveDiv() {
+            // Helper: ambil active annotation div. Cari via .active class dulu,
+            // kalau tidak ada (mis. user baru buka sidebar di mobile dan .active hilang),
+            // fallback ke data-id berdasarkan activeAnnotId.
+            let activeDiv = document.querySelector('.annotation-box.active');
+            if (!activeDiv && activeAnnotId) {
+                activeDiv = document.querySelector('.annotation-box[data-id="' + activeAnnotId + '"]');
+                if (activeDiv) {
+                    // Restore .active class supaya resize-handle & menu visible
+                    document.querySelectorAll('.annotation-box').forEach(b => b.classList.remove('active'));
+                    activeDiv.classList.add('active');
+                }
+            }
+            return activeDiv;
+        }
+
         function changeSpacing(type, delta) {
             if (!activeAnnotId) return;
             let annot = annotations.find(a => a.id === activeAnnotId);
             if (!annot || annot.type !== 'text') return;
-            let activeDiv = document.querySelector('.annotation-box.active');
+            let activeDiv = getActiveDiv();
             if (!activeDiv) return;
             if (type === 'letter') {
                 // Spasi huruf pakai step 0.01 (paling halus) supaya peningkatan
@@ -1624,6 +1650,7 @@
                 // Dibulatkan ke 2 desimal untuk hindari floating point error.
                 let curr = parseFloat(annot.letterSpacing || 0);
                 curr = Math.round((curr + delta) * 100) / 100;
+                if (curr < 0) curr = 0;
                 annot.letterSpacing = curr;
                 activeDiv.style.letterSpacing = curr + 'px';
                 document.getElementById('sbValLetter').value = curr.toFixed(2);
@@ -1648,7 +1675,7 @@
             if (!activeAnnotId) return;
             const annot = annotations.find(a => a.id === activeAnnotId);
             if (!annot || annot.type !== 'text') return;
-            const activeDiv = document.querySelector('.annotation-box.active');
+            const activeDiv = getActiveDiv();
             if (!activeDiv) return;
             const inputId = type === 'letter' ? 'sbValLetter' : 'sbValLine';
             const input = document.getElementById(inputId);
@@ -1704,12 +1731,44 @@
         });
 
         document.addEventListener('mousedown', (e) => {
-            if (!e.target.closest('.annotation-box') && !e.target.closest('.popover-menu') && !e.target.closest('.sidebar') && !e.target.closest('.float-tools')) {
+            // Jangan clear active annotation saat user berinteraksi dengan UI elements
+            // (header, sidebar, float-tools, popover, backdrop, modal). Ini penting untuk
+            // mobile di mana user harus tap menu-toggle (di header) untuk buka sidebar,
+            // dan activeAnnotId tidak boleh hilang agar tombol +/- spasi masih berfungsi.
+            if (!e.target.closest('.annotation-box') 
+                && !e.target.closest('.popover-menu') 
+                && !e.target.closest('.sidebar') 
+                && !e.target.closest('.float-tools')
+                && !e.target.closest('header')
+                && !e.target.closest('#backdrop')
+                && !e.target.closest('.modal-overlay')
+                && !e.target.closest('.modal-content')) {
                 document.querySelectorAll('.annotation-box').forEach(b => b.classList.remove('active'));
                 activeAnnotId = null;
                 updateSidebarTools(null, null);
             }
         });
+        // Touch equivalent untuk mobile (mousedown synthetic kadang fired setelah touch,
+        // gunakan touchstart juga untuk konsistensi)
+        document.addEventListener('touchstart', (e) => {
+            if (!e.target.closest('.annotation-box') 
+                && !e.target.closest('.popover-menu') 
+                && !e.target.closest('.sidebar') 
+                && !e.target.closest('.float-tools')
+                && !e.target.closest('header')
+                && !e.target.closest('#backdrop')
+                && !e.target.closest('.modal-overlay')
+                && !e.target.closest('.modal-content')
+                && !e.target.isContentEditable) {
+                // Jangan clear jika user sedang interaksi dengan annotation tools
+                // Hanya clear jika benar-benar tap di area kosong PDF
+                if (e.target.closest('.pdf-area') || e.target.closest('#pdfContainer') || e.target.closest('#interactionLayer')) {
+                    document.querySelectorAll('.annotation-box').forEach(b => b.classList.remove('active'));
+                    activeAnnotId = null;
+                    updateSidebarTools(null, null);
+                }
+            }
+        }, { passive: true });
 
         function createMenu(annotId, isText, element) {
             const trigger = document.createElement('div');
@@ -1880,12 +1939,16 @@
                     const canvasH = parseFloat(canvas.style.height);
 
                     if (annot.type === 'text') { 
-                        let s = Math.max(8, startFontSize + dx); 
+                        // Minimum 1px supaya user bisa perkecil sampai sangat kecil untuk
+                        // pas dengan kolom formulir. Sebelumnya min 8px terlalu besar.
+                        let s = Math.max(1, startFontSize + dx); 
                         element.style.fontSize = s + 'px'; 
                         annot.size = (s / canvasW) * currentPdfW; 
                     } else { 
-                        let newW = Math.max(10, startW + dx); 
-                        let newH = Math.max(10, startH + dy); 
+                        // Minimum 1px untuk check & circle, supaya bisa pas dengan kolom.
+                        // Sebelumnya min 10px terlalu besar untuk form kecil.
+                        let newW = Math.max(1, startW + dx); 
+                        let newH = Math.max(1, startH + dy); 
                         element.style.width = newW + 'px'; 
                         element.style.height = newH + 'px'; 
                         
@@ -1895,6 +1958,12 @@
                                 imgEl.style.width = newW + 'px';
                                 imgEl.style.height = newH + 'px';
                             }
+                        }
+                        
+                        // Update border width circle proporsional saat resize
+                        if (annot.type === 'circle') {
+                            const bw = Math.max(0.5, (newW + newH) / 2 * 0.02);
+                            element.style.borderWidth = bw + 'px';
                         }
                         
                         annot.width = (newW / canvasW) * currentPdfW; 
@@ -1962,7 +2031,11 @@
                             }
                         });
                     } else if (a.type === 'circle') {
-                        page.drawEllipse({ x: pdfX, y: pdfY_base, xScale: a.width/2, yScale: a.height/2, borderColor: rgb(0, 0, 0), borderWidth: 2.5 });
+                        // Border width proporsional sama dengan canvas (2% rata-rata dimensi),
+                        // supaya hasil render PDF cocok dengan preview di layar.
+                        // Sebelumnya borderWidth hardcode 2.5 yang terlalu tebal untuk lingkaran kecil.
+                        const borderW = Math.max(0.5, (a.width + a.height) / 2 * 0.02);
+                        page.drawEllipse({ x: pdfX, y: pdfY_base, xScale: a.width/2, yScale: a.height/2, borderColor: rgb(0, 0, 0), borderWidth: borderW });
                     } else if (a.type === 'check') {
                         page.drawLine({ start: { x: pdfX - a.width * 0.4, y: pdfY_base - a.height * 0.1 }, end: { x: pdfX - a.width * 0.1, y: pdfY_base - a.height * 0.3 }, thickness: a.width * 0.12, color: rgb(0, 0, 0) });
                         page.drawLine({ start: { x: pdfX - a.width * 0.1, y: pdfY_base - a.height * 0.3 }, end: { x: pdfX + a.width * 0.4, y: pdfY_base + a.height * 0.3 }, thickness: a.width * 0.12, color: rgb(0, 0, 0) });
