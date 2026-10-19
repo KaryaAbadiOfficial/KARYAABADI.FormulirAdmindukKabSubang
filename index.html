@@ -2,7 +2,11 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#1a1a1a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>KARYA ABADI - Formulir Administrasi Kependudukan Subang</title>
     <link rel="icon" type="image/png" href="favicon.png?v=2">
     <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
@@ -12,13 +16,19 @@
             --black: #1a1a1a; --red: #e74c3c; --white: #ffffff; --green: #27ae60;
             --light-bg: #f4f6f5; --light-gray: #e0e0e0; --gray-text: #555;
         }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
+        html, body { -webkit-text-size-adjust: 100%; -moz-text-size-adjust: 100%; text-size-adjust: 100%; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; background-color: var(--light-bg); color: #333; overflow-x: hidden; }
         
         header {
-            background: var(--black); color: var(--white); padding: 10px 20px;
+            background: var(--black); color: var(--white); padding: 10px 16px;
+            padding-top: max(10px, env(safe-area-inset-top, 10px));
+            padding-left: max(16px, env(safe-area-inset-left, 16px));
+            padding-right: max(16px, env(safe-area-inset-right, 16px));
             display: flex; justify-content: space-between; align-items: center;
+            gap: 10px;
             border-bottom: 4px solid var(--red); box-shadow: 0 4px 6px rgba(0,0,0,0.2); position: relative; z-index: 1000;
+            min-width: 0;
         }
         
         .logo-karya-abadi-img {
@@ -32,15 +42,16 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 0 0 2px var(--red);
         }
         
-        .header-left { display: flex; align-items: center; gap: 15px; }
-        .header-title { display: flex; flex-direction: column; justify-content: center; }
-        .header-title h1 { margin: 0; font-size: 20px; color: var(--white); font-weight: bold; line-height: 1.2; text-transform: uppercase; }
-        .header-title p { margin: 2px 0 0; font-size: 12px; color: var(--red); letter-spacing: 1px; font-weight: 500; text-transform: uppercase; }
+        .header-left { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; }
+        .header-title { display: flex; flex-direction: column; justify-content: center; min-width: 0; overflow: hidden; }
+        .header-title h1 { margin: 0; font-size: 20px; color: var(--white); font-weight: bold; line-height: 1.2; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .header-title p { margin: 2px 0 0; font-size: 12px; color: var(--red); letter-spacing: 1px; font-weight: 500; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
         .datetime-widget {
             background: rgba(255,255,255,0.1); border: 1px solid var(--white);
             border-radius: 8px; padding: 6px 12px; text-align: center; color: var(--white);
             min-width: 160px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            flex-shrink: 0;
         }
         .datetime-widget .dw-date { font-size: 12px; font-weight: 600; }
         .datetime-widget .dw-day { font-size: 10px; color: #ccc; margin-top: 2px; }
@@ -49,6 +60,8 @@
         .menu-toggle {
             background: var(--red); color: var(--white); border: none; width: 40px; height: 40px;
             border-radius: 6px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; padding: 0; line-height: 1;
+            touch-action: manipulation;
         }
 
         .navbar {
@@ -64,7 +77,9 @@
             color: var(--white); text-decoration: none; font-weight: bold; font-size: 13px;
             text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.2s;
             padding: 12px 5px; border-radius: 6px; text-align: center;
-            display: flex; align-items: center; justify-content: center; 
+            display: flex; align-items: center; justify-content: center;
+            touch-action: manipulation; min-height: 44px;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
         .navbar a:hover { background: var(--black); border-color: var(--black); color: var(--white); }
 
@@ -91,25 +106,29 @@
                               radial-gradient(circle at 80% 70%, rgba(255,255,255,0.05) 0%, transparent 50%);
             pointer-events: none;
         }
-        .hero-slide-content { position: relative; z-index: 2; max-width: 800px; text-align: center; color: var(--white); }
+        .hero-slide-content { position: relative; z-index: 2; max-width: 800px; width: 100%; text-align: center; color: var(--white); padding: 0 4px; overflow-wrap: break-word; word-wrap: break-word; }
         .hero-slide-content .badge {
             display: inline-block; background: var(--red); color: var(--white);
             padding: 6px 16px; border-radius: 20px; font-size: 11px; font-weight: bold;
             letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 15px;
             box-shadow: 0 4px 12px rgba(231,76,60,0.4);
+            max-width: 100%;
         }
         .hero-slide-content h1 {
             font-size: 34px; margin: 0 0 12px 0; font-weight: bold;
             text-transform: uppercase; letter-spacing: 2px; color: var(--white);
             text-shadow: 0 2px 8px rgba(0,0,0,0.5); line-height: 1.2;
+            word-break: break-word;
         }
         .hero-slide-content p.subtitle {
             font-size: 16px; margin: 0 0 20px 0; color: var(--red);
             font-weight: 600; letter-spacing: 0.5px;
+            padding: 0 8px;
         }
         .hero-slide-content p.desc {
             font-size: 15px; color: #e0e0e0; line-height: 1.7; margin: 0 0 25px 0;
             max-width: 620px; margin-left: auto; margin-right: auto;
+            padding: 0 8px;
         }
         .hero-slide-content blockquote {
             margin: 0 auto 20px auto; font-size: 17px; font-style: italic;
@@ -122,6 +141,8 @@
             text-decoration: none; text-transform: uppercase; letter-spacing: 1px;
             transition: all 0.2s; box-shadow: 0 4px 12px rgba(231,76,60,0.4);
             cursor: pointer; border: 2px solid var(--red);
+            max-width: 90%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            touch-action: manipulation;
         }
         .hero-slide-content .btn-cta:hover {
             background: transparent; color: var(--white); border-color: var(--white);
@@ -164,13 +185,15 @@
             transition: width 0.1s linear;
         }
 
-        .main-layout { display: flex; min-height: 800px; align-items: flex-start; }
+        .main-layout { display: flex; min-height: 500px; align-items: flex-start; width: 100%; }
         .sidebar {
             width: 320px; max-width: 85vw; flex-shrink: 0; background: var(--white); padding: 20px;
             box-shadow: 2px 0 10px rgba(0,0,0,0.1); border-right: 4px solid var(--black);
             position: fixed; top: 0; left: 0; height: 100%; z-index: 999;
-            transform: translateX(-100%); transition: transform 0.3s ease; overflow-y: auto;
+            transform: translateX(-100%); transition: transform 0.3s ease; overflow-y: auto; overflow-x: hidden;
             padding-top: 80px;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
         }
         .sidebar.active { transform: translateX(0); }
         .sidebar h3 { font-size: 14px; color: var(--black); text-transform: uppercase; letter-spacing: 1px; margin: 20px 0 10px; border-bottom: 2px solid var(--red); padding-bottom: 5px; }
@@ -188,16 +211,17 @@
             text-transform: uppercase; text-decoration: none; display: flex; align-items: center; justify-content: center;
         }
 
-        select { width: 100%; padding: 12px; border: 2px solid var(--black); border-radius: 6px; font-size: 13px; cursor: pointer; background: var(--white); margin-bottom: 15px; }
+        select { width: 100%; padding: 12px; border: 2px solid var(--black); border-radius: 6px; font-size: 14px; cursor: pointer; background: var(--white); margin-bottom: 15px; touch-action: manipulation; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231a1a1a'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 18px; padding-right: 36px; }
         
         .btn-add-text {
             background: var(--red); color: var(--white); border: none; width: 100%; padding: 15px;
             border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px;
+            touch-action: manipulation;
         }
         
         .sidebar-spacing .spacing-row { color: #333; border-top: none; padding: 8px 0; font-size: 14px; font-weight: 600; justify-content: space-between; }
         .sidebar-spacing .spacing-controls { gap: 8px; }
-        .sidebar-spacing .spacing-btn { background: var(--light-bg); color: var(--black); border: 1px solid #ccc; width: 32px; height: 32px; font-size: 18px; border-radius: 6px; }
+        .sidebar-spacing .spacing-btn { background: var(--light-bg); color: var(--black); border: 1px solid #ccc; width: 36px; height: 36px; font-size: 20px; border-radius: 6px; touch-action: manipulation; flex-shrink: 0; cursor: pointer; }
         .sidebar-spacing .spacing-btn:not(:disabled):hover { background: var(--red); color: var(--white); border-color: var(--red); }
         .sidebar-spacing .spacing-btn:disabled { background: #f0f0f0; color: #aaa; cursor: not-allowed; border-color: #ddd; }
         .sidebar-spacing .spacing-val { color: #333; font-size: 14px; width: 64px; padding: 4px 2px; text-align: center; border: 1px solid #ccc; border-radius: 6px; background: #fff; font-family: inherit; }
@@ -212,6 +236,7 @@
             background: var(--white); color: var(--black); border: 2px solid var(--black);
             padding: 15px 5px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;
             display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s;
+            touch-action: manipulation; min-height: 44px;
         }
         .btn-mode.active { background: var(--black); color: var(--white); border-color: var(--black); box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); }
         .btn-upload { display: flex; width: 100%; justify-content: center; box-sizing: border-box; cursor: pointer; }
@@ -228,14 +253,15 @@
         .upload-guide-box li { margin-bottom: 6px; }
         .upload-guide-box a { color: var(--red); text-decoration: underline; cursor: pointer; font-weight: bold; display: block; margin-top: 10px; font-style: italic; }
 
-        .row-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; margin-bottom: 20px; }
-        .btn-nav { background: var(--black); color: var(--white); border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; }
-        .page-info { font-weight: bold; color: var(--black); font-size: 14px; }
+        .row-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; margin-bottom: 20px; gap: 8px; }
+        .btn-nav { background: var(--black); color: var(--white); border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; touch-action: manipulation; min-height: 40px; flex-shrink: 0; }
+        .page-info { font-weight: bold; color: var(--black); font-size: 14px; text-align: center; flex: 1; min-width: 0; }
         
         .btn-download {
             background: var(--red); color: var(--white); border: none; padding: 15px;
             width: 100%; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold;
             display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 6px rgba(231, 76, 60, 0.4);
+            touch-action: manipulation; min-height: 48px;
         }
 
         .guide-box { background: #f9f9f9; padding: 15px; border-radius: 8px; font-size: 13px; line-height: 1.5; color: #555; border: 1px solid #eee; margin-top: 20px; margin-bottom: 30px; }
@@ -245,10 +271,11 @@
         .guide-box li b { color: var(--black); }
 
         .pdf-area { 
-            flex-grow: 1; padding: 15px; overflow: hidden; 
+            flex-grow: 1; flex: 1 1 auto; padding: 15px; overflow: hidden; 
             display: flex; justify-content: center; align-items: flex-start; 
-            background: #eef2f7; position: relative; width: 100%; 
+            background: #eef2f7; position: relative; width: 100%; min-width: 0; 
             touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none;
+            min-height: 400px;
         }
         .pdf-area.panning { cursor: grabbing; }
         
@@ -261,50 +288,55 @@
         #interactionLayer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; touch-action: none; }
         .annotation-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
         
-        .annotation-box { position: absolute; pointer-events: auto; touch-action: none; width: max-content; min-width: 1px; min-height: 1px; }
-        .text-annot { color: black; font-family: Arial, sans-serif; white-space: pre; line-height: 1.15; font-weight: bold; outline: none; cursor: move; padding: 2px; }
+        .annotation-box { position: absolute; pointer-events: auto; touch-action: none; width: max-content; min-width: 1px; min-height: 1px; max-width: 95%; }
+        .text-annot { color: black; font-family: Arial, sans-serif; white-space: pre; line-height: 1.15; font-weight: bold; outline: none; cursor: move; padding: 2px; word-break: break-word; touch-action: none; }
+        .text-content { touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+        .text-content[contenteditable="true"] { user-select: text; -webkit-user-select: text; cursor: text; touch-action: text; }
         .text-content:focus { border: 1px dashed var(--red); cursor: text; background: rgba(255,255,255,0.8); outline: none; }
         .circle-annot { border: 2.5px solid black; border-radius: 50%; cursor: move; }
         .check-annot { overflow: visible; cursor: move; }
         
         .resize-handle {
-            position: absolute; bottom: -35px; right: -35px; 
+            position: absolute; bottom: -32px; right: -32px; 
             width: 28px; height: 28px; 
             background: rgba(255,255,255,0.95); border: 1.5px solid var(--red); border-radius: 4px; 
             cursor: se-resize; pointer-events: auto; touch-action: none; z-index: 10; display: none;
             align-items: center; justify-content: center; color: var(--red); line-height: 0;
         }
-        .annotation-box.active .resize-handle, .annotation-box:hover .resize-handle { display: flex; }
+        .annotation-box.active .resize-handle { display: flex; }
         
         .menu-trigger {
-            position: absolute; top: -35px; right: -35px; 
+            position: absolute; top: -32px; right: -32px; 
             background: #fff; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;
             width: 32px; height: 32px; display: none; 
             align-items: center; justify-content: center;
             font-weight: bold; color: #333; font-size: 20px; line-height: 1; z-index: 1001; box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            touch-action: manipulation;
         }
-        .annotation-box.active .menu-trigger, .annotation-box:hover .menu-trigger { display: flex; }
+        .annotation-box.active .menu-trigger { display: flex; }
         
         .popover-menu {
             position: absolute; top: 0; left: 0; 
             background: var(--black); color: var(--white); border-radius: 8px; padding: 8px; display: none;
             flex-direction: column; gap: 4px; z-index: 1005; box-shadow: 0 8px 16px rgba(0,0,0,0.4); 
-            width: 160px; box-sizing: border-box;
+            width: 160px; max-width: 90vw; box-sizing: border-box;
         }
         .popover-menu button {
-            background: none; border: none; color: var(--white); text-align: left; padding: 8px 10px; cursor: pointer;
+            background: none; border: none; color: var(--white); text-align: left; padding: 10px 12px; cursor: pointer;
             font-size: 13px; border-radius: 4px; display: flex; align-items: center; gap: 8px; width: 100%; font-family: 'Segoe UI', sans-serif;
+            touch-action: manipulation;
         }
-        .popover-menu button:hover { background: #333; }
+        .popover-menu button:hover, .popover-menu button:active { background: #333; }
 
         .float-tools {
             position: fixed; bottom: 20px; left: 10px; top: auto; right: auto; z-index: 997; background: white; padding: 5px;
             border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.25); display: flex; align-items: center; gap: 4px; border: 2px solid var(--black); touch-action: none;
+            max-width: calc(100vw - 20px);
         }
-        .drag-handle { cursor: grab; padding: 0 5px; display: flex; align-items: center; color: #888; }
-        .btn-icon-float { width: 32px; height: 32px; background: var(--red); color: var(--white); border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .drag-handle { cursor: grab; padding: 0 4px; display: flex; align-items: center; color: #888; touch-action: none; }
+        .btn-icon-float { width: 32px; height: 32px; background: var(--red); color: var(--white); border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); flex-shrink: 0; touch-action: manipulation; }
         .btn-icon-float:disabled { background: #e0e0e0; color: #999; cursor: not-allowed; box-shadow: none; }
-        .btn-reset-pos { width: 24px; height: 24px; background: #eee; color: var(--black); border: 1px solid #ccc; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .btn-reset-pos { width: 24px; height: 24px; background: #eee; color: var(--black); border: 1px solid #ccc; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; touch-action: manipulation; }
         
         footer {
             background: var(--black); color: var(--white); padding: 30px 25px 15px;
@@ -332,26 +364,29 @@
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.75); z-index: 10000; display: none;
-            align-items: center; justify-content: center; padding: 20px;
+            align-items: center; justify-content: center; padding: 16px;
             backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+            overflow-y: auto;
         }
         .modal-overlay.active { display: flex; }
         .modal-content {
             background: white; border-radius: 12px; max-width: 700px; width: 100%;
-            max-height: 85vh; overflow: hidden; display: flex; flex-direction: column;
+            max-height: 90vh; overflow: hidden; display: flex; flex-direction: column;
             box-shadow: 0 20px 60px rgba(0,0,0,0.4); border: 3px solid var(--red);
             animation: modalIn 0.25s ease;
+            margin: auto;
         }
         @keyframes modalIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .modal-header { background: var(--black); color: var(--white); padding: 18px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--red); }
-        .modal-header h3 { margin: 0; font-size: 18px; font-weight: bold; letter-spacing: 0.5px; }
-        .modal-close { background: var(--red); color: var(--white); border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .modal-header { background: var(--black); color: var(--white); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; gap: 10px; border-bottom: 3px solid var(--red); flex-shrink: 0; }
+        .modal-header h3 { margin: 0; font-size: 16px; font-weight: bold; letter-spacing: 0.5px; flex: 1; min-width: 0; }
+        .modal-close { background: var(--red); color: var(--white); border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; touch-action: manipulation; }
         .modal-close:hover { background: var(--white); color: var(--black); transform: rotate(90deg); }
-        .modal-body { padding: 25px; overflow-y: auto; color: #333; font-size: 14px; line-height: 1.7; }
+        .modal-body { padding: 20px; overflow-y: auto; color: #333; font-size: 14px; line-height: 1.7; -webkit-overflow-scrolling: touch; }
         .modal-body h4 { color: var(--black); margin: 18px 0 8px 0; font-size: 15px; border-bottom: 1px solid var(--red); padding-bottom: 4px; }
         .modal-body p { margin: 0 0 10px 0; text-align: justify; }
         .modal-body ul { margin: 0 0 10px 18px; padding: 0; }
         .modal-body li { margin-bottom: 6px; }
+        .modal-body h4:first-child { margin-top: 0; }
 
         @media (min-width: 768px) {
             header { padding: 12px 30px; }
@@ -375,57 +410,160 @@
         }
 
         @media (max-width: 767px) {
-            .header-title h1 { font-size: 14px; }
-            .header-title p { font-size: 9px; }
-            .datetime-widget { min-width: 0; padding: 4px 8px; }
+            header { padding: 8px 12px; gap: 8px; }
+            .header-left { gap: 8px; }
+            .header-title h1 { font-size: 13px; letter-spacing: 0.3px; }
+            .header-title p { font-size: 9px; letter-spacing: 0.5px; }
+            .datetime-widget { min-width: 0; padding: 4px 8px; flex: 0 0 auto; }
             .datetime-widget .dw-date { font-size: 9px; }
             .datetime-widget .dw-day { display: none; }
-            .datetime-widget .dw-time { font-size: 11px; }
-            .logo-karya-abadi-img, .logo-fallback-svg { width: 35px; height: 35px; padding: 2px; }
+            .datetime-widget .dw-time { font-size: 11px; letter-spacing: 0.5px; }
+            .logo-karya-abadi-img, .logo-fallback-svg { width: 32px; height: 32px; padding: 2px; border-radius: 6px; }
+            .menu-toggle { width: 36px; height: 36px; font-size: 20px; border-radius: 5px; }
             
-            .hero-carousel { height: 300px; }
-            .hero-slide-content h1 { font-size: 20px; letter-spacing: 1px; }
-            .hero-slide-content p.subtitle { font-size: 12px; }
-            .hero-slide-content p.desc { font-size: 12px; -webkit-line-clamp: 3; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
-            .hero-slide-content blockquote { font-size: 12px; padding: 0 10px; }
-            .hero-slide-content .badge { font-size: 9px; padding: 4px 12px; }
-            .hero-slide-content .btn-cta { padding: 10px 18px; font-size: 11px; }
-            .hero-divider { margin: 10px auto; }
-            .hero-arrow { width: 34px; height: 34px; }
-            .hero-arrow.prev { left: 8px; }
-            .hero-arrow.next { right: 8px; }
-            .hero-dots { bottom: 12px; gap: 6px; }
-            .hero-dot { width: 7px; height: 7px; }
-            .hero-dot.active { width: 20px; }
+            .hero-carousel { height: 280px; }
+            .hero-slide { padding: 24px 14px; }
+            .hero-slide-content .badge { font-size: 9px; padding: 4px 12px; letter-spacing: 1px; margin-bottom: 10px; }
+            .hero-slide-content h1 { font-size: 20px; letter-spacing: 0.5px; margin: 0 0 8px 0; }
+            .hero-slide-content p.subtitle { font-size: 11px; margin: 0 0 12px 0; padding: 0 4px; }
+            .hero-slide-content p.desc { font-size: 11px; line-height: 1.5; margin: 0 0 16px 0; -webkit-line-clamp: 3; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; padding: 0 4px; }
+            .hero-slide-content blockquote { font-size: 11px; padding: 0 8px; line-height: 1.5; margin: 0 auto 14px auto; }
+            .hero-slide-content .btn-cta { padding: 8px 16px; font-size: 10px; letter-spacing: 0.5px; max-width: 80%; }
+            .hero-divider { margin: 8px auto; width: 40px; }
+            .hero-arrow { width: 32px; height: 32px; }
+            .hero-arrow.prev { left: 6px; }
+            .hero-arrow.next { right: 6px; }
+            .hero-dots { bottom: 10px; gap: 6px; }
+            .hero-dot { width: 6px; height: 6px; }
+            .hero-dot.active { width: 18px; }
 
             .navbar { display: none; }
             .mobile-nav { display: block; }
-            .float-tools { bottom: 20px; left: 10px; top: auto; }
+            
+            .float-tools { 
+                bottom: max(16px, env(safe-area-inset-bottom, 16px)); 
+                left: 10px; top: auto; right: auto; 
+                padding: 4px; gap: 3px;
+            }
+            .btn-icon-float { width: 30px; height: 30px; }
+            .btn-reset-pos { width: 22px; height: 22px; }
+            .drag-handle { padding: 0 3px; }
 
-            .main-layout { display: flex; flex-direction: column; height: calc(100dvh - 65px - 300px); min-height: 280px; overflow: hidden; }
-            .pdf-area { position: relative; flex: 1; width: 100%; height: 100%; overflow: hidden; padding: 10px; touch-action: none; }
+            .main-layout { 
+                display: flex; flex-direction: column; 
+                height: auto; min-height: 60vh; 
+                overflow: hidden; 
+                width: 100%;
+            }
+            .pdf-area { 
+                position: relative; flex: 1 1 auto; width: 100%; 
+                height: 60vh; min-height: 320px; 
+                overflow: hidden; padding: 10px; touch-action: none; 
+            }
             
             .sidebar { 
                 position: fixed; 
-                bottom: 0; left: 0; width: 100%; 
-                height: 55dvh; top: auto; 
+                bottom: 0; left: 0; right: 0; width: 100%; 
+                height: 70dvh; max-height: 70dvh; top: auto; 
                 transform: translateY(100%); 
                 transition: transform 0.3s ease; 
                 z-index: 1001; 
                 border-radius: 15px 15px 0 0; 
                 border-right: none; border-top: 4px solid var(--red); 
-                padding-top: 20px;
+                padding: 20px 16px 30px;
+                padding-bottom: max(30px, env(safe-area-inset-bottom, 30px));
                 box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
                 touch-action: pan-y; 
                 -webkit-overflow-scrolling: touch;
+                overscroll-behavior: contain;
+                overflow-y: auto; overflow-x: hidden;
             }
             .sidebar.active { transform: translateY(0); }
             
-            .backdrop { top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.2); }
+            .backdrop { top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
             
             .sidebar::before {
-                content: ''; display: block; width: 40px; height: 5px; background: #ccc; border-radius: 10px; margin: -15px auto 15px;
+                content: ''; display: block; width: 40px; height: 5px; background: #ccc; border-radius: 10px; margin: -12px auto 12px; position: relative;
             }
+            
+            .sidebar h3 { font-size: 13px; margin: 16px 0 8px; }
+            .sidebar select { font-size: 12px; padding: 10px; margin-bottom: 12px; }
+            .btn-add-text { padding: 12px; font-size: 13px; margin-bottom: 14px; }
+            .mode-grid { gap: 8px; margin-bottom: 12px; }
+            .btn-mode { padding: 12px 4px; font-size: 11px; }
+            .btn-download { padding: 12px; font-size: 14px; }
+            .row-nav { margin-top: 14px; margin-bottom: 14px; }
+            .btn-nav { padding: 8px 12px; font-size: 12px; }
+            .page-info { font-size: 12px; }
+            .upload-guide-box { font-size: 11px; padding: 10px; }
+            .upload-guide-box strong { font-size: 12px; }
+            .guide-box { padding: 12px; font-size: 12px; margin-top: 14px; margin-bottom: 20px; }
+            .guide-box li { margin-bottom: 8px; }
+            .mobile-nav-grid { gap: 6px; }
+            .mobile-nav-grid a { padding: 8px 4px; font-size: 10px; }
+            
+            .modal-content { max-width: calc(100vw - 24px); max-height: 92vh; }
+            .modal-header { padding: 12px 16px; }
+            .modal-header h3 { font-size: 14px; }
+            .modal-body { padding: 16px; font-size: 13px; line-height: 1.6; }
+            .modal-body h4 { font-size: 14px; margin: 14px 0 6px 0; }
+            
+            footer { padding: 24px 16px 16px; padding-bottom: max(20px, env(safe-area-inset-bottom, 20px)); }
+            .footer-grid { gap: 18px; }
+            .footer-col h4 { font-size: 13px; }
+            .footer-col p, .footer-col ul li a, .footer-col.address-col .address-text, .footer-col.address-col .postal-code { font-size: 12px; }
+        }
+
+        /* Very small screens (≤ 360px) — squeeze everything tighter */
+        @media (max-width: 360px) {
+            header { padding: 6px 8px; gap: 6px; }
+            .header-left { gap: 6px; }
+            .header-title h1 { font-size: 11px; }
+            .header-title p { font-size: 8px; letter-spacing: 0.2px; }
+            .logo-karya-abadi-img, .logo-fallback-svg { width: 28px; height: 28px; }
+            .menu-toggle { width: 32px; height: 32px; font-size: 18px; }
+            .datetime-widget { padding: 3px 6px; }
+            .datetime-widget .dw-date { font-size: 8px; }
+            .datetime-widget .dw-time { font-size: 10px; }
+            
+            .hero-carousel { height: 240px; }
+            .hero-slide { padding: 16px 10px; }
+            .hero-slide-content .badge { font-size: 8px; padding: 3px 10px; }
+            .hero-slide-content h1 { font-size: 17px; letter-spacing: 0.3px; }
+            .hero-slide-content p.subtitle { font-size: 10px; }
+            .hero-slide-content p.desc { font-size: 10px; -webkit-line-clamp: 2; }
+            .hero-slide-content blockquote { font-size: 10px; padding: 0 4px; }
+            .hero-slide-content .btn-cta { padding: 7px 14px; font-size: 9px; max-width: 75%; }
+            .hero-arrow { width: 28px; height: 28px; }
+            .hero-arrow.prev { left: 4px; }
+            .hero-arrow.next { right: 4px; }
+            
+            .float-tools { padding: 3px; gap: 2px; left: 6px; bottom: 12px; }
+            .btn-icon-float { width: 28px; height: 28px; }
+            .btn-reset-pos { width: 20px; height: 20px; }
+            
+            .pdf-area { padding: 6px; min-height: 280px; }
+            
+            .sidebar { padding: 18px 12px 30px; padding-bottom: max(30px, env(safe-area-inset-bottom, 30px)); }
+            .sidebar h3 { font-size: 12px; }
+            .sidebar select { font-size: 11px; padding: 8px; }
+            .btn-add-text { padding: 10px; font-size: 12px; }
+            .btn-mode { padding: 10px 3px; font-size: 10px; }
+            .btn-download { padding: 10px; font-size: 13px; }
+            .btn-nav { padding: 6px 10px; font-size: 11px; }
+            .mobile-nav-grid a { padding: 6px 3px; font-size: 9px; }
+            .upload-guide-box { font-size: 10px; padding: 8px; }
+            .guide-box { font-size: 11px; padding: 10px; }
+        }
+
+        /* Landscape mobile — short height fix */
+        @media (max-width: 900px) and (max-height: 480px) and (orientation: landscape) {
+            .hero-carousel { height: 200px; }
+            .hero-slide { padding: 16px 12px; }
+            .hero-slide-content h1 { font-size: 18px; }
+            .hero-slide-content p.desc { -webkit-line-clamp: 2; }
+            .pdf-area { min-height: 240px; height: 50vh; }
+            .sidebar { height: 85dvh; }
         }
     </style>
 </head>
@@ -880,7 +1018,10 @@
         }
         function closeModal() {
             document.getElementById('modalOverlay').classList.remove('active');
-            document.body.style.overflow = '';
+            // Restore body overflow only if sidebar is not active (mobile bottom sheet)
+            if (window.innerWidth >= 768 || !sidebar.classList.contains('active')) {
+                document.body.style.overflow = '';
+            }
         }
         
         function closeDownloadModal() {
@@ -917,9 +1058,25 @@
         const pdfContainer = document.getElementById('pdfContainer');
 
         function toggleSidebar() {
+            const willOpen = !sidebar.classList.contains('active');
             sidebar.classList.toggle('active');
             backdrop.classList.toggle('active');
+            // Lock body scroll on mobile when sidebar is open as bottom sheet
+            if (window.innerWidth < 768) {
+                document.body.style.overflow = willOpen ? 'hidden' : '';
+            }
+            // Tutup semua popover menu yang terbuka
+            document.querySelectorAll('.popover-menu').forEach(m => m.style.display = 'none');
         }
+        
+        // Tutup sidebar ketika user mengubah orientasi atau resize ke desktop
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768 && sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+                backdrop.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
 
         // Logika Pilih Pengajuan (Online / Offline)
         // Backup bytes TTD & Materai saat switch ke Offline, lalu restore saat balik ke Online.
@@ -1376,6 +1533,22 @@
                         updateSidebarTools(div, a);
                         makeEditable(a, div);
                     });
+                    // Double-tap support untuk mobile (dblclick tidak selalu fired di touch device)
+                    let lastTapTime = 0;
+                    textSpan.addEventListener('touchend', (e) => {
+                        e.stopPropagation();
+                        const now = Date.now();
+                        if (now - lastTapTime < 350) {
+                            // Double-tap detected
+                            e.preventDefault();
+                            document.querySelectorAll('.annotation-box').forEach(b => b.classList.remove('active'));
+                            div.classList.add('active');
+                            activeAnnotId = a.id;
+                            updateSidebarTools(div, a);
+                            makeEditable(a, div);
+                        }
+                        lastTapTime = now;
+                    }, { passive: false });
                     div.appendChild(textSpan);
                     div.appendChild(createMenu(a.id, true, div));
                 } else if (a.type === 'circle') {
