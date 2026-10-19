@@ -1492,8 +1492,16 @@
             };
 
             if (currentMode === 'check' || currentMode === 'circle') {
-                annot.width = (20 / canvasW) * currentPdfW; 
-                annot.height = (20 / canvasH) * currentPdfH;
+                // Anchor point: TOP-LEFT div (bukan center). Saat user klik di (x, y),
+                // kita geser a.x, a.y agar top-left div = klik - (W/2, H/2), sehingga
+                // center div berada di posisi klik (sesuai ekspektasi user).
+                // Default size 20x20 canvas px → W/2 = 10, H/2 = 10.
+                const defaultW = 20, defaultH = 20;
+                annot.width = (defaultW / canvasW) * currentPdfW; 
+                annot.height = (defaultH / canvasH) * currentPdfH;
+                // a.x, a.y = top-left div dalam PDF units
+                annot.x = ((x - defaultW/2) / canvasW) * currentPdfW; 
+                annot.y = ((y - defaultH/2) / canvasH) * currentPdfH; 
                 annotations.push(annot); saveHistory(); renderAnnotations();
             } else if (currentMode === 'sign' || currentMode === 'materai') {
                 if (currentMode === 'sign' && !signImgBytes) return alert('Upload TTD dulu!');
@@ -1559,9 +1567,9 @@
                     div.classList.add('circle-annot'); 
                     const cw = (a.width / currentPdfW * canvasW);
                     const ch = (a.height / currentPdfH * canvasH);
+                    // a.x, a.y = top-left div (sudah di-set di atas). Tidak pakai transform.
                     div.style.width = cw + 'px'; 
                     div.style.height = ch + 'px'; 
-                    div.style.transform = 'translate(-50%, -50%)'; 
                     // Border width proporsional dengan ukuran lingkaran (2% rata-rata dimensi,
                     // min 1px). Ini memastikan render canvas cocok dengan render PDF (yang juga
                     // proporsional), dan lingkaran kecil tidak terlihat "terlalu tebal" di HP.
@@ -1569,9 +1577,9 @@
                     div.appendChild(createMenu(a.id, false, div));
                 } else if (a.type === 'check') {
                     div.classList.add('check-annot'); 
+                    // a.x, a.y = top-left div (sudah di-set di atas). Tidak pakai transform.
                     div.style.width = (a.width / currentPdfW * canvasW) + 'px'; 
                     div.style.height = (a.height / currentPdfH * canvasH) + 'px';
-                    div.style.transform = 'translate(-50%, -50%)';
                     div.innerHTML = `<svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none"><polyline points="10,60 40,80 90,20" fill="none" stroke="black" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
                     div.appendChild(createMenu(a.id, false, div));
                 } else if (a.type === 'sign' || a.type === 'materai') {
@@ -2031,14 +2039,36 @@
                             }
                         });
                     } else if (a.type === 'circle') {
-                        // Border width proporsional sama dengan canvas (2% rata-rata dimensi),
-                        // supaya hasil render PDF cocok dengan preview di layar.
-                        // Sebelumnya borderWidth hardcode 2.5 yang terlalu tebal untuk lingkaran kecil.
+                        // Anchor: TOP-LEFT div. a.x, a.y = top-left dalam PDF units.
+                        // Center ellipse = top-left + (W/2, H/2) dalam PDF coords.
+                        // Y di PDF flipped, jadi y_center = pdfY_base - H/2.
+                        // Border width proporsional sama dengan canvas (2% rata-rata dimensi).
                         const borderW = Math.max(0.5, (a.width + a.height) / 2 * 0.02);
-                        page.drawEllipse({ x: pdfX, y: pdfY_base, xScale: a.width/2, yScale: a.height/2, borderColor: rgb(0, 0, 0), borderWidth: borderW });
+                        const cx = pdfX + a.width/2;
+                        const cy = pdfY_base - a.height/2;
+                        page.drawEllipse({ x: cx, y: cy, xScale: a.width/2, yScale: a.height/2, borderColor: rgb(0, 0, 0), borderWidth: borderW });
                     } else if (a.type === 'check') {
-                        page.drawLine({ start: { x: pdfX - a.width * 0.4, y: pdfY_base - a.height * 0.1 }, end: { x: pdfX - a.width * 0.1, y: pdfY_base - a.height * 0.3 }, thickness: a.width * 0.12, color: rgb(0, 0, 0) });
-                        page.drawLine({ start: { x: pdfX - a.width * 0.1, y: pdfY_base - a.height * 0.3 }, end: { x: pdfX + a.width * 0.4, y: pdfY_base + a.height * 0.3 }, thickness: a.width * 0.12, color: rgb(0, 0, 0) });
+                        // Anchor: TOP-LEFT div. a.x, a.y = top-left dalam PDF units.
+                        // SVG checkmark viewBox "0 0 100 100", points "10,60 40,80 90,20".
+                        // Tiap titik SVG (sv, sv) di div top-left (pdfX, pdfY_base):
+                        //   x = pdfX + (sv/100) * W
+                        //   y_canvas = a.y + (sv/100) * H  (dari atas)
+                        //   y_pdf = pageH - y_canvas = pdfY_base - (sv/100) * H
+                        // Titik (10, 60): (pdfX + 0.1W, pdfY_base - 0.6H)
+                        // Titik (40, 80): (pdfX + 0.4W, pdfY_base - 0.8H)
+                        // Titik (90, 20): (pdfX + 0.9W, pdfY_base - 0.2H)
+                        const w = a.width, h = a.height;
+                        const thickness = Math.max(1, w * 0.12);
+                        page.drawLine({ 
+                            start: { x: pdfX + w * 0.1, y: pdfY_base - h * 0.6 }, 
+                            end: { x: pdfX + w * 0.4, y: pdfY_base - h * 0.8 }, 
+                            thickness: thickness, color: rgb(0, 0, 0) 
+                        });
+                        page.drawLine({ 
+                            start: { x: pdfX + w * 0.4, y: pdfY_base - h * 0.8 }, 
+                            end: { x: pdfX + w * 0.9, y: pdfY_base - h * 0.2 }, 
+                            thickness: thickness, color: rgb(0, 0, 0) 
+                        });
                     } else if (a.type === 'sign' || a.type === 'materai') {
                         const bytes = a.type === 'sign' ? signImgBytes : materaiImgBytes; if (!bytes) continue;
                         let img; try { img = await pdfDocLib.embedPng(bytes); } catch { img = await pdfDocLib.embedJpg(bytes); }
